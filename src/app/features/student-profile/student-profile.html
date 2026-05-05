@@ -1,0 +1,112 @@
+<!-- Contenedor con margen IZQUIERDO FIJO para respetar la sidebar -->
+<div class="ml-64 p-4 md:p-8 space-y-8 animate-in fade-in duration-700 text-left min-h-screen bg-[#F8FAFC]">
+
+  <!-- Header Section: Responsive dentro del espacio restante -->
+  <div class="max-w-[1400px] mx-auto w-full flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4">
+    <div>
+      <h2 class="text-xl md:text-3xl font-black text-slate-900 tracking-tighter uppercase italic">Mi Perfil</h2>
+      <p class="text-slate-400 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mt-1 opacity-70">Información académica y personal</p>
+    </div>
+    <button class="w-full xl:w-auto bg-white border border-slate-100 px-4 py-2 md:px-5 md:py-3 rounded-xl font-bold text-[10px] md:text-xs text-slate-600 shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+      ⚙️ Editar Perfil
+    </button>
+  </div>
+
+  <!-- Profile Card: Ajustada para anchos pequeños -->
+  <div class="max-w-[1400px] mx-auto w-full">
+    <div class="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-8 border border-slate-100 shadow-sm flex flex-col 2xl:flex-row gap-6 md:gap-8 items-center relative overflow-hidden">
+      <!-- Avatar: Reducido un poco para pantallas pequeñas -->
+      <div class="w-20 h-20 md:w-32 md:h-32 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl md:text-4xl font-black shadow-xl z-10 shrink-0">
+        {{initials}}
+      </div>
+      
+      <!-- Info Personal -->
+      <div class="flex-1 z-10 text-center 2xl:text-left w-full">
+        <h3 class="text-lg md:text-2xl font-black text-slate-800 tracking-tight leading-tight">{{user?.name || "Carlos Fabian Mendoza Quispe"}}</h3>
+        <p class="text-slate-400 text-xs font-bold mt-1">Código: <span class="text-blue-600">U20231C416</span></p>
+        
+        <!-- Contactos: Apilados en móvil, grid en desktop -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 mt-4 text-[9px] md:text-[11px] font-bold text-slate-500 uppercase tracking-tight">
+          <div class="flex items-center justify-center 2xl:justify-start gap-2 break-all">📧 u20231c416@upc.edu.pe</div>
+          <div class="flex items-center justify-center 2xl:justify-start gap-2">📞 +51 987 654 321</div>
+          <div class="flex items-center justify-center 2xl:justify-start gap-2 md:col-span-2">📍 Av. Universitaria 1224, Lima</div>
+        </div>
+      </div>
+
+      <!-- Stats Académicos rápidos -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 2xl:flex gap-4 border-t 2xl:border-t-0 2xl:border-l border-slate-100 pt-5 2xl:pt-0 2xl:pl-8 w-full 2xl:w-auto">
+        <div class="text-center 2xl:text-left">
+          <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Programa</p>
+          <p class="text-[10px] md:text-sm font-black text-slate-800 tracking-tight">Ciencias de la Computación</p>
+        </div>
+        <div class="text-center 2xl:text-left">
+          <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Semestre</p>
+          <p class="text-[10px] md:text-sm font-black text-slate-800 tracking-tight">7mo Semestre</p>
+        </div>
+        <div class="text-center 2xl:text-left">
+          <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Estado</p>
+          <p class="text-[10px] md:text-sm font-black text-emerald-500 tracking-tight">Regular</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Grid: De 1 columna a 3 según el espacio -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-[1400px] mx-auto w-full">
+    <div class="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+      <div class="text-left">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Promedio</p>
+        <p class="text-xl md:text-2xl font-black text-blue-600 leading-none">16.95</p>
+      </div>
+      <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-lg bg-slate-50">🏅</div>
+    </div>
+
+    <div class="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+      <div class="text-left">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Créditos</p>
+        <p class="text-xl md:text-2xl font-black text-purple-600 leading-none">37</p>
+      </div>
+      <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-lg bg-slate-50">💳</div>
+    </div>
+
+    <div class="bg-white p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 shadow-sm md:col-span-2 lg:col-span-1 space-y-3">
+      <div class="flex justify-between items-center">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Carrera</p>
+        <span class="text-emerald-500 font-bold text-xs">19%</span>
+      </div>
+      <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+        <div class="bg-emerald-500 h-full w-[19%]"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial con Scroll Horizontal Interno -->
+  <div class="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-8 border border-slate-100 shadow-sm max-w-[1400px] mx-auto w-full overflow-hidden">
+    <h3 class="font-black text-slate-800 text-md md:text-lg flex items-center gap-2 mb-6">
+      <span class="text-blue-600">📜</span> Historial Académico
+    </h3>
+    
+    <div class="overflow-x-auto rounded-xl">
+      <table class="w-full min-w-[500px]">
+        <thead>
+          <tr class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest text-left border-b border-slate-50">
+            <th class="pb-4">Curso</th>
+            <th class="pb-4 text-center">Nota</th>
+            <th class="pb-4 text-right">Estado</th>
+          </tr>
+        </thead>
+        <tbody class="text-xs md:text-sm font-bold text-slate-600">
+          <tr *ngFor="let course of academicHistory[0].courses" class="border-b border-slate-50 last:border-none">
+            <td class="py-4 pr-4">{{course.name}}</td>
+            <td class="py-4 text-center text-emerald-600">{{course.grade}}</td>
+            <td class="py-4 text-right">
+              <span class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg text-[8px] md:text-[9px] font-black uppercase">
+                {{course.status}}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
