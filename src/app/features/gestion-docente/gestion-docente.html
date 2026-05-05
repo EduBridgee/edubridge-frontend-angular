@@ -1,0 +1,356 @@
+<main class="flex-1 ml-64 bg-[#F8FAFC] min-h-screen flex flex-col font-['Inter'] relative text-left">
+
+  <div class="p-8 pb-0 w-full relative z-[60]">
+    <div
+      class="bg-white/70 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-slate-100 flex items-center justify-between px-6 overflow-visible">
+      <div class="flex items-center gap-3 flex-1">
+        <span class="text-lg">🔍</span>
+        <input type="text" placeholder="Buscar procesos, tareas administrativas..."
+          class="bg-transparent border-none outline-none text-sm font-medium text-slate-400 w-full" />
+      </div>
+      <div class="flex items-center gap-4 overflow-visible">
+        <app-notification-bell [user]="user"></app-notification-bell>
+        <div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
+        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/60">DOCENTE</span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="p-10 font-black text-slate-400 italic animate-pulse tracking-widest uppercase text-xs">
+    Sincronizando con Servidor EduBridge...
+  </div>
+
+  <div *ngIf="!loading" class="p-8 flex gap-8 animate-in fade-in duration-500">
+
+    <section class="flex-1 space-y-8">
+      <div>
+        <h2 class="text-2xl font-black text-slate-900 leading-none uppercase tracking-tighter italic">Gestión Docente
+        </h2>
+        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-2 opacity-60">Control de tareas
+          administrativas y reportes de ciclo</p>
+      </div>
+
+      <div class="grid grid-cols-4 gap-4">
+        <div
+          class="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm hover:shadow-md transition-all">
+          <div class="text-left">
+            <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Promedio Aula</p>
+            <p class="text-2xl font-black text-slate-900 leading-none tracking-tighter">{{promedioAula}}</p>
+            <p class="text-[9px] font-black mt-2 uppercase tracking-tighter text-blue-600">General</p>
+          </div>
+          <div
+            class="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shadow-sm bg-blue-50 text-blue-600">📊
+          </div>
+        </div>
+
+        <div
+          class="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm hover:shadow-md transition-all">
+          <div class="text-left">
+            <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Estudiantes</p>
+            <p class="text-2xl font-black text-slate-900">{{estudiantes.length}}</p>
+            <p class="text-[9px] font-black mt-2 uppercase tracking-tighter text-emerald-600">Registrados</p>
+          </div>
+          <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-xl bg-emerald-50 text-emerald-600">👥
+          </div>
+        </div>
+
+        <div
+          class="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm hover:shadow-md transition-all">
+          <div class="text-left">
+            <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Clases Hoy</p>
+            <p class="text-2xl font-black text-slate-900">5</p>
+            <p class="text-[9px] font-black mt-2 uppercase tracking-tighter text-purple-600">Sincrónicas</p>
+          </div>
+          <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-xl bg-purple-50 text-purple-600">📅
+          </div>
+        </div>
+
+        <div
+          class="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm hover:shadow-md transition-all">
+          <div class="text-left">
+            <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Horas Ahorro</p>
+            <p class="text-2xl font-black text-slate-900">24h</p>
+            <p class="text-[9px] font-black mt-2 uppercase tracking-tighter text-orange-600">Automatización</p>
+          </div>
+          <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-xl bg-orange-50 text-orange-600">🕒
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-4">
+        <div (click)="showNotasModal = true"
+          class="p-6 rounded-[2.5rem] bg-blue-50 text-blue-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
+          <span class="text-3xl group-hover:scale-110 transition-transform">⭐</span>
+          <span class="text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Subir Notas</span>
+        </div>
+        <div (click)="showAsistenciaModal = true"
+          class="p-6 rounded-[2.5rem] bg-emerald-50 text-emerald-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
+          <span class="text-3xl group-hover:scale-110">👤</span>
+          <span class="text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Asistencia</span>
+        </div>
+        <div (click)="showStatsModal = true"
+          class="p-6 rounded-[2.5rem] bg-purple-50 text-purple-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
+          <span class="text-3xl group-hover:scale-110">📊</span>
+          <span class="text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Estadísticas</span>
+        </div>
+        <div (click)="showNotifyModal = true"
+          class="p-6 rounded-[2.5rem] bg-orange-50 text-orange-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
+          <span class="text-3xl group-hover:scale-110">🔔</span>
+          <span class="text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Notificar</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
+        <h3 class="font-black text-slate-800 text-lg mb-8 uppercase tracking-tighter italic">Tareas del Servidor</h3>
+        <div class="space-y-8">
+          <div *ngFor="let task of tasks" class="space-y-4 text-left group">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="font-black text-slate-800 text-base tracking-tight">{{task.title}}</p>
+                <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-1 opacity-60">{{task.tag}}
+                  Prioridad</p>
+              </div>
+              <span [class]="task.status === 'Pendiente' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'"
+                class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-sm">
+                {{task.status}}
+              </span>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex-1 bg-slate-50 h-2 rounded-full overflow-hidden">
+                <div class="bg-blue-600 h-full transition-all duration-1000" [style.width.%]="task.progress"></div>
+              </div>
+              <span class="text-[10px] font-black text-slate-800">{{task.progress}}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="w-80 shrink-0 space-y-6">
+      <div class="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
+        <h3 class="font-black text-slate-800 mb-6 uppercase text-[10px] tracking-[0.2em]">Horario de Hoy</h3>
+        <div class="space-y-4">
+          <div class="p-4 rounded-2xl border bg-slate-50 border-slate-100 opacity-50 grayscale text-left">
+            <p class="text-[9px] font-black text-blue-600 mb-1 uppercase tracking-tighter">08:00 - 09:00</p>
+            <p class="text-xs font-black text-slate-800 leading-none tracking-tight">Matemáticas</p>
+            <p class="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-widest">Aula 201</p>
+          </div>
+          <div class="p-4 rounded-2xl border bg-white border-blue-50 shadow-sm text-left">
+            <p class="text-[9px] font-black text-blue-600 mb-1 uppercase tracking-tighter">10:00 - 11:00</p>
+            <p class="text-xs font-black text-slate-800 leading-none tracking-tight">Física</p>
+            <p class="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-widest">Lab 301</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2.5rem] p-8 text-white shadow-xl shadow-blue-200 relative overflow-hidden group">
+        <div class="relative z-10 text-left">
+          <h3 class="font-black mb-2 uppercase text-[10px] tracking-widest">Exportar Datos</h3>
+          <p class="text-[10px] font-bold text-blue-100 mb-6 uppercase leading-tight opacity-70">Generar consolidado de
+            asistencia y notas en PDF.</p>
+          <button (click)="loading = true"
+            class="w-full bg-white text-blue-600 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg group-hover:scale-105 transition-transform">
+            📥 Descargar PDF
+          </button>
+        </div>
+        <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+      </div>
+    </aside>
+  </div>
+
+  <div *ngIf="showNotasModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-center p-4">
+    <div
+      class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+      <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-blue-50/50">
+        <h3 class="font-black text-slate-800 text-xl uppercase tracking-tighter">⭐ Registro de Notas</h3>
+        <button (click)="showNotasModal = false"
+          class="text-3xl font-light hover:rotate-90 transition-transform">×</button>
+      </div>
+      <form (ngSubmit)="manejarSubirNota()" class="p-8 space-y-5 text-left">
+        <div>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Estudiante
+            Seleccionado</label>
+          <select required name="studentId" [(ngModel)]="nuevaNota.studentId"
+            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500 transition-all">
+            <option [ngValue]="null" disabled>Elegir alumno de la lista...</option>
+            <option *ngFor="let s of estudiantes" [value]="s.id">{{s.name}} ({{s.code}})</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Curso
+              Académico</label>
+            <select name="courseId" [(ngModel)]="nuevaNota.courseId" required
+              class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-xs font-bold outline-none focus:border-blue-500 transition-all">
+              <option [ngValue]="null" disabled>Seleccionar curso...</option>
+              <option *ngFor="let curso of courses" [value]="curso.id">
+                {{curso.icon}} {{curso.name}}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Nota
+              (0-20)</label>
+            <input type="number" name="score" [(ngModel)]="nuevaNota.score" required min="0" max="20"
+              placeholder="Ej: 18.5"
+              class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500 transition-all" />
+          </div>
+        </div>
+        <button type="submit"
+          class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">
+          Sincronizar Nota con PostgreSQL
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="showStatsModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl p-10 animate-in zoom-in-95 duration-300">
+      <div class="flex justify-between items-start mb-10">
+        <div class="text-left">
+          <h3 class="font-black text-slate-900 text-3xl tracking-tighter uppercase italic leading-none">Análisis
+            Académico</h3>
+          <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Métricas globales del aula basadas
+            en datos reales</p>
+        </div>
+        <button (click)="showStatsModal = false"
+          class="bg-slate-100 w-10 h-10 rounded-full flex items-center justify-center hover:rotate-90 transition-transform">×</button>
+      </div>
+      <div class="grid grid-cols-2 gap-10">
+        <div class="space-y-6 text-left">
+          <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rendimiento por Grupos</h4>
+
+          <div class="space-y-2">
+            <div
+              class="flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">
+              <span>Aprobados (>10.5)</span>
+              <span class="text-slate-800">{{statsAprobados}}%</span>
+            </div>
+            <div class="w-full bg-slate-50 h-2.5 rounded-full overflow-hidden border border-slate-100/50">
+              <div class="bg-emerald-500 h-full transition-all duration-[1500ms]" [style.width.%]="statsAprobados">
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <div
+              class="flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">
+              <span>En Riesgo (&lt;10.5)</span>
+                  <span class="text-slate-800">{{100 - statsAprobados}}%</span>
+            </div>
+            <div class="w-full bg-slate-50 h-2.5 rounded-full overflow-hidden border border-slate-100/50">
+              <div class="bg-rose-500 h-full transition-all duration-[1500ms]" [style.width.%]="100 - statsAprobados">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-[2rem] p-8 flex flex-col items-center justify-center text-center">
+          <div class="relative flex items-center justify-center mb-4">
+            <svg class="w-32 h-32 transform -rotate-90">
+              <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="12" fill="transparent"
+                class="text-slate-200" />
+              <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="12" fill="transparent"
+                [style.strokeDasharray]="364" [style.strokeDashoffset]="364 - (364 * (+promedioAula/20))"
+                class="text-blue-600 transition-all duration-1000" />
+            </svg>
+            <span class="absolute text-2xl font-black text-slate-800">{{promedioAula}}</span>
+          </div>
+          <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Promedio Grupal</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showAsistenciaModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-center p-4">
+    <div
+      class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+      <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+        <h3 class="font-black text-slate-800 text-xl uppercase tracking-tighter italic leading-none">Pase de Lista Real
+        </h3>
+        <button (click)="showAsistenciaModal = false"
+          class="text-3xl font-light hover:rotate-90 transition-transform">×</button>
+      </div>
+      <div class="p-8 max-h-[450px] overflow-y-auto space-y-3 custom-scrollbar text-left">
+        <div *ngFor="let alumno of estudiantes"
+          [class]="asistencia[alumno.id] ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'"
+          class="flex items-center justify-between p-4 rounded-2xl transition-all border-2">
+          <div class="text-left flex-1">
+            <span class="font-black text-xs text-slate-800 tracking-tight block leading-none">{{alumno.name}}</span>
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 block">Riesgo:
+              {{alumno.riskLevel || 'Bajo'}}</span>
+          </div>
+          <button (click)="toggleCheck(alumno.id)"
+            [class]="asistencia[alumno.id] ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' : 'bg-rose-500 text-white shadow-lg shadow-rose-200'"
+            class="px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all">
+            {{asistencia[alumno.id] ? 'Presente' : 'Falta'}}
+          </button>
+        </div>
+      </div>
+      <div class="p-8 border-t border-slate-50">
+        <button (click)="guardarAsistencia()"
+          class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-95">
+          Sincronizar Asistencia con Servidor
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showNotifyModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-center p-4">
+    <div
+      class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 text-left">
+      <div class="p-8 border-b border-slate-50 bg-orange-50/30 flex justify-between items-center">
+        <div>
+          <h3 class="font-black text-slate-800 text-xl uppercase tracking-tighter italic leading-none">Lanzar
+            Notificación</h3>
+          <p class="text-[9px] font-bold text-orange-600 uppercase tracking-widest mt-1">Alerta directa al portal del
+            estudiante</p>
+        </div>
+        <button (click)="showNotifyModal = false"
+          class="text-3xl font-light hover:rotate-90 transition-transform">×</button>
+      </div>
+      <form (ngSubmit)="manejarEnvioNotificacion()" class="p-8 space-y-5">
+        <div>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Seleccionar
+            Estudiante</label>
+          <select required name="studentIdNotif" [(ngModel)]="nuevaNotif.studentId"
+            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500 transition-all">
+            <option value="" disabled selected>Elegir alumno...</option>
+            <option *ngFor="let s of estudiantes" [value]="s.id">{{s.name}}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Tipo de
+            Notificación</label>
+          <select required name="notifType" [(ngModel)]="nuevaNotif.type"
+            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500 transition-all">
+            <option value="GENERAL">General 📢</option>
+            <option value="RIESGO">Alerta de Riesgo Académico ⚠️</option>
+            <option value="EXAMEN">Recordatorio de Examen 📝</option>
+            <option value="TAREA">Entrega de Tarea Pendiente 📂</option>
+            <option value="FELICITACION">Reconocimiento / Felicitación ✨</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Mensaje</label>
+          <textarea required name="message" [(ngModel)]="nuevaNotif.message"
+            placeholder="Escribe el aviso detallado aquí..."
+            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold h-32 resize-none outline-none focus:ring-4 focus:ring-blue-50 transition-all"></textarea>
+        </div>
+
+        <button type="submit" [disabled]="loading"
+          class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-50">
+          {{ loading ? 'Enviando...' : 'Enviar Notificación 🚀' }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+</main>
