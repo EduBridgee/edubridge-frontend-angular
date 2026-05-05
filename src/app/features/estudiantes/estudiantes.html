@@ -1,0 +1,255 @@
+<main class="flex-1 ml-64 bg-[#F8FAFC] h-screen overflow-hidden flex flex-col font-['Inter']">
+  
+  <div *ngIf="loading && students.length === 0" class="p-10 space-y-8 animate-pulse">
+    <div class="h-8 bg-slate-200 w-48 rounded-lg"></div>
+    <div class="grid grid-cols-3 gap-6">
+      <div *ngFor="let i of [1,2,3]" class="h-40 bg-white rounded-[2.5rem] border border-slate-100"></div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading || students.length > 0" class="flex-1 flex overflow-hidden">
+    
+    <aside class="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 shadow-sm z-10">
+      <div class="p-6 space-y-4">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-black text-slate-900 tracking-tighter uppercase italic">Estudiantes</h2>
+          <span class="text-[10px] font-black bg-slate-100 px-2 py-1 rounded-md text-slate-500">{{filteredStudents.length}}</span>
+        </div>
+        <div class="relative">
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            (input)="filtrarAlumnos()"
+            placeholder="Buscar por nombre o código..." 
+            class="w-full h-11 pl-10 pr-4 bg-slate-50 rounded-2xl text-xs font-bold border border-slate-100 outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all" />
+          <span class="absolute left-3.5 top-3.5 opacity-30 text-xs">🔍</span>
+        </div>
+      </div>
+      
+      <div class="flex-1 overflow-y-auto px-4 pb-4 space-y-2 custom-scrollbar">
+        <div *ngIf="filteredStudents.length === 0" class="py-10 text-center space-y-2">
+          <p class="text-2xl italic opacity-20">🔍</p>
+          <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">No hay coincidencias</p>
+        </div>
+
+        <div 
+          *ngFor="let s of filteredStudents"
+          (click)="seleccionarAlumno(s)"
+          [ngClass]="selectedStudent?.id === s.id ? 'bg-blue-600 border-blue-600 shadow-xl shadow-blue-200 -translate-y-0.5' : 'bg-white border-slate-50 hover:border-slate-200 hover:shadow-md'"
+          class="p-4 rounded-2xl cursor-pointer transition-all flex items-center gap-3 border group"
+        >
+          <div [ngClass]="selectedStudent?.id === s.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600'"
+               class="w-11 h-11 rounded-xl flex items-center justify-center font-black text-xs shrink-0 transition-colors">
+            {{ getInitials(s.name) }}
+          </div>
+          <div class="flex-1 min-w-0 text-left">
+            <p [ngClass]="selectedStudent?.id === s.id ? 'text-white' : 'text-slate-900'"
+               class="font-black text-sm truncate leading-tight">{{s.name}}</p>
+            <p [ngClass]="selectedStudent?.id === s.id ? 'text-blue-100' : 'text-slate-400'"
+               class="text-[9px] font-black uppercase tracking-widest mt-1">{{s.program || 'General'}}</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="flex-1 overflow-y-auto p-10 space-y-8 bg-[#F8FAFC] custom-scrollbar">
+      <ng-container *ngIf="selectedStudent">
+        
+        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm flex items-center gap-8 relative overflow-hidden group">
+          <div class="w-24 h-24 bg-slate-900 rounded-[2.2rem] flex items-center justify-center text-white text-4xl font-black shadow-2xl shrink-0 group-hover:rotate-3 transition-transform duration-500">
+            {{ getInitials(selectedStudent.name) }}
+          </div>
+          <div class="flex-1 relative z-10 text-left">
+            <div class="flex items-center gap-2">
+               <span [ngClass]="{
+                 'bg-emerald-100 text-emerald-600': selectedStudent.status === 'Activo',
+                 'bg-rose-100 text-rose-600': selectedStudent.status === 'Inactivo'
+               }" class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                {{selectedStudent.status || 'Activo'}}
+              </span>
+            </div>
+            <h3 class="text-4xl font-black text-slate-900 tracking-tighter mt-2">{{selectedStudent.name}}</h3>
+            <div class="flex items-center gap-6 mt-3 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+              <span class="flex items-center gap-1.5"><b class="text-slate-900">ID</b> {{selectedStudent.code || 'N/A'}}</span>
+              <span class="opacity-30">|</span>
+              <span class="flex items-center gap-1.5"><b class="text-slate-900">CARRERA</b> {{selectedStudent.program || 'S/D'}}</span>
+              <span class="opacity-30">|</span>
+              <span class="lowercase flex items-center gap-1.5 font-medium text-blue-500">📧 {{selectedStudent.email}}</span>
+            </div>
+          </div>
+          <button (click)="abrirEdicion()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:-translate-y-1 transition-all shadow-xl active:scale-95">
+            Editar Registro
+          </button>
+          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-slate-50 rounded-full blur-3xl -z-10"></div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6">
+          <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm text-left hover:shadow-xl hover:shadow-blue-500/5 transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <p class="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em]">Promedio General</p>
+              <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">📚</div>
+            </div>
+            <h4 class="text-5xl font-black tracking-tighter text-blue-600">
+              {{selectedStudent.averageGrade | number:'1.1-1'}}
+            </h4>
+            <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
+                <div class="bg-blue-600 h-full transition-all duration-1000" [style.width.%]="(selectedStudent.averageGrade / 20) * 100"></div>
+            </div>
+          </div>
+
+          <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm text-left hover:shadow-xl hover:shadow-emerald-500/5 transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <p class="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em]">Asistencia</p>
+              <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">📅</div>
+            </div>
+            <h4 class="text-5xl font-black tracking-tighter text-emerald-600">{{selectedStudent.attendancePercentage || 0}}%</h4>
+            <p class="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-widest">
+              {{selectedStudent.attendedClasses || 0}} / {{selectedStudent.totalClasses || 0}} Sesiones
+            </p>
+          </div>
+
+          <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm text-left hover:shadow-xl transition-all group">
+            <div class="flex justify-between items-start mb-4">
+              <p class="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em]">Alerta de Riesgo</p>
+              <div [ngClass]="{
+                    'bg-rose-50 text-rose-600': selectedStudent.riskLevel === 'Alto Riesgo',
+                    'bg-amber-50 text-amber-600': selectedStudent.riskLevel === 'Riesgo Medio',
+                    'bg-emerald-50 text-emerald-600': selectedStudent.riskLevel === 'Estable'
+                  }" 
+                   class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl group-hover:animate-pulse">⚠️</div>
+            </div>
+            <h4 [ngClass]="{
+                  'text-rose-600': selectedStudent.riskLevel === 'Alto Riesgo',
+                  'text-amber-600': selectedStudent.riskLevel === 'Riesgo Medio',
+                  'text-emerald-600': selectedStudent.riskLevel === 'Estable'
+                }"
+                class="text-4xl font-black tracking-tighter truncate">{{selectedStudent.riskLevel || 'Estable'}}</h4>
+            <p class="text-[10px] text-slate-400 font-bold mt-2 uppercase tracking-widest">Estado de Monitoreo</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8">
+          <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200 shadow-sm relative overflow-hidden">
+            <h4 class="font-black text-slate-800 mb-8 flex items-center gap-3 uppercase text-[10px] tracking-widest text-left">
+              <span class="w-2.5 h-2.5 bg-blue-600 rounded-full animate-pulse"></span> 
+              Cursos Inscritos (BD)
+            </h4>
+
+            <div *ngIf="loadingCourses" class="space-y-4 animate-pulse">
+              <div *ngFor="let i of [1,2,3]" class="h-16 bg-slate-50 rounded-2xl w-full"></div>
+            </div>
+
+            <div *ngIf="!loadingCourses" class="space-y-4 custom-scrollbar max-h-[350px] overflow-y-auto pr-2">
+              <div *ngFor="let curso of courses" class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-blue-50 hover:border-blue-100 transition-all group">
+                <div class="flex items-center gap-4 text-left">
+                  <span class="text-2xl group-hover:scale-125 transition-transform duration-300">{{curso.icon || '📚'}}</span>
+                  <div>
+                    <p class="text-xs font-black text-slate-900 leading-tight group-hover:text-blue-700 transition-colors">{{curso.name}}</p>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                      {{curso.code}} • {{curso.credits}} Créditos
+                    </p>
+                  </div>
+                </div>
+                <span class="text-[9px] font-black text-blue-600 bg-blue-100/50 px-2 py-1 rounded-lg uppercase tracking-widest">
+                  {{curso.category}}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200 shadow-sm text-left flex flex-col justify-between">
+            <div>
+                <h4 class="font-black text-slate-800 mb-8 uppercase text-[10px] tracking-widest">Información Académica</h4>
+                <div class="grid grid-cols-1 gap-6">
+                  <div class="flex items-center gap-4 group">
+                      <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-sm group-hover:bg-blue-50 transition-colors">📱</div>
+                      <div>
+                          <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Teléfono</p>
+                          <p class="text-sm font-bold text-slate-800">{{selectedStudent.phone || '+51 923 456 789'}}</p>
+                      </div>
+                  </div>
+                  <div class="flex items-center gap-4 group">
+                      <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-sm group-hover:bg-blue-50 transition-colors">🏛️</div>
+                      <div>
+                          <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Semestre Actual</p>
+                          <p class="text-sm font-bold text-slate-800">{{selectedStudent.semester || 'Ciclo 2026-I'}}</p>
+                      </div>
+                  </div>
+                   <div class="flex items-center gap-4 group">
+                      <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-sm group-hover:bg-blue-50 transition-colors">📍</div>
+                      <div>
+                          <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Campus</p>
+                          <p class="text-sm font-bold text-slate-800">Monterrico / San Miguel</p>
+                      </div>
+                  </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-slate-50">
+                <button class="w-full py-4 border-2 border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">Enviar correo institucional</button>
+            </div>
+          </div>
+        </div>
+
+      </ng-container>
+    </section>
+  </div>
+
+  <div *ngIf="showEditModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+      
+      <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+        <h3 class="font-black text-slate-800 text-xl uppercase tracking-tighter italic">📝 Editar Registro</h3>
+        <button (click)="showEditModal = false" class="text-3xl font-light hover:rotate-90 transition-transform">×</button>
+      </div>
+
+      <form (ngSubmit)="guardarCambios()" class="p-8 space-y-5 text-left">
+        
+        <div>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Nombre Completo</label>
+          <input type="text" name="name" [(ngModel)]="editingStudent.name" 
+                 class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500 transition-all" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Código (ID)</label>
+            <input type="text" name="code" [(ngModel)]="editingStudent.code" 
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500 transition-all" />
+          </div>
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Programa / Carrera</label>
+            <input type="text" name="program" [(ngModel)]="editingStudent.program" 
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500 transition-all" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Estatus Académico</label>
+            <select name="status" [(ngModel)]="editingStudent.status" 
+                    class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500 transition-all">
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Nivel de Riesgo</label>
+            <select name="riskLevel" [(ngModel)]="editingStudent.riskLevel" 
+                    class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500 transition-all">
+              <option value="Estable">Estable</option>
+              <option value="Riesgo Medio">Riesgo Medio</option>
+              <option value="Alto Riesgo">Alto Riesgo</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" [disabled]="loading" 
+                class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all disabled:opacity-50">
+          {{ loading ? 'Sincronizando...' : 'Sincronizar Cambios' }}
+        </button>
+      </form>
+
+    </div>
+  </div>
+  
+</main>
