@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -29,7 +29,7 @@ export class RecursosComponent implements OnInit {
     rating: 5.0
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.cargarDatos();
@@ -42,10 +42,12 @@ export class RecursosComponent implements OnInit {
         this.recursos = data;
         this.aplicarFiltro();
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error("Error cargando recursos:", err);
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
