@@ -1,0 +1,316 @@
+<main class="flex-1 ml-64 bg-[#F8FAFC] min-h-screen flex flex-col font-['Inter'] text-left">
+
+  <div *ngIf="loading" class="p-10 font-black text-slate-400 animate-pulse text-sm uppercase tracking-widest">
+    Sincronizando con Servidor EduBridge...
+  </div>
+
+  <div *ngIf="!loading">
+    <div class="p-8 pb-0 w-full">
+      <div
+        class="bg-white/70 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-slate-100 flex items-center justify-between px-6">
+        <div class="flex items-center gap-3 flex-1">
+          <span class="text-lg">🔍</span>
+          <input type="text" placeholder="Buscar en el portal..."
+            class="bg-transparent border-none outline-none text-sm font-medium text-slate-400 w-full" />
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="text-xl cursor-pointer hover:scale-110 transition-transform">🔔</span>
+          <div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
+          <span class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/60">{{user?.role}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-8 space-y-8">
+
+      <section *ngIf="user.role === 'docente'" class="space-y-8 animate-in fade-in duration-500">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-2xl font-black text-slate-900 leading-none tracking-tighter uppercase italic">Sistema de
+              Tutorías en Línea</h2>
+            <p class="text-slate-500 text-xs mt-2 font-bold uppercase tracking-widest opacity-60">Gestión de sesiones
+              sincrónicas y asincrónicas</p>
+          </div>
+          <button
+            class="bg-blue-600 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/20">
+            + Nueva Tutoría
+          </button>
+        </div>
+
+        <div class="grid grid-cols-4 gap-4">
+          <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm">
+            <div class="text-left">
+              <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Sesiones Hoy</p>
+              <p class="text-2xl font-black text-slate-900 leading-none tracking-tighter">4</p>
+            </div>
+            <div
+              class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-blue-50 text-blue-600 shadow-sm">
+              📅</div>
+          </div>
+          <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm">
+            <div class="text-left">
+              <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Estudiantes Activos</p>
+              <p class="text-2xl font-black text-slate-900 leading-none tracking-tighter">29</p>
+            </div>
+            <div
+              class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-emerald-50 text-emerald-600 shadow-sm">
+              👥</div>
+          </div>
+          <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm">
+            <div class="text-left">
+              <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Horas Totales</p>
+              <p class="text-2xl font-black text-slate-900 leading-none tracking-tighter">147</p>
+            </div>
+            <div
+              class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-purple-50 text-purple-600 shadow-sm">
+              🕒</div>
+          </div>
+          <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm">
+            <div class="text-left">
+              <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">Satisfacción</p>
+              <p class="text-2xl font-black text-slate-900 leading-none tracking-tighter">4.8</p>
+            </div>
+            <div
+              class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-amber-50 text-amber-600 shadow-sm">
+              ⭐</div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
+          <div class="flex border-b border-slate-50">
+            <button
+              class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600">Próximas
+              Sesiones</button>
+            <button class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Historial</button>
+          </div>
+          <div class="p-6 space-y-4">
+            <div *ngFor="let session of sessions" class="border border-slate-50 rounded-2xl p-6 bg-white group">
+              <div class="flex justify-between items-start mb-4">
+                <div class="flex gap-4 items-center">
+                  <div
+                    class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-lg">
+                    {{session.courseName[0]}}
+                  </div>
+                  <div>
+                    <h4 class="font-black text-slate-800 tracking-tight">{{session.courseName}}</h4>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{{session.teacherName}}
+                    </p>
+                  </div>
+                </div>
+                <span
+                  class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[9px] font-black uppercase tracking-tighter">CONFIRMADA</span>
+              </div>
+              <div class="grid grid-cols-2 gap-y-3 text-[10px] font-bold text-slate-500 mb-6">
+                <div class="flex items-center gap-2">🗓️ Hoy</div>
+                <div class="flex items-center gap-2">🕒 {{getFormattedTime(session.startTime)}}</div>
+                <div class="flex items-center gap-2">👥 {{session.studentCount}}/12 estudiantes</div>
+                <div class="flex items-center gap-2">💻 Sesión sincrónica</div>
+              </div>
+              <div class="flex gap-3">
+                <button (click)="unirseASesion(session.courseName)"
+                  class="flex-1 bg-blue-600 text-white py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg">Unirse
+                  a sesión</button>
+                <button
+                  class="px-6 py-3 border border-slate-100 rounded-2xl text-slate-400 font-black text-[10px] uppercase tracking-widest">Ver
+                  detalles</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h3 class="font-black text-slate-800 text-lg uppercase italic tracking-tighter">Pizarra Virtual</h3>
+              <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Herramienta colaborativa para
+                sesiones en vivo</p>
+            </div>
+            <button (click)="abrirPizarra('General')"
+              class="bg-slate-900 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg">Abrir
+              pizarra</button>
+          </div>
+          <div
+            class="h-48 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-400">
+            <span class="text-4xl mb-3">📖</span>
+            <p class="text-xs font-black text-slate-800 uppercase tracking-tighter">Comparte conceptos en tiempo real
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section *ngIf="user.role === 'estudiante'"
+        class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div class="flex justify-between items-end">
+          <div>
+            <h2 class="text-3xl font-black text-slate-800 tracking-tighter">Tutorías</h2>
+            <p class="text-slate-500 font-medium text-sm">Solicita ayuda personalizada con tus profesores</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden min-h-[600px]">
+          <div class="flex p-2 bg-slate-50/50 border-b border-slate-100">
+            <button (click)="setActiveTab('mis-tutorias')" [class.bg-white]="activeTab === 'mis-tutorias'"
+              [class.text-blue-600]="activeTab === 'mis-tutorias'" [class.shadow-sm]="activeTab === 'mis-tutorias'"
+              class="flex-1 py-3 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-600">
+              Mis Tutorías (2)
+            </button>
+            <button (click)="setActiveTab('buscar')" [class.bg-white]="activeTab === 'buscar'"
+              [class.text-blue-600]="activeTab === 'buscar'" [class.shadow-sm]="activeTab === 'buscar'"
+              class="flex-1 py-3 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-600">
+              Buscar Tutor
+            </button>
+            <button (click)="setActiveTab('historial')" [class.bg-white]="activeTab === 'historial'"
+              [class.text-blue-600]="activeTab === 'historial'" [class.shadow-sm]="activeTab === 'historial'"
+              class="flex-1 py-3 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-600">
+              Historial
+            </button>
+            <button (click)="setActiveTab('faq')" [class.bg-white]="activeTab === 'faq'"
+              [class.text-blue-600]="activeTab === 'faq'" [class.shadow-sm]="activeTab === 'faq'"
+              class="flex-1 py-3 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-600">
+              Preguntas Frecuentes
+            </button>
+          </div>
+
+          <div class="p-8">
+            <div *ngIf="activeTab === 'mis-tutorias'" class="space-y-4">
+              <div *ngIf="sessions.length === 0" class="text-center py-20 opacity-40">
+                <span class="text-5xl block mb-4">📭</span>
+                <p class="font-black uppercase tracking-widest text-xs">No tienes tutorías activas</p>
+              </div>
+
+              <div *ngFor="let session of sessions"
+                class="border border-slate-100 rounded-[1.5rem] p-6 space-y-4 hover:border-blue-100 transition-colors bg-white">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="font-black text-slate-800 text-lg">{{session.courseName}}</h4>
+                    <p class="text-slate-400 text-xs font-bold">Prof. {{session.teacherName}}</p>
+                  </div>
+                  <span
+                    class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-tighter">
+                    {{session.studentCount > 1 ? 'Grupal (' + session.studentCount + ')' : 'Individual'}}
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-3 text-[11px] font-bold text-slate-500 uppercase tracking-tighter">
+                  <div>🗓️ {{getFormattedDate(session.startTime)}}</div>
+                  <div>🕒 {{getFormattedTime(session.startTime)}}</div>
+                  <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    {{session.status}}
+                  </div>
+                </div>
+
+                <div class="flex gap-3">
+                  <button (click)="unirseASesion(session.courseName)"
+                    class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">
+                    Unirse a la Sesión
+                  </button>
+                  <button (click)="reprogramarTutoria(session.id)"
+                    class="px-6 py-2.5 border border-slate-200 rounded-xl text-slate-500 font-bold text-sm hover:bg-slate-50 transition-all">
+                    Reprogramar
+                  </button>
+                  <button (click)="cancelarTutoria(session.id)"
+                    class="px-6 py-2.5 border border-rose-100 text-rose-500 rounded-xl font-bold text-sm hover:bg-rose-50 transition-all">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="activeTab === 'buscar'" class="space-y-6">
+              <div class="relative">
+                <input type="text" placeholder="Buscar por materia o nombre del profesor..."
+                  class="w-full p-4 pl-12 bg-slate-50 rounded-2xl border border-slate-100 text-sm outline-none focus:ring-2 focus:ring-blue-100" />
+                <span class="absolute left-4 top-4 text-slate-400">🔍</span>
+              </div>
+              <div class="grid grid-cols-2 gap-6">
+                <div
+                  *ngFor="let p of [{n: 'Prof. Roberto Silva', s: 'Matemáticas', i: 'RS'}, {n: 'Prof. Laura Méndez', s: 'Física', i: 'LM'}]"
+                  class="border border-slate-100 rounded-[2rem] p-6 space-y-4">
+                  <div class="flex gap-4 items-center">
+                    <div
+                      class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-lg">
+                      {{p.i}}</div>
+                    <div>
+                      <h4 class="font-black text-slate-800 text-lg leading-none">{{p.n}}</h4>
+                      <p class="text-slate-400 text-xs font-bold mt-1">{{p.s}}</p>
+                    </div>
+                  </div>
+                  <button (click)="abrirModal(p.n)"
+                    class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-200 hover:scale-105 transition-all">
+                    + Solicitar Tutoría
+                  </button>
+                </div>
+              </div>
+
+              <div *ngIf="showModal"
+                class="fixed inset-0 z-[300] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+                <div class="bg-white w-[450px] rounded-[2.5rem] p-10 shadow-2xl border border-slate-100">
+                  <h3 class="text-xl font-black text-slate-800 mb-2 italic tracking-tighter uppercase">Nueva
+                    Solicitud</h3>
+                  <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">Completa los
+                    detalles de tu sesión con {{nuevaTutoria.teacherName}}</p>
+
+                  <form (ngSubmit)="guardarTutoria()" class="space-y-4">
+                    <div>
+                      <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Curso</label>
+                      <input type="text" [(ngModel)]="nuevaTutoria.courseName" name="course"
+                        class="w-full bg-slate-50 border-none p-4 rounded-2xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500/20"
+                        placeholder="Ej: Cálculo Diferencial" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Fecha y Hora</label>
+                        <input type="datetime-local" [(ngModel)]="nuevaTutoria.startTime" name="time"
+                          class="w-full bg-slate-50 border-none p-4 rounded-2xl text-xs font-bold outline-none"
+                          required>
+                      </div>
+                      <div>
+                        <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Tipo</label>
+                        <select [(ngModel)]="nuevaTutoria.type" name="type"
+                          class="w-full bg-slate-50 border-none p-4 rounded-2xl text-xs font-bold outline-none">
+                          <option value="INDIVIDUAL">Individual</option>
+                          <option value="GRUPAL">Grupal</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="flex gap-3 pt-6">
+                      <button type="button" (click)="showModal = false"
+                        class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 rounded-2xl transition-all">Cancelar</button>
+                      <button type="submit"
+                        class="flex-1 bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">Confirmar
+                        Solicitud</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="activeTab === 'historial'" class="space-y-4">
+              <div *ngFor="let i of [1, 2, 3]"
+                class="border border-slate-100 rounded-[1.5rem] p-6 flex justify-between items-center group hover:bg-slate-50/50">
+                <div class="space-y-1">
+                  <h4 class="font-black text-slate-800 text-lg tracking-tighter">Resolución de Ecuaciones</h4>
+                  <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">9 de abril de 2026 • 60 min
+                  </p>
+                </div>
+                <div class="text-amber-400 text-lg font-black tracking-widest">⭐⭐⭐⭐⭐</div>
+              </div>
+            </div>
+
+            <div *ngIf="activeTab === 'faq'" class="space-y-8">
+              <div *ngFor="let cat of ['Matemáticas', 'Física', 'Programación']" class="space-y-4">
+                <h4 class="font-black text-slate-800 flex items-center gap-2">💬 {{cat}}</h4>
+                <div class="p-4 bg-slate-50 rounded-xl flex justify-between items-center">
+                  <span class="text-xs font-bold text-slate-600 tracking-tight">¿Cómo resolver dudas comunes de esta
+                    materia?</span>
+                  <span class="text-[9px] font-black text-slate-400 uppercase">12 respuestas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
