@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -19,7 +19,7 @@ export class TutoriasComponent implements OnInit {
 
   private apiUrl = 'http://localhost:8081/api/tutoring';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.fetchTutorias();
@@ -32,10 +32,12 @@ export class TutoriasComponent implements OnInit {
         next: (data) => {
           this.sessions = data.filter(s => s.status !== 'Cancelada');
           this.loading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error("Error cargando tutorías:", err);
           this.loading = false;
+          this.cdr.detectChanges();
         }
       });
   }
