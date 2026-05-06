@@ -37,7 +37,7 @@ export class RecursosComponent implements OnInit {
 
   cargarDatos() {
     this.loading = true;
-    this.http.get<any[]>('http://localhost:8081/api/resources').subscribe({
+    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/resources').subscribe({
       next: (data) => {
         this.recursos = data;
         this.aplicarFiltro();
@@ -83,7 +83,7 @@ export class RecursosComponent implements OnInit {
   }
 
   manejarSubida() {
-    this.http.post('http://localhost:8081/api/resources', this.nuevoRecurso).subscribe({
+    this.http.post('https://edubridge-backend-v2.onrender.com/api/resources', this.nuevoRecurso).subscribe({
       next: () => {
         alert("✅ Recurso publicado exitosamente.");
         this.showModal = false;

@@ -25,7 +25,7 @@ export class ChatbotComponent implements OnInit {
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
-    const nombre = this.user.name || 'Christian';
+    const nombre = this.user.name || 'Estudiante';
     
     const bienvenida = this.user.role === 'DOCENTE'
       ? `¡Hola, colega! Soy el asistente IA de EduBridge. ¿Te ayudo con la redacción de avisos?`
@@ -53,11 +53,11 @@ export class ChatbotComponent implements OnInit {
     const payload = {
       message: texto,
       role: this.user.role || 'ESTUDIANTE',
-      userName: this.user.name || 'Christian',
+      userName: this.user.name || 'Estudiante',
       cursos: cursosStr
     };
 
-    this.http.post('http://localhost:8081/api/chat/ask', payload).subscribe({
+    this.http.post('https://edubridge-backend-v2.onrender.com/api/chat/ask', payload).subscribe({
       next: (res: any) => {
         this.loading = false;
         this.typeWriterEffect(res.answer);
@@ -70,7 +70,7 @@ export class ChatbotComponent implements OnInit {
         this.loading = false;
         this.chatMessages.push({
           role: 'assistant',
-          content: 'Error de conexión. ¿Está el backend encendido, Christian?'
+          content: 'Error de conexión. ¿Está el backend encendido, Estudiante/a?'
         });
       }
     });

@@ -28,7 +28,7 @@ export class EstudiantesComponent implements OnInit {
     value: null
   };
 
-  private readonly API_URL = 'http://localhost:8081/api';
+  private readonly API_URL = 'https://edubridge-backend-v2.onrender.com/api';
 
   constructor(private http: HttpClient, private cdRef: ChangeDetectorRef) { }
 

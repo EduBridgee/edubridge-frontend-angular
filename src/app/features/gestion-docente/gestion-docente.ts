@@ -61,7 +61,7 @@ export class GestionDocenteComponent implements OnInit {
 
   cargarEstudiantes(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.get<any[]>('http://localhost:8081/api/students').subscribe({
+      this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/students').subscribe({
         next: (data) => {
           this.estudiantes = data;
           this.estudiantes.forEach(s => {
@@ -76,7 +76,7 @@ export class GestionDocenteComponent implements OnInit {
 
   cargarCursos(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.get<any[]>('http://localhost:8081/api/courses').subscribe({
+      this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').subscribe({
         next: (data) => {
           this.courses = data;
           resolve();
@@ -88,7 +88,7 @@ export class GestionDocenteComponent implements OnInit {
 
   cargarTareasServidor(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.get<any[]>('http://localhost:8081/api/teacher-tasks').subscribe({
+      this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teacher-tasks').subscribe({
         next: (data) => {
           this.tasks = data;
           resolve();

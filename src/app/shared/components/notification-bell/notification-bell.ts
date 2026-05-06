@@ -15,7 +15,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy, OnChanges {
   notifications: any[] = [];
   isOpen = false;
   private intervalId: any;
-  private readonly API_URL = 'http://localhost:8081/api/notifications';
+  private readonly API_URL = 'https://edubridge-backend-v2.onrender.com/api/notifications';
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 

@@ -51,10 +51,10 @@ export class CursosComponent implements OnInit {
   cargarCursosDesdeBD() {
     this.loading = true;
 
-    this.http.get<any[]>('http://localhost:8081/api/courses').subscribe({
+    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').subscribe({
       next: (dataCursos) => {
 
-        this.http.get<any[]>(`http://localhost:8081/api/grades/student/${this.user.id}`).subscribe({
+        this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/grades/student/${this.user.id}`).subscribe({
           next: (notas) => {
 
             this.cursos = dataCursos.map((curso, index) => {

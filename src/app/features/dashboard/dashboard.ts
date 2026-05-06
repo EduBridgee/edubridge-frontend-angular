@@ -33,8 +33,8 @@ export class DashboardComponent implements OnInit {
     const isDocente = this.user.role === 'docente' || this.user.role === 'DOCENTE';
     const userId = this.user.id;
 
-    const studentsReq = this.http.get<any[]>('http://localhost:8081/api/students').pipe(catchError(() => of([])));
-    const gradesReq = isDocente ? of([]) : this.http.get<any[]>(`http://localhost:8081/api/grades/student/${userId}`).pipe(catchError(() => of([])));
+    const studentsReq = this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/students').pipe(catchError(() => of([])));
+    const gradesReq = isDocente ? of([]) : this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/grades/student/${userId}`).pipe(catchError(() => of([])));
 
     forkJoin({
       allStudents: studentsReq,

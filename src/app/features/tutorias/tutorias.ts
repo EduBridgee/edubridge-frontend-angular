@@ -17,7 +17,7 @@ export class TutoriasComponent implements OnInit {
   loading: boolean = true;
   activeTab: string = 'mis-tutorias';
 
-  private apiUrl = 'http://localhost:8081/api/tutoring';
+  private apiUrl = 'https://edubridge-backend-v2.onrender.com/api/tutoring';
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
@@ -120,7 +120,7 @@ export class TutoriasComponent implements OnInit {
   }
 
   guardarTutoria() {
-    this.http.post('http://localhost:8081/api/tutoring/request', this.nuevaTutoria)
+    this.http.post('https://edubridge-backend-v2.onrender.com/api/tutoring/request', this.nuevaTutoria) 
       .subscribe({
         next: () => {
           this.showModal = false;
