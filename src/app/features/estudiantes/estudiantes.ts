@@ -74,10 +74,12 @@ export class EstudiantesComponent implements OnInit {
           }
         }
         this.loading = false;
+        this.cdRef.detectChanges(); 
       },
       error: (err) => {
         console.error("Error cargando alumnos:", err);
         this.loading = false;
+        this.cdRef.detectChanges(); 
       }
     });
   }
@@ -110,10 +112,12 @@ export class EstudiantesComponent implements OnInit {
       next: (data) => {
         this.courses = data;
         this.loadingCourses = false;
+        this.cdRef.detectChanges(); 
       },
       error: (err) => {
         console.error("Error al cargar cursos:", err);
         this.loadingCourses = false;
+        this.cdRef.detectChanges(); 
       }
     });
   }
