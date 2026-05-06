@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.refreshUser();
+    this.updateCurrentPage();
   }
 
   onActivate(componentRef: any) {

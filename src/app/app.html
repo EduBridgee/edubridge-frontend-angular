@@ -1,7 +1,7 @@
 <div class="flex h-screen w-screen bg-[#F8FAFC] overflow-hidden font-['Inter'] text-left">
   
   <app-sidebar 
-    *ngIf="user" 
+    *ngIf="user && currentPage !== 'login'" 
     [userName]="user.name" 
     [userRole]="user.role"
     [currentPage]="currentPage"
@@ -14,7 +14,7 @@
   </main>
 
   <app-chatbot 
-    *ngIf="user"
+    *ngIf="user && currentPage !== 'login'"
     (tutoriaCreada)="handleTutoriaCreada()">
   </app-chatbot>
 
