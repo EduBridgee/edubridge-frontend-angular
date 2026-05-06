@@ -1,17 +1,17 @@
-<main class="flex-1 ml-64 bg-[#F8FAFC] min-h-screen flex flex-col font-['Inter'] text-left relative">
+<main class="flex-1 ml-0 md:ml-64 bg-[#F8FAFC] min-h-screen flex flex-col font-['Inter'] text-left relative transition-all">
 
-  <div class="p-8 pb-0 w-full relative z-[60]">
-    <div class="bg-white/70 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-slate-100 flex items-center justify-between px-6">
-      <div class="flex items-center gap-3 flex-1">
-        <span class="text-lg">🔍</span>
+  <div class="p-4 md:p-8 pb-0 w-full relative z-[60]">
+    <div class="bg-white/70 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-slate-100 flex items-center justify-between px-4 md:px-6 gap-4">
+      <div class="flex items-center gap-3 flex-1 min-w-[150px]">
+        <span class="text-lg opacity-40">🔍</span>
         <input type="text" placeholder="Buscar cursos, recursos..."
                class="bg-transparent border-none outline-none text-sm font-medium text-slate-400 w-full"
                (input)="buscarRecursos($event)" />
       </div>
-      <div class="flex items-center gap-4">
-        <span class="text-xl cursor-pointer">🔔</span>
-        <div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
-        <div class="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-xs font-black shadow-lg">
+      <div class="flex items-center gap-2 md:gap-4 shrink-0">
+        <span class="text-xl cursor-pointer hover:scale-110 transition-transform">🔔</span>
+        <div class="h-8 w-[1px] bg-slate-200 mx-1 md:mx-2"></div>
+        <div class="w-8 h-8 md:w-10 md:h-10 bg-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white text-[10px] md:text-xs font-black shadow-lg">
           {{user?.name?.[0] || 'U'}}
         </div>
       </div>
@@ -22,20 +22,21 @@
     Sincronizando Biblioteca...
   </div>
 
-  <div *ngIf="!loading" class="p-8 space-y-6 animate-in fade-in duration-500">
-    <div class="flex justify-between items-end">
+  <div *ngIf="!loading" class="p-4 md:p-8 space-y-6 animate-in fade-in duration-500">
+    
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
       <div>
-        <h2 class="text-2xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Gestión de Recursos</h2>
-        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-2">Panel administrativo de materiales</p>
+        <h2 class="text-xl md:text-2xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Gestión de Recursos</h2>
+        <p class="text-slate-400 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mt-2">Panel administrativo de materiales</p>
       </div>
       <button *ngIf="user.role === 'docente'"
               (click)="showModal = true"
-              class="bg-blue-600 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:scale-105 transition-all">
+              class="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 md:py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:scale-105 active:scale-95 transition-all">
         + Subir Recurso
       </button>
     </div>
 
-    <div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+    <div class="flex gap-3 overflow-x-auto pb-4 custom-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
       <button *ngFor="let f of ['Todos', 'Documentos', 'Videos', 'Audios', 'Presentaciones']"
               (click)="setActiveFilter(f)"
               [class]="activeFilter === f ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-100' : 'bg-white text-slate-400 border-slate-100 hover:bg-slate-50'"
@@ -51,69 +52,71 @@
       </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div *ngFor="let item of filteredRecursos" class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all group relative text-left">
-        <div class="h-40 relative flex items-center justify-center overflow-hidden">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <div *ngFor="let item of filteredRecursos" class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-xl transition-all group relative text-left flex flex-col">
+        <div class="h-40 relative flex items-center justify-center overflow-hidden shrink-0">
           <img [src]="item.img" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80" />
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
           <span class="text-5xl drop-shadow-2xl z-10">
             {{ item.type === 'PDF' ? '📄' : item.type === 'Video' ? '🎥' : '🎵' }}
           </span>
-          <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md text-[9px] font-black px-3 py-1.5 rounded-xl text-slate-800 uppercase tracking-widest shadow-sm">
+          <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md text-[8px] md:text-[9px] font-black px-3 py-1.5 rounded-xl text-slate-800 uppercase tracking-widest shadow-sm">
             {{item.type}}
           </span>
         </div>
-        <div class="p-8 space-y-4">
-          <div class="h-24">
+
+        <div class="p-6 md:p-8 space-y-4 flex-1 flex flex-col">
+          <div class="flex-1">
             <span class="text-blue-600 text-[9px] font-black uppercase tracking-[0.2em]">{{item.subject}}</span>
             <h4 class="font-black text-slate-800 text-lg leading-tight tracking-tight mt-1">{{item.title}}</h4>
-            <p class="text-[10px] text-slate-400 font-bold uppercase mt-2 italic">{{item.meta || 'Sin descripción'}}</p>
+            <p class="text-[10px] text-slate-400 font-bold uppercase mt-2 italic line-clamp-2">{{item.meta || 'Sin descripción'}}</p>
           </div>
-          <div class="flex gap-2">
-            <button (click)="manejarAccion(item)" class="flex-1 bg-slate-900 text-white py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg">Visualizar</button>
-            <button class="w-14 h-14 border border-slate-100 rounded-2xl text-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center">📥</button>
+          <div class="flex gap-2 pt-2">
+            <button (click)="manejarAccion(item)" class="flex-1 bg-slate-900 text-white py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg active:scale-95 transition-all">Visualizar</button>
+            <button class="w-12 h-12 md:w-14 md:h-14 shrink-0 border border-slate-100 rounded-2xl text-slate-300 hover:bg-slate-50 hover:text-blue-600 transition-colors flex items-center justify-center">📥</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm text-left">
-      <h3 class="font-black text-slate-800 text-xs uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+    <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 p-6 md:p-8 shadow-sm text-left">
+      <h3 class="font-black text-slate-800 text-[10px] uppercase tracking-[0.3em] mb-6 md:mb-8 flex items-center gap-3">
         <span class="w-2 h-2 bg-blue-600 rounded-full animate-ping"></span> Actividad Reciente
       </h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-        <div *ngFor="let r of recursos.slice(0, 2)" class="flex items-center gap-5 p-4 rounded-[1.5rem] bg-slate-50/50 border border-slate-50 hover:bg-white hover:shadow-md transition-all cursor-pointer">
-          <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 text-left">
+        <div *ngFor="let r of recursos.slice(0, 2)" class="flex items-center gap-4 md:gap-5 p-4 rounded-2xl md:rounded-[1.5rem] bg-slate-50/50 border border-slate-50 hover:bg-white hover:shadow-md transition-all cursor-pointer">
+          <div class="w-12 h-12 md:w-14 md:h-14 bg-white rounded-xl md:rounded-2xl shrink-0 flex items-center justify-center text-xl md:text-2xl shadow-sm">
             {{r.type === 'PDF' ? '📄' : '🎥'}}
           </div>
-          <div>
-            <p class="font-black text-slate-800 text-sm leading-none">{{r.title}}</p>
-            <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-2">{{r.subject}} • Visto hace poco</p>
+          <div class="min-w-0">
+            <p class="font-black text-slate-800 text-sm leading-none truncate">{{r.title}}</p>
+            <p class="text-[8px] md:text-[9px] text-slate-400 font-black uppercase tracking-widest mt-2 truncate">{{r.subject}} • Visto hace poco</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div *ngIf="showModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] flex justify-center items-center p-4">
-    <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300 text-left">
-      <div class="p-10 border-b border-slate-50 bg-blue-50/30 flex justify-between items-center">
+  <div *ngIf="showModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 text-left max-h-[90vh] overflow-y-auto">
+      
+      <div class="p-6 md:p-10 border-b border-slate-50 bg-blue-50/30 flex justify-between items-center sticky top-0 bg-white z-10">
         <div>
-          <h3 class="font-black text-slate-800 text-2xl uppercase tracking-tighter italic leading-none">Subir Material</h3>
-          <p class="text-[9px] font-black text-blue-600 uppercase tracking-widest mt-2">EduBridge Cloud Synchronization</p>
+          <h3 class="font-black text-slate-800 text-xl md:text-2xl uppercase tracking-tighter italic leading-none">Subir Material</h3>
+          <p class="text-[8px] md:text-[9px] font-black text-blue-600 uppercase tracking-widest mt-2">EduBridge Cloud Synchronization</p>
         </div>
-        <button (click)="showModal = false" class="text-4xl font-light hover:rotate-90 transition-transform">×</button>
+        <button (click)="showModal = false" class="text-3xl md:text-4xl font-light hover:rotate-90 transition-transform">×</button>
       </div>
 
-      <form (ngSubmit)="manejarSubida()" class="p-10 space-y-6">
+      <form (ngSubmit)="manejarSubida()" class="p-6 md:p-10 space-y-6">
         <div>
           <label class="text-[9px] font-black text-slate-400 uppercase block mb-2">Título del Material</label>
           <input type="text" name="title" [(ngModel)]="nuevoRecurso.title" required
-                 class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10"
+                 class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
                  placeholder="Ej: Guía de Cálculo Diferencial" />
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="text-[9px] font-black text-slate-400 uppercase block mb-2">Materia</label>
             <select name="subject" [(ngModel)]="nuevoRecurso.subject" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-[10px] font-black uppercase outline-none">
@@ -136,11 +139,11 @@
         <div>
           <label class="text-[9px] font-black text-slate-400 uppercase block mb-2">Descripción</label>
           <input type="text" name="meta" [(ngModel)]="nuevoRecurso.meta"
-                 class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none"
+                 class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
                  placeholder="Ej: Análisis de integrales por partes..." />
         </div>
 
-        <button type="submit" class="w-full bg-blue-600 text-white py-5 rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-blue-600/20">
+        <button type="submit" class="w-full bg-blue-600 text-white py-4 md:py-5 rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-blue-600/20 active:scale-95 transition-all">
           Publicar Recurso 🚀
         </button>
       </form>

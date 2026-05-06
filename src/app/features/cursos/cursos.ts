@@ -17,7 +17,7 @@ export class CursosComponent implements OnInit {
 
   promedioGeneral: number = 0;
   totalCreditos: number = 0;
-
+  diasSemana = ['l', 'm', 'mi', 'j', 'v'] as const;
   colores = [
     "from-blue-600 to-blue-400",
     "from-purple-600 to-purple-400",

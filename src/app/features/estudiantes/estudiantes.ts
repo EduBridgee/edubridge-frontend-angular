@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http'; // Añadido HttpHeaders
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-estudiantes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule], 
   templateUrl: './estudiantes.html',
   styleUrl: './estudiantes.css'
 })
@@ -22,6 +23,8 @@ export class EstudiantesComponent implements OnInit {
 
   showEditModal = false;
   editingStudent: any = {};
+  
+  isMobile: boolean = false;
 
   newGrade = {
     courseId: null,
@@ -30,11 +33,28 @@ export class EstudiantesComponent implements OnInit {
 
   private readonly API_URL = 'https://edubridge-backend-v2.onrender.com/api';
 
-  constructor(private http: HttpClient, private cdRef: ChangeDetectorRef) { }
+  private breakpointObserver = inject(BreakpointObserver);
+  private http = inject(HttpClient);
+  private cdRef = inject(ChangeDetectorRef);
+  
+  constructor(  ) { }
 
   ngOnInit(): void {
     this.cargarEstudiantes();
     this.cargarCursosDesdeBD();
+    this.configurarResponsive();
+  }
+
+  private configurarResponsive() {
+    this.breakpointObserver.observe(['(max-width: 768px)']).subscribe(result => {
+      this.isMobile = result.matches;
+      this.cdRef.detectChanges();
+    });
+  }
+
+  volverAlListado() {
+    this.selectedStudent = null;
+    this.cdRef.detectChanges();
   }
 
   private getHeaders() {
@@ -64,7 +84,6 @@ export class EstudiantesComponent implements OnInit {
     this.http.get<any[]>(`${this.API_URL}/students`).subscribe({
       next: (data) => {
         this.students = data;
-
         this.filteredStudents = [...data];
 
         if (this.selectedStudent) {
@@ -122,8 +141,6 @@ export class EstudiantesComponent implements OnInit {
     });
   }
 
-
-
   filtrarAlumnos() {
     const term = this.searchTerm.toLowerCase();
     this.filteredStudents = this.students.filter(s =>
@@ -134,6 +151,7 @@ export class EstudiantesComponent implements OnInit {
 
   seleccionarAlumno(alumno: any) {
     this.selectedStudent = alumno;
+    this.cdRef.detectChanges();
   }
 
   abrirEdicion() {
