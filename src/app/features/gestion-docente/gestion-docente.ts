@@ -122,7 +122,7 @@ export class GestionDocenteComponent implements OnInit {
       courseId: Number(this.nuevaNota.courseId),
       value: this.nuevaNota.score
     };
-    this.http.post('http://localhost:8081/api/grades', payload).subscribe({
+    this.http.post('https://edubridge-backend-v2.onrender.com/api/grades', payload).subscribe({
       next: () => {
         this.showNotasModal = false;
         this.nuevaNota = { studentId: null, courseId: null, score: null };
@@ -162,7 +162,7 @@ export class GestionDocenteComponent implements OnInit {
       type: this.nuevaNotif.type 
     };
 
-    this.http.post('http://localhost:8081/api/notifications', payload).subscribe({
+    this.http.post('https://edubridge-backend-v2.onrender.com/api/notifications', payload).subscribe({
       next: () => {
         this.showNotifyModal = false;
         this.nuevaNotif = { studentId: '', message: '', type: 'GENERAL' }; 
