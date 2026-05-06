@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -65,7 +65,7 @@ export class StudentProfileComponent implements OnInit {
     { title: "Certificado de Conducta", size: "120 KB", date: "10 de julio de 2024" }
   ];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.cargarEstudiantes();
@@ -81,10 +81,12 @@ export class StudentProfileComponent implements OnInit {
         this.filteredStudents = data;
         this.selectedStudent = data.find(s => s.email === this.user.email) || data[0];
         this.loading = false;
+        this.cdr.detectChanges(); 
       },
       error: (err) => {
         console.error("Error al cargar estudiantes", err);
         this.loading = false;
+        this.cdr.detectChanges(); 
       }
     });
   }
@@ -95,10 +97,12 @@ export class StudentProfileComponent implements OnInit {
       next: (data) => {
         this.courses = data;
         this.loadingCourses = false;
+        this.cdr.detectChanges(); 
       },
       error: (err) => {
         console.error("Error al cargar cursos", err);
         this.loadingCourses = false;
+        this.cdr.detectChanges(); 
       }
     });
   }
