@@ -3,7 +3,7 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "8e32e2a2-c102-416f-bc8a-880e324573a5"
+    "analytics": "24dcd8f7-2d34-4d4b-9d25-b70790f79970"
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -27,15 +27,7 @@
             ],
             "styles": [
               "src/styles.css"
-            ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "security": {
-              "allowedHosts": []
-            },
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            ]
           },
           "configurations": {
             "production": {
