@@ -2,17 +2,24 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { RoleService, UserRole } from '../../../core/services/role';
+import { LucideAngularModule, Bot, X, Send, Rocket } from 'lucide-angular';
 
 @Component({
   selector: 'app-chatbot',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './chatbot.html',
   styleUrl: './chatbot.css'
 })
 export class ChatbotComponent implements OnInit {
+  readonly Bot = Bot;
+  readonly X = X;
+  readonly Send = Send;
+  readonly Rocket = Rocket;
+
   @Input() misCursos: any[] = [];
-  
+
   @Output() tutoriaCreada = new EventEmitter<void>();
 
   isOpen = false;
@@ -21,14 +28,14 @@ export class ChatbotComponent implements OnInit {
   user: any = null;
   chatMessages: any[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private roleService: RoleService) { }
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
-    const nombre = this.user.name || 'Christian';
-    
-    const bienvenida = this.user.role === 'DOCENTE'
-      ? `¡Hola, colega! Soy el asistente IA de EduBridge. ¿Te ayudo con la redacción de avisos?`
+    const nombre = this.user.name || 'Estudiante';
+
+    const bienvenida = this.roleService.isDocente(this.user.role)
+      ? '¡Hola, colega! Soy el asistente IA de EduBridge. ¿Te ayudo con la redacción de avisos?'
       : `¡Hola ${nombre}! Soy tu tutor IA. ¿Tienes dudas con tus cursos o quieres agendar una tutoría?`;
 
     this.chatMessages.push({ role: 'assistant', content: bienvenida });
@@ -50,19 +57,24 @@ export class ChatbotComponent implements OnInit {
       ? this.misCursos.map(c => c.name).join(", ")
       : "Ecuaciones Diferenciales, Arquitectura de Computadoras, Física II";
 
+    
+    
+    
     const payload = {
       message: texto,
       role: this.user.role || 'ESTUDIANTE',
-      userName: this.user.name || 'Christian',
+      userName: this.user.name || 'Estudiante',
+      userId: this.user.id ? this.user.id.toString() : null, 
       cursos: cursosStr
     };
 
-    this.http.post('http://localhost:8081/api/chat/ask', payload).subscribe({
+    this.http.post('https://edubridge-backend-prueba-v2.onrender.com/api/chat/ask', payload).subscribe({
       next: (res: any) => {
         this.loading = false;
         this.typeWriterEffect(res.answer);
 
-        if (res.answer.includes('registrado') || res.answer.includes('agendado')) {
+        
+        if (res.answer.includes('registrado') || res.answer.includes('agendado') || res.answer.includes('sincronizada')) {
           this.tutoriaCreada.emit();
         }
       },
@@ -70,7 +82,7 @@ export class ChatbotComponent implements OnInit {
         this.loading = false;
         this.chatMessages.push({
           role: 'assistant',
-          content: 'Error de conexión. ¿Está el backend encendido, Christian?'
+          content: 'Error de conexión. ¿Está el backend encendido, Estudiante/a?'
         });
       }
     });
@@ -82,7 +94,7 @@ export class ChatbotComponent implements OnInit {
     this.chatMessages.push(assistantMessage);
 
     const formattedText = fullText
-      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') 
+      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
       .replace(/\n/g, '<br>');
 
     const interval = setInterval(() => {
