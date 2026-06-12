@@ -1,0 +1,25 @@
+@keyframes progress-fast {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.animate-progress-fast {
+  animation: progress-fast 1.5s ease-in-out forwards;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #CBD5E1;
+}

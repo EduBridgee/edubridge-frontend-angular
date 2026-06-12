@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -65,7 +65,7 @@ export class StudentProfileComponent implements OnInit {
     { title: "Certificado de Conducta", size: "120 KB", date: "10 de julio de 2024" }
   ];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.cargarEstudiantes();
@@ -75,30 +75,34 @@ export class StudentProfileComponent implements OnInit {
 
   cargarEstudiantes() {
     this.loading = true;
-    this.http.get<any[]>('http://localhost:8081/api/students').subscribe({
+    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/students').subscribe({
       next: (data) => {
         this.students = data;
         this.filteredStudents = data;
         this.selectedStudent = data.find(s => s.email === this.user.email) || data[0];
         this.loading = false;
+        this.cdr.detectChanges(); 
       },
       error: (err) => {
         console.error("Error al cargar estudiantes", err);
         this.loading = false;
+        this.cdr.detectChanges(); 
       }
     });
   }
 
   cargarCursosDesdeBD() {
     this.loadingCourses = true;
-    this.http.get<any[]>('http://localhost:8081/api/courses').subscribe({
+    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').subscribe({
       next: (data) => {
         this.courses = data;
         this.loadingCourses = false;
+        this.cdr.detectChanges(); 
       },
       error: (err) => {
         console.error("Error al cargar cursos", err);
         this.loadingCourses = false;
+        this.cdr.detectChanges(); 
       }
     });
   }
@@ -133,7 +137,7 @@ export class StudentProfileComponent implements OnInit {
   guardarCambios() {
     if (!this.editingStudent.id) return;
     this.loading = true;
-    this.http.put(`http://localhost:8081/api/students/${this.editingStudent.id}`, this.editingStudent).subscribe({
+    this.http.put(`https://edubridge-backend-v2.onrender.com/api/students/${this.editingStudent.id}`, this.editingStudent).subscribe({
       next: (updated: any) => {
         const index = this.students.findIndex(s => s.id === updated.id);
         if (index !== -1) {
@@ -160,7 +164,7 @@ export class StudentProfileComponent implements OnInit {
       value: this.newGrade.value
     };
 
-    this.http.post('http://localhost:8081/api/grades', payload).subscribe({
+    this.http.post('https://edubridge-backend-v2.onrender.com/api/grades', payload).subscribe({
       next: () => {
         alert("Nota sincronizada correctamente.");
         this.newGrade = { courseId: null, value: null };
