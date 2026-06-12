@@ -106,8 +106,7 @@
                             <!-- Área bajo la curva -->
                             <path [attr.d]="trendAreaPath" fill="url(#gradientDocente)" />
                             <!-- Línea de tendencia -->
-                            <path [attr.d]="trendLinePath" fill="none" stroke="#10b981" stroke-width="3"
-                                stroke-linecap="round" stroke-linejoin="round" />
+                            <path [attr.d]="trendLinePath" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                         <span *ngFor="let mes of ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']"
                             class="text-[10px] font-bold text-slate-300 pb-2 z-10">{{mes}}</span>
@@ -119,8 +118,7 @@
                     <div class="relative flex items-center justify-center mb-8">
                         <div class="w-44 h-44 rounded-full flex items-center justify-center shadow-inner transition-all duration-500"
                             [style.background]="getConicGradient()">
-                            <div
-                                class="w-32 h-32 rounded-full bg-white flex flex-col items-center justify-center shadow-sm">
+                            <div class="w-32 h-32 rounded-full bg-white flex flex-col items-center justify-center shadow-sm">
                                 <span class="text-[10px] font-bold text-slate-300 uppercase">Salud Aula</span>
                                 <span class="text-2xl font-black text-slate-700">{{globalHealth}}%</span>
                             </div>
@@ -258,8 +256,7 @@
                     <div class="text-left">
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Asistencia</p>
                         <h4 class="text-2xl font-black text-slate-900 leading-none">{{studentAttendancePct}}%</h4>
-                        <p class="text-[9px] font-bold text-emerald-500 mt-2">{{studentAttendedClasses}} de
-                            {{studentTotalClasses}} clases</p>
+                        <p class="text-[9px] font-bold text-emerald-500 mt-2">{{studentAttendedClasses}} de {{studentTotalClasses}} clases</p>
                     </div>
                     <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
                         <lucide-icon [img]="Check" [size]="24"></lucide-icon>

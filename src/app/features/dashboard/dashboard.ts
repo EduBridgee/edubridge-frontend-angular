@@ -15,7 +15,7 @@ import { LucideAngularModule, Search, Users, Award, Target, AlertTriangle, Trend
   styleUrl: './dashboard.css'
 })
 export class DashboardComponent implements OnInit {
-
+  
   user: any = {
     id: localStorage.getItem('user_id'),
     name: localStorage.getItem('user_name'),
@@ -37,7 +37,7 @@ export class DashboardComponent implements OnInit {
   students: any[] = [];
   loading: boolean = true;
 
-
+  
   data: any = null;
   statsGrados: any[] = [];
   distribucionRiesgo = { bajo: 0, medio: 0, alto: 0 };
@@ -45,7 +45,7 @@ export class DashboardComponent implements OnInit {
   trendLinePath: string = 'M0,150 L600,150';
   trendAreaPath: string = 'M0,150 L600,150 L600,240 L0,240 Z';
 
-
+  
   promedioCalculadoEstudiante: number = 0;
   studentSummary: any = null;
   studentGrades: any[] = [];
@@ -55,7 +55,7 @@ export class DashboardComponent implements OnInit {
   studentAttendedClasses: number = 0;
   studentTotalClasses: number = 0;
 
-
+  
   tendenciaMensual: string = '+0.0';
   esTendenciaPositiva: boolean = true;
 
@@ -74,7 +74,7 @@ export class DashboardComponent implements OnInit {
     const normalizedRole = this.roleService.normalizeRole(this.user.role);
     const userId = Number(this.user.id);
 
-
+    
     if (normalizedRole === UserRole.ADMIN) {
       this.processAdminDashboard();
       return;
@@ -113,13 +113,13 @@ export class DashboardComponent implements OnInit {
         if (isDocente) {
           const teacherId = Number(this.user.id);
 
-
+          
           const nuevosCursos = res.allCourses.filter(c => c.teacher && Number(c.teacher.id) === teacherId);
 
-
+          
           const viejosCursos = res.allTeachers.filter(p => Number(p.id) === teacherId && p.course).map(p => p.course);
 
-
+          
           const combinados = [...nuevosCursos];
           viejosCursos.forEach(vc => {
             if (vc && !combinados.some(c => c.id === vc.id)) {
@@ -129,7 +129,7 @@ export class DashboardComponent implements OnInit {
 
           const teacherCourseIds = combinados.map(c => Number(c.id));
 
-
+          
           const myStudentIds = new Set<number>();
           res.allEnrollments.forEach(m => {
             const cId = m.courseId ? Number(m.courseId) : (m.course ? Number(m.course.id) : null);
@@ -139,11 +139,11 @@ export class DashboardComponent implements OnInit {
             }
           });
 
-
+          
           const myStudents = res.allStudents.filter(alumno => myStudentIds.has(Number(alumno.id)));
           this.students = myStudents;
 
-
+          
           const myGrades = res.myGrades.filter(g => g.course && teacherCourseIds.includes(Number(g.course.id)));
 
           this.processDocenteData(myStudents, myGrades, combinados, res.allEnrollments);
@@ -163,11 +163,11 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-
-
-
+  
+  
+  
   private processAdminDashboard() {
-
+    
     forkJoin({
       allStudents: this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/students').pipe(catchError(() => of([]))),
       allCourses: this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/courses').pipe(catchError(() => of([])))
@@ -176,7 +176,7 @@ export class DashboardComponent implements OnInit {
         this.students = res.allStudents;
         const totalStudents = res.allStudents.length;
 
-
+        
         const sumaNotas = res.allStudents.reduce((acc, s) => acc + (s.averageGrade || 0), 0);
 
         this.data = {
@@ -186,7 +186,7 @@ export class DashboardComponent implements OnInit {
           highRiskCount: res.allStudents.filter(s => s.riskLevel === 'Alto Riesgo').length
         };
 
-
+        
         const alto = this.data.highRiskCount;
         const medio = res.allStudents.filter(s => s.riskLevel === 'Riesgo Medio').length;
         const bajo = totalStudents > 0 ? (totalStudents - (alto + medio)) : 0;
@@ -198,7 +198,7 @@ export class DashboardComponent implements OnInit {
         };
 
         this.globalHealth = 100 - this.distribucionRiesgo.alto;
-        this.tendenciaMensual = '+1.4';
+        this.tendenciaMensual = '+1.4'; 
         this.esTendenciaPositiva = true;
 
         this.loading = false;
@@ -237,7 +237,7 @@ export class DashboardComponent implements OnInit {
       highRiskCount: allStudents.filter(s => s.riskLevel === 'Alto Riesgo').length
     };
 
-
+    
     if (myCourses.length > 0) {
       const counts = myCourses.map(course => {
         const enrolls = allEnrollments.filter(m => {
@@ -269,7 +269,7 @@ export class DashboardComponent implements OnInit {
 
     this.globalHealth = 100 - this.distribucionRiesgo.alto;
 
-
+    
     const pc1Grades = myGrades.filter(g => g.type === 'PC1').map(g => g.value);
     const pc2Grades = myGrades.filter(g => g.type === 'PC2').map(g => g.value);
     const eaGrades = myGrades.filter(g => g.type === 'EA').map(g => g.value);
@@ -288,7 +288,7 @@ export class DashboardComponent implements OnInit {
 
     const valToY = (val: number) => {
       const cl = Math.max(0, Math.min(20, val));
-      return 210 - (cl * 9);
+      return 210 - (cl * 9); 
     };
 
     const y0 = valToY(avgPC1 - 0.6);
@@ -320,7 +320,7 @@ export class DashboardComponent implements OnInit {
   private processEstudianteData(allStudents: any[], myGrades: any[], userId: number, myEnrollments: any[] = []) {
     this.studentSummary = allStudents.find(s => s.id === userId);
 
-
+    
     this.studentEnrolledCoursesCount = myEnrollments.length;
     let sumAttended = 0;
     let sumTotal = 0;

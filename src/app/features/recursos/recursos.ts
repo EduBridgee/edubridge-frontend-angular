@@ -46,7 +46,7 @@ export class RecursosComponent implements OnInit {
 
   nuevoRecurso = {
     title: '',
-    subject: '',
+    subject: '', 
     type: 'PDF',
     meta: '',
     img: '',
@@ -55,7 +55,7 @@ export class RecursosComponent implements OnInit {
   };
 
   constructor(
-    private http: HttpClient,
+    private http: HttpClient, 
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService
   ) {}
@@ -76,7 +76,7 @@ export class RecursosComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
-
+    
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
       this.handleFile(files[0]);
@@ -91,7 +91,7 @@ export class RecursosComponent implements OnInit {
   }
 
   private handleFile(file: File) {
-
+    
     const MAX_SIZE_KB = 500;
     if (file.size > MAX_SIZE_KB * 1024) {
       this.notificationService.showError(`El archivo es demasiado grande (${(file.size / 1024).toFixed(1)}KB). Límite permitido: ${MAX_SIZE_KB}KB.`, 'Archivo excedido');
@@ -105,7 +105,7 @@ export class RecursosComponent implements OnInit {
 
     const reader = new FileReader();
     reader.onload = (e: any) => {
-
+      
       this.nuevoRecurso.img = e.target.result;
       this.cdr.detectChanges();
     };
@@ -115,15 +115,15 @@ export class RecursosComponent implements OnInit {
   manejarSubida() {
     if (!this.nuevoRecurso.title) return;
 
-
+    
     const payload = {
       type: this.nuevoRecurso.type,
       title: this.nuevoRecurso.title,
-      subject: this.nuevoRecurso.subject,
+      subject: this.nuevoRecurso.subject, 
       meta: this.nuevoRecurso.meta || 'Material académico',
       stats: this.nuevoRecurso.stats,
       rating: this.nuevoRecurso.rating,
-      img: this.nuevoRecurso.type === 'Video' ? this.videoUrl : this.nuevoRecurso.img
+      img: this.nuevoRecurso.type === 'Video' ? this.videoUrl : this.nuevoRecurso.img 
     };
 
     console.log('Enviando recurso al backend (Modelo exacto):', { ...payload, img: payload.img?.substring(0, 50) + '...' });
@@ -183,14 +183,14 @@ export class RecursosComponent implements OnInit {
             next: (profesores) => {
               const misCursos = data.filter(c => c.teacher && Number(c.teacher.id) === Number(this.user.id));
               const viejosCursos = profesores.filter(p => Number(p.id) === Number(this.user.id) && p.course).map(p => p.course);
-
+              
               const combinados = [...misCursos];
               viejosCursos.forEach(vc => {
                 if (!combinados.some(c => c.id === vc.id)) {
                   combinados.push(vc);
                 }
               });
-
+              
               this.cursos = combinados;
               if (this.cursos.length > 0) {
                 this.nuevoRecurso.subject = this.cursos[0].name;
@@ -223,10 +223,10 @@ export class RecursosComponent implements OnInit {
   }
 
   registrarActividad(recurso: any) {
-
+    
     this.recentActivity = this.recentActivity.filter(a => a.id !== recurso.id);
-
-
+    
+    
     this.recentActivity.unshift({
       id: recurso.id,
       title: recurso.title,
@@ -235,9 +235,9 @@ export class RecursosComponent implements OnInit {
       timestamp: new Date().getTime()
     });
 
-
+    
     this.recentActivity = this.recentActivity.slice(0, 4);
-
+    
     localStorage.setItem(this.ACTIVITY_KEY, JSON.stringify(this.recentActivity));
     this.cdr.detectChanges();
   }
@@ -245,7 +245,7 @@ export class RecursosComponent implements OnInit {
   cargarDatos() {
     this.loading = true;
     const role = this.user.role ? this.user.role.toLowerCase() : '';
-
+    
     this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/resources').subscribe({
       next: (dataRecursos) => {
         if (role === 'estudiante' || role === 'student') {
@@ -292,11 +292,11 @@ export class RecursosComponent implements OnInit {
     if (this.activeFilter === 'Todos') {
       this.filteredRecursos = this.recursos;
     } else {
-      const typeMap: any = {
-        'Documentos': 'PDF',
-        'Videos': 'Video',
-        'Quizzes': 'Quiz',
-        'Audios': 'Audio',
+      const typeMap: any = { 
+        'Documentos': 'PDF', 
+        'Videos': 'Video', 
+        'Quizzes': 'Quiz', 
+        'Audios': 'Audio', 
         'Presentaciones': 'PPT',
         'Imágenes': 'Imagen'
       };
@@ -315,7 +315,7 @@ export class RecursosComponent implements OnInit {
 
   manejarAccion(recurso: any) {
     this.registrarActividad(recurso);
-
+    
     let content = recurso.img;
 
     if (!content) {
@@ -327,7 +327,7 @@ export class RecursosComponent implements OnInit {
       }
     }
 
-
+    
     if (content.startsWith('data:')) {
       try {
         const byteString = atob(content.split(',')[1]);
@@ -352,7 +352,7 @@ export class RecursosComponent implements OnInit {
 
   descargarRecurso(recurso: any) {
     const content = recurso.img;
-
+    
     if (!content) {
       this.notificationService.showInfo('No hay un archivo físico disponible para descargar.', 'Sin archivo');
       return;

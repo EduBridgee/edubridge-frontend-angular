@@ -76,7 +76,7 @@ export class CursosComponent implements OnInit {
             next: (profesores) => {
               const misCursos = allCourses.filter(c => c.teacher && Number(c.teacher.id) === Number(this.user.id));
               const viejosCursos = profesores.filter(p => Number(p.id) === Number(this.user.id) && p.course).map(p => p.course);
-
+              
               const combinados = [...misCursos];
               viejosCursos.forEach(vc => {
                 if (!combinados.some(c => c.id === vc.id)) {
@@ -138,17 +138,17 @@ export class CursosComponent implements OnInit {
                     prof: profesorReal ? profesorReal.name : "Prof. Por Asignar",
                     evaluaciones: notasDelCurso.map(n => ({ type: n.type, value: n.value })),
 
-
+                    
                     notaPromedio: notasDelCurso.length > 0
                       ? notasDelCurso.reduce((acc, n) => acc + n.value, 0) / notasDelCurso.length
                       : 0,
 
-
+                    
                     asis: (matricula.attendancePercentage !== undefined && matricula.attendancePercentage !== null)
                       ? `${matricula.attendancePercentage}%`
                       : "0%",
 
-
+                    
                     puntosParticipacion: matricula.participations || 0,
 
                     prog: Math.floor(Math.random() * (90 - 60 + 1)) + 60
