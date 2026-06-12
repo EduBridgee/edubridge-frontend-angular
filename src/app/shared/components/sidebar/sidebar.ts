@@ -27,6 +27,8 @@ export class SidebarComponent {
 
   constructor(private router: Router) { }
   
+  isMenuOpen = false;
+
   get filteredMenu() {
     return this.menuItems.filter(item => item.roles.includes(this.userRole));
   }
@@ -48,4 +50,9 @@ export class SidebarComponent {
   logout() {
     this.onLogout.emit();
   }
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
 }

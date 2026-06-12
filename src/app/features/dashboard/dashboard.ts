@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell';
@@ -22,7 +22,7 @@ export class DashboardComponent implements OnInit {
   averageEvolution: any[] = [];
   loading: boolean = true;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.fetchData();
@@ -33,8 +33,8 @@ export class DashboardComponent implements OnInit {
     const isDocente = this.user.role === 'docente' || this.user.role === 'DOCENTE';
     const userId = this.user.id;
 
-    const studentsReq = this.http.get<any[]>('http://localhost:8081/api/students').pipe(catchError(() => of([])));
-    const gradesReq = isDocente ? of([]) : this.http.get<any[]>(`http://localhost:8081/api/grades/student/${userId}`).pipe(catchError(() => of([])));
+    const studentsReq = this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/students').pipe(catchError(() => of([])));
+    const gradesReq = isDocente ? of([]) : this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/grades/student/${userId}`).pipe(catchError(() => of([])));
 
     forkJoin({
       allStudents: studentsReq,
@@ -70,8 +70,12 @@ export class DashboardComponent implements OnInit {
           this.generateEvolutionChart(this.studentSummary);
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: () => this.loading = false
+      error: () =>  {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 

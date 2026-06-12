@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class AuthService { 
-  private apiUrl = 'http://localhost:8081/api/auth';
+  private apiUrl = 'https://edubridge-backend-v2.onrender.com/api/auth';  
 
   constructor(private http: HttpClient) { }
 
@@ -14,6 +14,6 @@ export class AuthService {
   }
 
   handleSocialLogin(platform: string) {
-    window.location.href = `http://localhost:8081/oauth2/authorization/${platform.toLowerCase()}`;
+    window.location.href = `https://edubridge-backend-v2.onrender.com/oauth2/authorization/${platform.toLowerCase()}`;
   }
 }
