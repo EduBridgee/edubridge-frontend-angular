@@ -1,10 +1,12 @@
-<main class="flex-1 ml-0 md:ml-64 bg-[#F8FAFC] min-h-screen flex flex-col font-['Inter'] relative text-left transition-all">
+<main class="flex-1 ml-0 md:ml-64 bg-[#F8FAFC] min-h-screen flex flex-col font-inter relative text-left transition-all">
 
   <div class="p-4 md:p-8 pb-0 w-full relative z-[60]">
-    <div class="bg-white/70 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-slate-100 flex items-center justify-between px-4 md:px-6 gap-4">
+    <div
+      class="bg-white/70 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-slate-100 flex items-center justify-between px-4 md:px-6 gap-4">
       <div class="flex items-center gap-3 flex-1 min-w-[150px]">
-        <span class="text-lg opacity-40">🔍</span>
-        <input type="text" placeholder="Buscar procesos..." class="bg-transparent border-none outline-none text-sm font-medium text-slate-400 w-full" />
+        <lucide-icon [img]="Search" [size]="18" class="opacity-40"></lucide-icon>
+        <input type="text" placeholder="Buscar procesos..."
+          class="bg-transparent border-none outline-none text-sm font-medium text-slate-400 w-full" />
       </div>
       <div class="flex items-center gap-2 md:gap-4 shrink-0">
         <app-notification-bell [user]="user"></app-notification-bell>
@@ -22,45 +24,68 @@
 
     <section class="flex-1 space-y-8">
       <div class="text-left">
-        <h2 class="text-xl md:text-2xl font-black text-slate-900 leading-none uppercase tracking-tighter italic">Gestión Docente</h2>
-        <p class="text-slate-400 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mt-2 opacity-60">Control de tareas administrativas y reportes</p>
+        <h2 class="text-xl md:text-2xl font-black text-slate-900 leading-none uppercase tracking-tighter italic">Gestión
+          Docente</h2>
+        <p class="text-slate-400 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mt-2 opacity-60">Control
+          de tareas administrativas y reportes</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div *ngFor="let kpi of [
-          {label: 'Promedio Aula', val: promedioAula, sub: 'General', icon: '📊', color: 'blue'},
-          {label: 'Estudiantes', val: estudiantes.length, sub: 'Registrados', icon: '👥', color: 'emerald'},
-          {label: 'Clases Hoy', val: '5', sub: 'Sincrónicas', icon: '📅', color: 'purple'},
-          {label: 'Horas Ahorro', val: '24h', sub: 'Automatización', icon: '🕒', color: 'orange'}
+          {label: 'Promedio Aula', val: promedioAula, sub: 'General', color: 'blue'},
+          {label: 'Estudiantes', val: estudiantesCurso.length, sub: 'En este curso', color: 'emerald'},
+          {label: 'Clases Hoy', val: '5', sub: 'Sincrónicas', color: 'purple'},
+          {label: 'Horas Ahorro', val: '24h', sub: 'Automatización', color: 'orange'}
         ]" class="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm">
           <div class="text-left">
             <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">{{kpi.label}}</p>
             <p class="text-2xl font-black text-slate-900 leading-none tracking-tighter">{{kpi.val}}</p>
-            <p class="text-[9px] font-black mt-2 uppercase tracking-tighter" [ngClass]="'text-'+kpi.color+'-600'">{{kpi.sub}}</p>
+            <p class="text-[9px] font-black mt-2 uppercase tracking-tighter" [ngClass]="'text-'+kpi.color+'-600'">
+              {{kpi.sub}}</p>
           </div>
-          <div [ngClass]="'bg-'+kpi.color+'-50 text-'+kpi.color+'-600'" class="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shadow-sm">
-            {{kpi.icon}}
+          <div [ngClass]="'bg-'+kpi.color+'-50 text-'+kpi.color+'-600'"
+            class="w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm">
+            <lucide-icon *ngIf="kpi.label === 'Promedio Aula'" [img]="BarChart3" [size]="20"></lucide-icon>
+            <lucide-icon *ngIf="kpi.label === 'Estudiantes'" [img]="Users" [size]="20"></lucide-icon>
+            <lucide-icon *ngIf="kpi.label === 'Clases Hoy'" [img]="Calendar" [size]="20"></lucide-icon>
+            <lucide-icon *ngIf="kpi.label === 'Horas Ahorro'" [img]="Clock" [size]="20"></lucide-icon>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div (click)="showNotasModal = true" class="p-6 rounded-[2rem] bg-blue-50 text-blue-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
-          <span class="text-2xl md:text-3xl group-hover:scale-110 transition-transform">⭐</span>
-          <span class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Subir Notas</span>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div (click)="showNotasModal = true"
+          class="p-6 rounded-[2rem] bg-blue-50 text-blue-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
+          <lucide-icon [img]="Star" [size]="24"
+            class="md:text-3xl group-hover:scale-110 transition-transform"></lucide-icon>
+          <span class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Subir
+            Notas</span>
         </div>
-        <div (click)="showAsistenciaModal = true" class="p-6 rounded-[2rem] bg-emerald-50 text-emerald-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
-          <span class="text-2xl md:text-3xl group-hover:scale-110">👤</span>
-          <span class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Asistencia</span>
+        <div (click)="showAsistenciaModal = true"
+          class="p-6 rounded-[2rem] bg-emerald-50 text-emerald-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
+          <lucide-icon [img]="User" [size]="24" class="md:text-3xl group-hover:scale-110"></lucide-icon>
+          <span
+            class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Asistencia</span>
         </div>
-        <div (click)="showStatsModal = true" class="p-6 rounded-[2rem] bg-purple-50 text-purple-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
-          <span class="text-2xl md:text-3xl group-hover:scale-110">📊</span>
-          <span class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Estadísticas</span>
+        <div (click)="showStatsModal = true"
+          class="p-6 rounded-[2rem] bg-purple-50 text-purple-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
+          <lucide-icon [img]="BarChart3" [size]="24" class="md:text-3xl group-hover:scale-110"></lucide-icon>
+          <span
+            class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Estadísticas</span>
         </div>
-        <div (click)="showNotifyModal = true" class="p-6 rounded-[2rem] bg-orange-50 text-orange-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
-          <span class="text-2xl md:text-3xl group-hover:scale-110">🔔</span>
-          <span class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Notificar</span>
+        <div (click)="showNotifyModal = true"
+          class="p-6 rounded-[2rem] bg-orange-50 text-orange-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
+          <lucide-icon [img]="Bell" [size]="24" class="md:text-3xl group-hover:scale-110"></lucide-icon>
+          <span
+            class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Notificar</span>
         </div>
+        <div (click)="showParticipacionModal = true"
+          class="p-6 rounded-[2rem] bg-amber-50 text-amber-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
+          <lucide-icon [img]="Edit" [size]="24" class="md:text-3xl group-hover:scale-110"></lucide-icon>
+          <span
+            class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Participación</span>
+        </div>
+
       </div>
 
       <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 p-6 md:p-8 shadow-sm text-left">
@@ -69,10 +94,13 @@
           <div *ngFor="let task of tasks" class="space-y-4 group">
             <div class="flex justify-between items-start gap-2">
               <div>
-                <p class="font-black text-slate-800 text-sm md:text-base tracking-tight leading-tight">{{task.title}}</p>
-                <p class="text-[8px] md:text-[9px] text-slate-400 font-black uppercase tracking-widest mt-1 opacity-60">{{task.tag}} Prioridad</p>
+                <p class="font-black text-slate-800 text-sm md:text-base tracking-tight leading-tight">{{task.title}}
+                </p>
+                <p class="text-[8px] md:text-[9px] text-slate-400 font-black uppercase tracking-widest mt-1 opacity-60">
+                  {{task.tag}} Prioridad</p>
               </div>
-              <span [class]="task.status === 'Pendiente' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'" class="px-3 md:px-4 py-1.5 rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest shadow-sm">
+              <span [class]="task.status === 'Pendiente' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'"
+                class="px-3 md:px-4 py-1.5 rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest shadow-sm">
                 {{task.status}}
               </span>
             </div>
@@ -106,8 +134,9 @@
         <div class="relative z-10 text-left">
           <h3 class="font-black mb-2 uppercase text-[10px] tracking-widest">Exportar Datos</h3>
           <p class="text-[10px] font-bold text-blue-100 mb-6 uppercase opacity-70">Generar consolidado en PDF.</p>
-          <button (click)="loading = true" class="w-full bg-white text-blue-600 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:scale-105 transition-transform">
-            📥 Descargar PDF
+          <button (click)="loading = true"
+            class="w-full bg-white text-blue-600 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:scale-105 transition-transform">
+            <lucide-icon [img]="Download" [size]="14" class="inline mr-1"></lucide-icon> Descargar PDF
           </button>
         </div>
         <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
@@ -115,73 +144,144 @@
     </aside>
   </div>
 
-  <div *ngIf="showNotasModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
+  <div *ngIf="showNotasModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
+    <div
+      class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
       <div class="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center bg-blue-50/50">
-        <h3 class="font-black text-slate-800 text-lg md:text-xl uppercase tracking-tighter">⭐ Registro de Notas</h3>
-        <button (click)="showNotasModal = false" class="text-3xl font-light hover:rotate-90 transition-transform">×</button>
+        <h3 class="font-black text-slate-800 text-lg md:text-xl uppercase tracking-tighter flex items-center gap-2">
+          <lucide-icon [img]="Star" [size]="18"></lucide-icon> Registro de Notas
+        </h3>
+        <button (click)="showNotasModal = false" class="text-3xl font-light hover:rotate-90 transition-transform">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
       <form (ngSubmit)="manejarSubirNota()" class="p-6 md:p-8 space-y-5 text-left max-h-[80vh] overflow-y-auto">
+
         <div>
-          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Estudiante</label>
-          <select required name="studentId" [(ngModel)]="nuevaNota.studentId" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500">
-            <option [ngValue]="null" disabled>Elegir alumno...</option>
-            <option *ngFor="let s of estudiantes" [value]="s.id">{{s.name}} ({{s.code}})</option>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Curso</label>
+          <select [ngModel]="cursoSeleccionadoId" (ngModelChange)="onCursoSeleccionadoChange($event)"
+            name="courseIdSelector"
+            class="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold outline-none focus:border-blue-500">
+            <option [ngValue]="null" disabled>Seleccionar curso...</option>
+            <option *ngFor="let curso of courses" [value]="curso.id">{{curso.name}}</option>
           </select>
         </div>
+
+        <div>
+          <label
+            class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Estudiante</label>
+          <select required name="studentId" [(ngModel)]="nuevaNota.studentId"
+            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500">
+            <option [ngValue]="null" disabled>Elegir alumno...</option>
+            <option *ngFor="let s of estudiantesCurso" [value]="s.id">{{s.name}} ({{s.code}})</option>
+          </select>
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Curso</label>
-            <select name="courseId" [(ngModel)]="nuevaNota.courseId" required class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-xs font-bold outline-none">
-              <option [ngValue]="null" disabled>Curso...</option>
-              <option *ngFor="let curso of courses" [value]="curso.id">{{curso.name}}</option>
+            <label
+              class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Evaluación</label>
+            <select name="evaluationType" [(ngModel)]="nuevaNota.type" required
+              class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-xs font-bold outline-none focus:border-blue-500">
+              <option [ngValue]="null" disabled>Tipo...</option>
+              <option value="PC1">Práctica Calificada 1</option>
+              <option value="PC2">Práctica Calificada 2</option>
+              <option value="PC3">Práctica Calificada 3</option>
+              <option value="EA">Examen Parcial</option>
+              <option value="EB">Examen Final</option>
+              <option value="DD">Evaluación de Desempeño</option>
+              <option value="TF">Trabajo Final</option>
             </select>
           </div>
+
           <div>
-            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Nota (0-20)</label>
-            <input type="number" name="score" [(ngModel)]="nuevaNota.score" required min="0" max="20" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none" />
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-1">Nota
+              (0-20)</label>
+            <input type="number" name="score" [(ngModel)]="nuevaNota.score" required min="0" max="20"
+              placeholder="Ej: 15.5"
+              class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500" />
           </div>
         </div>
-        <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl active:scale-95">
+
+        <button type="submit"
+          class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl active:scale-95 transition-all">
           Sincronizar Nota
         </button>
       </form>
     </div>
   </div>
 
-  <div *ngIf="showAsistenciaModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
-      <div class="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50 sticky top-0 z-10">
-        <h3 class="font-black text-slate-800 text-lg md:text-xl uppercase tracking-tighter italic leading-none">Pase de Lista</h3>
-        <button (click)="showAsistenciaModal = false" class="text-3xl font-light">×</button>
+  <div *ngIf="showAsistenciaModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
+    <div
+      class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
+
+      <div
+        class="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50 sticky top-0 z-10">
+        <h3
+          class="font-black text-slate-800 text-lg md:text-xl uppercase tracking-tighter italic leading-none flex items-center gap-2">
+          <lucide-icon [img]="Check" [size]="18"></lucide-icon> Pase de Lista
+        </h3>
+        <button (click)="showAsistenciaModal = false" class="text-3xl font-light">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
-      <div class="p-4 md:p-8 max-h-[60vh] overflow-y-auto space-y-3 custom-scrollbar">
-        <div *ngFor="let alumno of estudiantes" [class]="asistencia[alumno.id] ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'" class="flex items-center justify-between p-4 rounded-2xl transition-all border-2 gap-4">
+
+      <div class="p-6 pb-2 border-b border-slate-50 bg-slate-50/50 flex flex-col gap-2">
+        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block px-1">Materia en
+          curso</label>
+        <select [ngModel]="cursoSeleccionadoId" (ngModelChange)="onCursoSeleccionadoChange($event)"
+          class="w-full bg-white border border-slate-200 p-3 rounded-xl text-xs font-bold outline-none focus:border-blue-500">
+          <option *ngFor="let curso of courses" [value]="curso.id">{{curso.name}}</option>
+        </select>
+      </div>
+
+      <div class="p-4 md:p-8 max-h-[450px] overflow-y-auto space-y-3 custom-scrollbar">
+        <div *ngFor="let alumno of estudiantesCurso"
+          [class]="asistencia[alumno.id] ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'"
+          class="flex items-center justify-between p-4 rounded-2xl transition-all border-2 gap-4">
           <div class="text-left flex-1 min-w-0">
             <span class="font-black text-xs text-slate-800 truncate block leading-none">{{alumno.name}}</span>
-            <span class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase mt-1 block">Riesgo: {{alumno.riskLevel || 'Bajo'}}</span>
+            <span class="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase mt-1 block">
+              Riesgo: {{alumno.riskLevel || 'Bajo'}} • Asistencia: {{getStudentAttendanceText(alumno.id)}}</span>
           </div>
-          <button (click)="toggleCheck(alumno.id)" [class]="asistencia[alumno.id] ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'" class="px-3 md:px-4 py-2 rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest shrink-0">
+          <button (click)="toggleCheck(alumno.id)"
+            [class]="asistencia[alumno.id] ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'"
+            class="px-3 md:px-4 py-2 rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest shrink-0">
             {{asistencia[alumno.id] ? 'Presente' : 'Falta'}}
           </button>
         </div>
+
+        <div *ngIf="estudiantesCurso.length === 0" class="text-center py-10 opacity-40 font-bold uppercase text-[10px]">
+          No hay alumnos matriculados en este curso.
+        </div>
       </div>
+
       <div class="p-6 md:p-8 border-t border-slate-50">
-        <button (click)="guardarAsistencia()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl active:scale-95">
+        <button (click)="guardarAsistencia()"
+          class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl active:scale-95 transition-all">
           Sincronizar Asistencia
         </button>
       </div>
     </div>
   </div>
 
-  <div *ngIf="showStatsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-2xl rounded-t-[3rem] sm:rounded-[3rem] shadow-2xl p-6 md:p-10 animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
+  <div *ngIf="showStatsModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
+    <div
+      class="bg-white w-full max-w-2xl rounded-t-[3rem] sm:rounded-[3rem] shadow-2xl p-6 md:p-10 animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-start mb-10">
         <div class="text-left">
-          <h3 class="font-black text-slate-900 text-2xl md:text-3xl tracking-tighter uppercase italic leading-none">Análisis Académico</h3>
-          <p class="text-slate-400 text-[10px] md:text-xs font-bold uppercase tracking-widest mt-2">Métricas globales del aula</p>
+          <h3 class="font-black text-slate-900 text-2xl md:text-3xl tracking-tighter uppercase italic leading-none">
+            Análisis Académico</h3>
+          <p class="text-slate-400 text-[10px] md:text-xs font-bold uppercase tracking-widest mt-2">Métricas globales
+            del aula filtrada</p>
         </div>
-        <button (click)="showStatsModal = false" class="bg-slate-100 w-10 h-10 rounded-full flex items-center justify-center hover:rotate-90 transition-transform">×</button>
+        <button (click)="showStatsModal = false"
+          class="bg-slate-100 w-10 h-10 rounded-full flex items-center justify-center hover:rotate-90 transition-transform">
+          <lucide-icon [img]="X" [size]="18"></lucide-icon>
+        </button>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
         <div class="space-y-6 text-left">
@@ -189,7 +289,7 @@
           <div class="space-y-4">
             <div class="space-y-2">
               <div class="flex justify-between items-center text-[9px] font-black text-slate-400 uppercase px-1">
-                <span>Aprobados (>10.5)</span>
+                <span>Aprobados (&gt;10.5)</span>
                 <span class="text-slate-800">{{statsAprobados}}%</span>
               </div>
               <div class="w-full bg-slate-50 h-2.5 rounded-full overflow-hidden border border-slate-100/50">
@@ -202,7 +302,8 @@
                 <span class="text-slate-800">{{100 - statsAprobados}}%</span>
               </div>
               <div class="w-full bg-slate-50 h-2.5 rounded-full overflow-hidden border border-slate-100/50">
-                <div class="bg-rose-500 h-full transition-all duration-1000" [style.width.%]="100 - statsAprobados"></div>
+                <div class="bg-rose-500 h-full transition-all duration-1000" [style.width.%]="100 - statsAprobados">
+                </div>
               </div>
             </div>
           </div>
@@ -210,8 +311,11 @@
         <div class="bg-slate-50 rounded-[2rem] p-8 flex flex-col items-center justify-center text-center">
           <div class="relative flex items-center justify-center mb-4">
             <svg class="w-24 h-24 md:w-32 md:h-32 transform -rotate-90">
-              <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="10" fill="transparent" class="text-slate-200" />
-              <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="10" fill="transparent" [style.strokeDasharray]="364" [style.strokeDashoffset]="364 - (364 * (+promedioAula/20))" class="text-blue-600 transition-all duration-1000" />
+              <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="10" fill="transparent"
+                class="text-slate-200" />
+              <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="10" fill="transparent"
+                [style.strokeDasharray]="364" [style.strokeDashoffset]="364 - (364 * (+promedioAula/20))"
+                class="text-blue-600 transition-all duration-1000" />
             </svg>
             <span class="absolute text-xl md:text-2xl font-black text-slate-800">{{promedioAula}}</span>
           </div>
@@ -221,39 +325,103 @@
     </div>
   </div>
 
-  <div *ngIf="showNotifyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 text-left">
+  <div *ngIf="showNotifyModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4"
+    (click)="showNotifyModal = false">
+    <div (click)="$event.stopPropagation()"
+      class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 text-left">
       <div class="p-6 md:p-8 border-b border-slate-50 bg-orange-50/30 flex justify-between items-center">
         <div>
-          <h3 class="font-black text-slate-800 text-lg md:text-xl uppercase tracking-tighter italic leading-none">Lanzar Notificación</h3>
-          <p class="text-[8px] md:text-[9px] font-bold text-orange-600 uppercase tracking-widest mt-1">Alerta directa al portal del estudiante</p>
+          <h3
+            class="font-black text-slate-800 text-lg md:text-xl uppercase tracking-tighter italic leading-none flex items-center gap-2">
+            <lucide-icon [img]="Bell" [size]="18"></lucide-icon> Lanzar Notificación
+          </h3>
+          <p class="text-[8px] md:text-[9px] font-bold text-orange-600 uppercase tracking-widest mt-1">Alerta directa al
+            portal del estudiante</p>
         </div>
-        <button (click)="showNotifyModal = false" class="text-3xl font-light hover:rotate-90 transition-transform">×</button>
+        <button (click)="showNotifyModal = false" class="text-3xl font-light hover:rotate-90 transition-transform">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
       </div>
       <form (ngSubmit)="manejarEnvioNotificacion()" class="p-6 md:p-8 space-y-5">
         <div>
-          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Seleccionar Estudiante</label>
-          <select required name="studentIdNotif" [(ngModel)]="nuevaNotif.studentId" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500">
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Seleccionar
+            Estudiante</label>
+          <select required name="studentIdNotif" [(ngModel)]="nuevaNotif.studentId"
+            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500">
             <option value="" disabled selected>Elegir alumno...</option>
-            <option *ngFor="let s of estudiantes" [value]="s.id">{{s.name}}</option>
+            <option *ngFor="let s of estudiantesCurso" [value]="s.id">{{s.name}} ({{s.code}})</option>
           </select>
         </div>
         <div>
-          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Tipo de Notificación</label>
-          <select required name="notifType" [(ngModel)]="nuevaNotif.type" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500">
-            <option value="GENERAL">General 📢</option>
-            <option value="RIESGO">Alerta de Riesgo Académico ⚠️</option>
-            <option value="EXAMEN">Recordatorio de Examen 📝</option>
-            <option value="TAREA">Entrega de Tarea Pendiente 📂</option>
-            <option value="FELICITACION">Reconocimiento ✨</option>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Tipo de
+            Notificación</label>
+          <select required name="notifType" [(ngModel)]="nuevaNotif.type"
+            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:border-blue-500">
+            <option value="GENERAL">General</option>
+            <option value="RIESGO">Alerta de Riesgo Académico</option>
+            <option value="EXAMEN">Recordatorio de Examen</option>
+            <option value="TAREA">Entrega de Tarea Pendiente</option>
+            <option value="FELICITACION">Reconocimiento</option>
           </select>
         </div>
         <div>
           <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Mensaje</label>
-          <textarea required name="message" [(ngModel)]="nuevaNotif.message" placeholder="Escribe el aviso aquí..." class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold h-32 resize-none outline-none focus:ring-4 focus:ring-blue-50 transition-all"></textarea>
+          <textarea required name="message" [(ngModel)]="nuevaNotif.message" placeholder="Escribe el aviso aquí..."
+            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold h-32 resize-none outline-none focus:ring-4 focus:ring-blue-50 transition-all"></textarea>
         </div>
-        <button type="submit" [disabled]="loading" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-blue-700 active:scale-95 disabled:opacity-50 transition-all">
-          {{ loading ? 'Enviando...' : 'Enviar Notificación 🚀' }}
+        <button type="submit" [disabled]="loading"
+          class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-blue-700 active:scale-95 transition-all">
+          <lucide-icon [img]="Bell" [size]="14" class="inline mr-1"></lucide-icon> {{ loading ? 'Enviando...' : 'Enviar
+          Notificación' }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="showParticipacionModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
+    <div
+      class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 duration-300">
+      <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-amber-50/50">
+        <h3 class="font-black text-slate-800 text-lg uppercase tracking-tighter italic flex items-center gap-2">
+          <lucide-icon [img]="Edit" [size]="18"></lucide-icon> Participación
+        </h3>
+        <button (click)="showParticipacionModal = false" class="text-3xl font-light">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
+      </div>
+      <form (ngSubmit)="manejarRegistroParticipacion()" class="p-6 space-y-4 text-left">
+        <div>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Alumno</label>
+          <select required name="pStudentId" [(ngModel)]="nuevaParticipacion.studentId"
+            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none">
+            <option [ngValue]="null" disabled>Elegir alumno...</option>
+            <option *ngFor="let s of estudiantesCurso" [value]="s.id">{{s.name}} ({{s.code}})</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Puntos</label>
+            <input type="number" name="pPoints" [(ngModel)]="nuevaParticipacion.points"
+              class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold" />
+          </div>
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Fecha</label>
+            <input type="date" name="pDate" [(ngModel)]="nuevaParticipacion.date"
+              class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-xs font-bold" />
+          </div>
+        </div>
+        <div>
+          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Observación
+            Conductual</label>
+          <textarea name="pObs" [(ngModel)]="nuevaParticipacion.observation"
+            placeholder="Ej: Participó activamente en el debate..."
+            class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold h-24 resize-none"></textarea>
+        </div>
+        <button type="submit"
+          class="w-full bg-amber-500 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+          Registrar Compromiso
         </button>
       </form>
     </div>
