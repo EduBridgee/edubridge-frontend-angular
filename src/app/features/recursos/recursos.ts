@@ -128,7 +128,7 @@ export class RecursosComponent implements OnInit {
 
     console.log('Enviando recurso al backend (Modelo exacto):', { ...payload, img: payload.img?.substring(0, 50) + '...' });
 
-    this.http.post('https://edubridge-backend-prueba-v2.onrender.com/api/resources', payload).subscribe({
+    this.http.post('https://edubridge-backend-v2.onrender.com/api/resources', payload).subscribe({
       next: () => {
         this.notificationService.showSuccess("El recurso ha sido publicado exitosamente.");
         this.showModal = false;
@@ -176,10 +176,10 @@ export class RecursosComponent implements OnInit {
 
   cargarCursos() {
     const role = this.user.role ? this.user.role.toLowerCase() : '';
-    this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/courses').subscribe({
+    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').subscribe({
       next: (data) => {
         if (role === 'docente' || role === 'teacher') {
-          this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/teachers').subscribe({
+          this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teachers').subscribe({
             next: (profesores) => {
               const misCursos = data.filter(c => c.teacher && Number(c.teacher.id) === Number(this.user.id));
               const viejosCursos = profesores.filter(p => Number(p.id) === Number(this.user.id) && p.course).map(p => p.course);
@@ -246,10 +246,10 @@ export class RecursosComponent implements OnInit {
     this.loading = true;
     const role = this.user.role ? this.user.role.toLowerCase() : '';
     
-    this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/resources').subscribe({
+    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/resources').subscribe({
       next: (dataRecursos) => {
         if (role === 'estudiante' || role === 'student') {
-          this.http.get<any[]>(`https://edubridge-backend-prueba-v2.onrender.com/api/enrollments/student/${this.user.id}`).subscribe({
+          this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/enrollments/student/${this.user.id}`).subscribe({
             next: (dataMatriculas) => {
               const cursosMatriculados = dataMatriculas.map(m => m.course?.name?.toLowerCase().trim());
               this.recursos = dataRecursos.filter(r => {

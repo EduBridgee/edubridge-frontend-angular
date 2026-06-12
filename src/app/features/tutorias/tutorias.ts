@@ -38,7 +38,7 @@ export class TutoriasComponent implements OnInit {
   loading: boolean = true;
   activeTab: string = 'mis-tutorias';
 
-  private apiUrl = 'https://edubridge-backend-prueba-v2.onrender.com/api/tutoring';
+  private apiUrl = 'https://edubridge-backend-v2.onrender.com/api/tutoring';
 
   teacherKpis = {
     todaySessions: 0,
@@ -86,7 +86,7 @@ export class TutoriasComponent implements OnInit {
 
   fetchTeachers() {
     
-    this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/teachers').subscribe({
+    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teachers').subscribe({
       next: (data) => {
         this.teachers = data.map(t => ({
           n: t.name,
@@ -311,7 +311,7 @@ export class TutoriasComponent implements OnInit {
       return;
     }
 
-    this.http.post('https://edubridge-backend-prueba-v2.onrender.com/api/tutoring/request', this.nuevaTutoria)
+    this.http.post('https://edubridge-backend-v2.onrender.com/api/tutoring/request', this.nuevaTutoria)
       .subscribe({
         next: () => {
           this.showModal = false;

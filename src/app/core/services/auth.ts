@@ -15,7 +15,7 @@ export interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'https://edubridge-backend-prueba-v2.onrender.com/api/auth';
+  private readonly API_URL = 'https://edubridge-backend-v2.onrender.com/api/auth';
   private http = inject(HttpClient);
 
   constructor() { }
@@ -64,7 +64,7 @@ export class AuthService {
     return localStorage.getItem('user_role');
   }
   handleSocialLogin(platform: string) {
-    window.location.href = `https://edubridge-backend-prueba-v2.onrender.com/oauth2/authorization/${platform.toLowerCase()}`;
+    window.location.href = `https://edubridge-backend-v2.onrender.com/oauth2/authorization/${platform.toLowerCase()}`;
   }
 
   recoverPassword(email: string) {

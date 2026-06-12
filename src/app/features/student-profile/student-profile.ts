@@ -105,7 +105,7 @@ export class StudentProfileComponent implements OnInit {
     const currentUser = this.user;
     const currentUserIdNum = currentUser.id ? Number(currentUser.id) : null;
 
-    this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/students').subscribe({
+    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/students').subscribe({
       next: (data) => {
         this.students = data;
         this.filteredStudents = data;
@@ -142,7 +142,7 @@ export class StudentProfileComponent implements OnInit {
   }
 
   cargarNotasEstudiante(studentId: number) {
-    this.http.get<any[]>(`https://edubridge-backend-prueba-v2.onrender.com/api/grades/student/${studentId}`).subscribe({
+    this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/grades/student/${studentId}`).subscribe({
       next: (notas) => {
         const cursosMap = new Map();
 
@@ -184,7 +184,7 @@ export class StudentProfileComponent implements OnInit {
   }
 
   cargarFaltasEstudiante(studentId: number) {
-    this.http.get<any[]>(`https://edubridge-backend-prueba-v2.onrender.com/api/enrollments/student/${studentId}`).subscribe({
+    this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/enrollments/student/${studentId}`).subscribe({
       next: (enrollments) => {
         let totalFaltas = 0;
         enrollments.forEach(e => {
@@ -201,7 +201,7 @@ export class StudentProfileComponent implements OnInit {
 
   cargarCursosDesdeBD() {
     this.loadingCourses = true;
-    this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/courses').subscribe({
+    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').subscribe({
       next: (data) => {
         this.courses = data;
         this.loadingCourses = false;
@@ -247,7 +247,7 @@ export class StudentProfileComponent implements OnInit {
   guardarCambios() {
     if (!this.editingStudent.id) return;
     this.saving = true;
-    this.http.put(`https://edubridge-backend-prueba-v2.onrender.com/api/students/${this.editingStudent.id}`, this.editingStudent).subscribe({
+    this.http.put(`https://edubridge-backend-v2.onrender.com/api/students/${this.editingStudent.id}`, this.editingStudent).subscribe({
       next: (updated: any) => {
         const index = this.students.findIndex(s => s.id === updated.id);
         if (index !== -1) {
@@ -286,7 +286,7 @@ export class StudentProfileComponent implements OnInit {
       value: this.newGrade.value
     };
 
-    this.http.post('https://edubridge-backend-prueba-v2.onrender.com/api/grades', payload).subscribe({
+    this.http.post('https://edubridge-backend-v2.onrender.com/api/grades', payload).subscribe({
       next: () => {
         this.notificationService.showSuccess("La nota ha sido sincronizada correctamente.");
         this.newGrade = { courseId: null, value: null };

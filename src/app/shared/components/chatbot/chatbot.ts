@@ -68,7 +68,7 @@ export class ChatbotComponent implements OnInit {
       cursos: cursosStr
     };
 
-    this.http.post('https://edubridge-backend-prueba-v2.onrender.com/api/chat/ask', payload).subscribe({
+    this.http.post('https://edubridge-backend-v2.onrender.com/api/chat/ask', payload).subscribe({
       next: (res: any) => {
         this.loading = false;
         this.typeWriterEffect(res.answer);

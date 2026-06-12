@@ -70,9 +70,9 @@ export class CursosComponent implements OnInit {
 
     const role = this.user.role ? this.user.role.toLowerCase() : '';
     if (role === 'docente' || role === 'teacher') {
-      this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/courses').subscribe({
+      this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').subscribe({
         next: (allCourses) => {
-          this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/teachers').subscribe({
+          this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teachers').subscribe({
             next: (profesores) => {
               const misCursos = allCourses.filter(c => c.teacher && Number(c.teacher.id) === Number(this.user.id));
               const viejosCursos = profesores.filter(p => Number(p.id) === Number(this.user.id) && p.course).map(p => p.course);
@@ -120,11 +120,11 @@ export class CursosComponent implements OnInit {
       return;
     }
 
-    this.http.get<any[]>(`https://edubridge-backend-prueba-v2.onrender.com/api/enrollments/student/${this.user.id}`).subscribe({
+    this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/enrollments/student/${this.user.id}`).subscribe({
       next: (dataMatriculas) => {
-        this.http.get<any[]>(`https://edubridge-backend-prueba-v2.onrender.com/api/grades/student/${this.user.id}`).subscribe({
+        this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/grades/student/${this.user.id}`).subscribe({
           next: (notas) => {
-            this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/teachers').subscribe({
+            this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teachers').subscribe({
               next: (profesores) => {
 
                 this.cursos = dataMatriculas.map((matricula, index) => {
