@@ -1,0 +1,10 @@
+{
+	"appId": "com.edubridge.app",
+	"appName": "EduBridge",
+	"webDir": "dist/edubridge-frontend/browser",
+	"server": {
+		"androidScheme": "https",
+		"hostname": "localhost"
+	},
+	"packageClassList": []
+}
