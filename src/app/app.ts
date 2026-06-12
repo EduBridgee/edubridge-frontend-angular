@@ -4,11 +4,12 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { SidebarComponent } from './shared/components/sidebar/sidebar';
 import { ChatbotComponent } from './shared/components/chatbot/chatbot';
+import { ToastContainer } from './shared/components/toast-container/toast-container';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, ChatbotComponent],
+  imports: [CommonModule, RouterOutlet, SidebarComponent, ChatbotComponent, ToastContainer],
   templateUrl: './app.html'
 })
 export class AppComponent implements OnInit {

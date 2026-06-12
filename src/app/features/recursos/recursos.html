@@ -21,7 +21,7 @@
   </div>
 
   <div *ngIf="!loading" class="p-4 md:p-8 space-y-6 animate-in fade-in duration-500">
-
+    
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
       <div>
         <h2 class="text-xl md:text-2xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Gestión de Recursos</h2>
@@ -59,7 +59,7 @@
           <img *ngIf="item.type === 'Video'" src="https://images.unsplash.com/photo-1492724441997-5dc865305da7?w=400" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-700" />
           <img *ngIf="item.type === 'PPT'" src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-700" />
           <img *ngIf="item.type === 'Imagen'" [src]="item.img" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-
+          
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent"></div>
           <span class="relative flex items-center justify-center text-4xl drop-shadow-2xl z-10">
             <lucide-icon *ngIf="item.type === 'PDF'" [img]="FileText" [size]="32"></lucide-icon>
@@ -94,9 +94,9 @@
       <h3 class="font-black text-slate-800 text-[10px] uppercase tracking-[0.3em] mb-6 md:mb-8 flex items-center gap-3">
         <span class="w-2 h-2 bg-blue-600 rounded-full animate-ping"></span> Actividad Reciente
       </h3>
-
+      
       <div *ngIf="recentActivity.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 text-left">
-        <div *ngFor="let r of recentActivity"
+        <div *ngFor="let r of recentActivity" 
              (click)="manejarAccion(r)"
              class="flex items-center gap-4 md:gap-5 p-4 rounded-2xl md:rounded-[1.5rem] bg-slate-50/50 border border-slate-50 hover:bg-white hover:shadow-md transition-all cursor-pointer group">
           <div class="w-12 h-12 md:w-14 md:h-14 bg-white rounded-xl md:rounded-2xl shrink-0 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
@@ -122,7 +122,7 @@
 
   <div *ngIf="showModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300 text-left max-h-[90vh] overflow-y-auto">
-
+      
       <div class="p-6 md:p-10 border-b border-slate-50 bg-blue-50/30 flex justify-between items-center sticky top-0 bg-white z-10">
         <div>
           <h3 class="font-black text-slate-800 text-xl md:text-2xl uppercase tracking-tighter italic leading-none">Subir Material</h3>
@@ -161,17 +161,17 @@
         <!-- Área de Carga de Archivos (PDF, PPT, Imagen) -->
         <div *ngIf="nuevoRecurso.type !== 'Video'">
           <label class="text-[9px] font-black text-slate-400 uppercase block mb-2">Archivo del Recurso</label>
-          <div
+          <div 
             (dragover)="onDragOver($event)"
             (dragleave)="onDragLeave($event)"
             (drop)="onDrop($event)"
             [class.border-blue-500]="isDragging"
             [class.bg-blue-50]="isDragging"
             class="relative group cursor-pointer border-2 border-dashed border-slate-200 rounded-[2rem] p-8 transition-all hover:border-blue-400 hover:bg-slate-50/50 flex flex-col items-center justify-center gap-4">
-
-            <input type="file" (change)="onFileSelected($event)" class="absolute inset-0 opacity-0 cursor-pointer"
+            
+            <input type="file" (change)="onFileSelected($event)" class="absolute inset-0 opacity-0 cursor-pointer" 
                    [accept]="nuevoRecurso.type === 'PDF' ? '.pdf' : nuevoRecurso.type === 'Imagen' ? 'image/*' : '.ppt,.pptx'" />
-
+            
             <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
               <lucide-icon *ngIf="nuevoRecurso.type === 'PDF'" [img]="FileText" [size]="24"></lucide-icon>
               <lucide-icon *ngIf="nuevoRecurso.type === 'Video'" [img]="Video" [size]="24"></lucide-icon>

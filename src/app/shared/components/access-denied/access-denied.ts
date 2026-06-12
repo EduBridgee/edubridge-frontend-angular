@@ -14,7 +14,7 @@ export class AccessDeniedComponent {
   readonly ShieldAlert = ShieldAlert;
   readonly ArrowLeft = ArrowLeft;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {}
 
   goBack() {
     this.router.navigate(['/dashboard']);

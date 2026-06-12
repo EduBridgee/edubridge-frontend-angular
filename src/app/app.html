@@ -1,4 +1,4 @@
-<div class="flex h-screen w-screen bg-[#F8FAFC] overflow-hidden font-['Inter'] text-left">
+<div class="flex h-screen w-screen bg-[#F8FAFC] overflow-hidden font-inter text-left">
   
   <app-sidebar 
     *ngIf="user && currentPage !== 'login'" 
@@ -17,5 +17,7 @@
     *ngIf="user && currentPage !== 'login'"
     (tutoriaCreada)="handleTutoriaCreada()">
   </app-chatbot>
+
+  <app-toast-container></app-toast-container>
 
 </div>
