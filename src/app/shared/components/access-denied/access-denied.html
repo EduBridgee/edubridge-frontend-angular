@@ -1,0 +1,19 @@
+<div class="min-h-screen flex items-center justify-center bg-[#F8FAFC] font-inter">
+    <div class="text-center p-8 max-w-md">
+        <div class="w-24 h-24 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-8">
+            <lucide-icon [img]="ShieldAlert" [size]="48" class="text-rose-500"></lucide-icon>
+        </div>
+
+        <h1 class="text-4xl font-black text-slate-900 mb-4 tracking-tight">Acceso Denegado</h1>
+
+        <p class="text-slate-500 mb-8 text-lg">
+            No tienes permisos para acceder a esta sección. Contacta a tu administrador si crees que esto es un error.
+        </p>
+
+        <button (click)="goBack()"
+            class="bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-sm uppercase tracking-widest shadow-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2">
+            <lucide-icon [img]="ArrowLeft" [size]="16"></lucide-icon>
+            Volver al Dashboard
+        </button>
+    </div>
+</div>

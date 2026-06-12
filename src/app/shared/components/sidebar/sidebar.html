@@ -1,0 +1,56 @@
+<button (click)="toggleMenu()"
+  class="md:hidden fixed top-4 left-4 z-[110] p-3 bg-[#0F172A] text-white rounded-xl shadow-2xl border border-slate-700 active:scale-90 transition-all duration-200">
+  <lucide-icon [img]="isMenuOpen ? X : Menu" [size]="20"></lucide-icon>
+</button>
+
+<div *ngIf="isMenuOpen" (click)="isMenuOpen = false"
+  class="md:hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[90] animate-in fade-in duration-300">
+</div>
+
+<div [class.translate-x-0]="isMenuOpen"
+  class="w-64 bg-[#0F172A] h-screen flex flex-col fixed left-0 top-0 z-[100] shadow-2xl text-slate-300 transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0">
+
+  <div class="p-8 pt-20 md:pt-8 flex items-center gap-3">
+    <img src="assets/images/logo.jpeg" class="w-10 h-10 rounded-xl object-cover shadow-lg" alt="EduBridge">
+    <div class="text-left">
+      <h1 class="font-bold text-white text-lg leading-none tracking-tight">EduBridge</h1>
+      <span
+        [class]="userRole.toLowerCase() === 'admin' ? 'bg-orange-500/10 text-orange-400' : (userRole.toLowerCase() === 'docente' ? 'bg-blue-500/10 text-blue-400' : 'bg-emerald-500/10 text-emerald-400')"
+        class="text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-md mt-1 inline-block">
+        Portal {{userRole}}
+      </span>
+    </div>
+  </div>
+
+  <nav class="flex-1 px-4 space-y-2 mt-4 overflow-y-auto custom-scrollbar">
+    <div *ngFor="let item of filteredMenu" (click)="changePage(item.id); isMenuOpen = false"
+      [class.bg-orange-600]="currentPage === item.id && userRole.toLowerCase() === 'admin'"
+      [class.bg-blue-600]="currentPage === item.id && userRole.toLowerCase() === 'docente'"
+      [class.bg-emerald-600]="currentPage === item.id && userRole.toLowerCase() === 'estudiante'"
+      [class.text-white]="currentPage === item.id"
+      class="flex items-center gap-3 p-3.5 rounded-2xl cursor-pointer transition-all duration-300 group hover:bg-slate-800/50 hover:text-white text-left">
+      <lucide-icon [img]="item.icon" [size]="18"></lucide-icon>
+      <span class="font-semibold text-sm tracking-tight">{{item.name}}</span>
+    </div>
+  </nav>
+
+  <div class="p-6 bg-slate-900/40 border-t border-slate-800/50 space-y-5">
+
+    <div class="flex items-center gap-3">
+      <div
+        class="w-10 h-10 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white text-xs font-black border border-white/10 shadow-lg shrink-0">
+        {{getInitials(userName)}}
+      </div>
+      <div class="overflow-hidden text-left">
+        <p class="text-xs font-bold text-white truncate leading-none mb-1">{{userName || 'Cargando...'}}</p>
+        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest opacity-70">{{userRole}}</p>
+      </div>
+    </div>
+
+    <button (click)="logout()"
+      class="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-slate-800/50 hover:bg-rose-500/10 hover:text-rose-500 transition-all text-[10px] font-black uppercase tracking-[0.2em] border border-slate-700/50 group">
+      <lucide-icon [img]="LogOut" [size]="14"></lucide-icon>
+      <span>Salir</span>
+    </button>
+  </div>
+</div>
