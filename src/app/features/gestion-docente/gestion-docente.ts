@@ -197,11 +197,15 @@ export class GestionDocenteComponent implements OnInit {
 
     this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/enrollments/course/${this.cursoSeleccionadoId}`).subscribe({
       next: (matriculas) => {
-        this.matriculasCurso = matriculas;
+        const activeMatriculas = matriculas.filter(m => {
+          const status = (m.status || '').toUpperCase();
+          return status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+        });
+        this.matriculasCurso = activeMatriculas;
 
         
         this.estudiantesCurso = this.estudiantes.filter(alumno => {
-          return matriculas.some(m => {
+          return activeMatriculas.some(m => {
             const idMatriculaAlumno = m.studentId ? Number(m.studentId) : (m.student ? Number(m.student.id) : null);
             return idMatriculaAlumno === Number(alumno.id);
           });

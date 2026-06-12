@@ -93,8 +93,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy, OnChanges {
       next: (data) => {
         this.notifications = data || [];
 
-        console.log("=== ENVIANDO DESDE NEON A LA CAMPANA ===");
-        console.log(`Alertas del estudiante ${studentId}:`, this.notifications);
+
 
         
         setTimeout(() => {

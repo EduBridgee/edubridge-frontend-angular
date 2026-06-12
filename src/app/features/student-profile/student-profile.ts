@@ -187,7 +187,11 @@ export class StudentProfileComponent implements OnInit {
     this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/enrollments/student/${studentId}`).subscribe({
       next: (enrollments) => {
         let totalFaltas = 0;
-        enrollments.forEach(e => {
+        const activeEnrollments = enrollments.filter(e => {
+          const status = (e.status || '').toUpperCase();
+          return status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+        });
+        activeEnrollments.forEach(e => {
           totalFaltas += e.absences !== undefined ? e.absences : ((e.totalClasses || 0) - (e.attendedClasses || 0));
         });
         this.faltasTotalesReales = totalFaltas;

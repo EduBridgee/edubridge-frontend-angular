@@ -126,8 +126,12 @@ export class CursosComponent implements OnInit {
           next: (notas) => {
             this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teachers').subscribe({
               next: (profesores) => {
+                const activeMatriculas = dataMatriculas.filter(m => {
+                  const status = (m.status || '').toUpperCase();
+                  return status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+                });
 
-                this.cursos = dataMatriculas.map((matricula, index) => {
+                this.cursos = activeMatriculas.map((matricula, index) => {
                   const curso = matricula.course;
                   const notasDelCurso = notas.filter(n => n.course && n.course.id === curso.id);
                   const profesorReal = curso.teacher || profesores.find(p => p.course && p.course.id === curso.id);

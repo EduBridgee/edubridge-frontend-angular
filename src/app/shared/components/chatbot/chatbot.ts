@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -28,7 +28,11 @@ export class ChatbotComponent implements OnInit {
   user: any = null;
   chatMessages: any[] = [];
 
-  constructor(private http: HttpClient, private roleService: RoleService) { }
+  constructor(
+    private http: HttpClient, 
+    private roleService: RoleService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -52,14 +56,12 @@ export class ChatbotComponent implements OnInit {
     this.chatMessages.push({ role: 'user', content: texto });
     this.mensajeUser = '';
     this.loading = true;
+    this.cdr.detectChanges();
 
     const cursosStr = this.misCursos && this.misCursos.length > 0
       ? this.misCursos.map(c => c.name).join(", ")
-      : "Ecuaciones Diferenciales, Arquitectura de Computadoras, Física II";
+      : "Ecuaciones Diferenciales, Architecture of Computadoras, Física II";
 
-    
-    
-    
     const payload = {
       message: texto,
       role: this.user.role || 'ESTUDIANTE',
@@ -71,9 +73,9 @@ export class ChatbotComponent implements OnInit {
     this.http.post('https://edubridge-backend-v2.onrender.com/api/chat/ask', payload).subscribe({
       next: (res: any) => {
         this.loading = false;
+        this.cdr.detectChanges();
         this.typeWriterEffect(res.answer);
 
-        
         if (res.answer.includes('registrado') || res.answer.includes('agendado') || res.answer.includes('sincronizada')) {
           this.tutoriaCreada.emit();
         }
@@ -84,6 +86,7 @@ export class ChatbotComponent implements OnInit {
           role: 'assistant',
           content: 'Error de conexión. ¿Está el backend encendido, Estudiante/a?'
         });
+        this.cdr.detectChanges();
       }
     });
   }
@@ -92,6 +95,7 @@ export class ChatbotComponent implements OnInit {
     let index = 0;
     const assistantMessage = { role: 'assistant', content: '' };
     this.chatMessages.push(assistantMessage);
+    this.cdr.detectChanges();
 
     const formattedText = fullText
       .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
@@ -107,6 +111,7 @@ export class ChatbotComponent implements OnInit {
           assistantMessage.content += formattedText.charAt(index);
           index++;
         }
+        this.cdr.detectChanges();
         this.scrollToBottom();
       } else {
         clearInterval(interval);
@@ -116,7 +121,7 @@ export class ChatbotComponent implements OnInit {
 
   private scrollToBottom() {
     setTimeout(() => {
-      const container = document.getElementById('chat-box-container');
+      const container = document.getElementById('chat-box');
       if (container) {
         container.scrollTop = container.scrollHeight;
       }

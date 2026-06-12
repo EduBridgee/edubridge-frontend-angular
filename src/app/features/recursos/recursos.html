@@ -172,11 +172,39 @@
             <input type="file" (change)="onFileSelected($event)" class="absolute inset-0 opacity-0 cursor-pointer" 
                    [accept]="nuevoRecurso.type === 'PDF' ? '.pdf' : nuevoRecurso.type === 'Imagen' ? 'image/*' : '.ppt,.pptx'" />
             
-            <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-              <lucide-icon *ngIf="nuevoRecurso.type === 'PDF'" [img]="FileText" [size]="24"></lucide-icon>
-              <lucide-icon *ngIf="nuevoRecurso.type === 'Video'" [img]="Video" [size]="24"></lucide-icon>
-              <lucide-icon *ngIf="nuevoRecurso.type === 'PPT'" [img]="Presentation" [size]="24"></lucide-icon>
-              <lucide-icon *ngIf="nuevoRecurso.type === 'Imagen'" [img]="Image" [size]="24"></lucide-icon>
+            <!-- Si no hay archivo seleccionado, o si es video o si es imagen sin cargar, mostramos el icono -->
+            <div *ngIf="!selectedFile || (nuevoRecurso.type === 'Imagen' && !nuevoRecurso.img)" class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
+              <lucide-icon *ngIf="nuevoRecurso.type === 'PDF'" [img]="FileText" [size]="24" class="text-red-500"></lucide-icon>
+              <lucide-icon *ngIf="nuevoRecurso.type === 'Video'" [img]="Video" [size]="24" class="text-blue-500"></lucide-icon>
+              <lucide-icon *ngIf="nuevoRecurso.type === 'PPT'" [img]="Presentation" [size]="24" class="text-orange-500"></lucide-icon>
+              <lucide-icon *ngIf="nuevoRecurso.type === 'Imagen'" [img]="Image" [size]="24" class="text-emerald-500"></lucide-icon>
+            </div>
+
+            <!-- Si es imagen y está seleccionada, mostramos la vista previa -->
+            <div *ngIf="selectedFile && nuevoRecurso.type === 'Imagen' && nuevoRecurso.img" class="w-full max-w-[200px] h-24 rounded-2xl overflow-hidden shadow-md border border-slate-100 flex items-center justify-center bg-slate-50 group-hover:scale-105 transition-transform duration-300">
+              <img [src]="nuevoRecurso.img" class="w-full h-full object-cover" />
+            </div>
+
+            <!-- Si es PDF y está seleccionado, mostramos una vista de documento elegante -->
+            <div *ngIf="selectedFile && nuevoRecurso.type === 'PDF' && nuevoRecurso.img" class="w-full max-w-[240px] p-4 bg-red-50/50 border border-red-100 rounded-2xl flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
+              <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center text-white shrink-0">
+                <lucide-icon [img]="FileText" [size]="20"></lucide-icon>
+              </div>
+              <div class="min-w-0 flex-1 text-left">
+                <p class="text-[10px] font-black text-slate-800 uppercase tracking-wider truncate">{{ selectedFile.name }}</p>
+                <p class="text-[8px] font-bold text-red-500 uppercase tracking-widest mt-1">Archivo PDF cargado</p>
+              </div>
+            </div>
+
+            <!-- Si es PPT y está seleccionado, mostramos una vista de presentación elegante -->
+            <div *ngIf="selectedFile && nuevoRecurso.type === 'PPT' && nuevoRecurso.img" class="w-full max-w-[240px] p-4 bg-orange-50/50 border border-orange-100 rounded-2xl flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
+              <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white shrink-0">
+                <lucide-icon [img]="Presentation" [size]="20"></lucide-icon>
+              </div>
+              <div class="min-w-0 flex-1 text-left">
+                <p class="text-[10px] font-black text-slate-800 uppercase tracking-wider truncate">{{ selectedFile.name }}</p>
+                <p class="text-[8px] font-bold text-orange-500 uppercase tracking-widest mt-1">Presentación cargada</p>
+              </div>
             </div>
 
             <div class="text-center">

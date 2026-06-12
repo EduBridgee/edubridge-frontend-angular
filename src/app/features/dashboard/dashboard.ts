@@ -132,6 +132,9 @@ export class DashboardComponent implements OnInit {
           
           const myStudentIds = new Set<number>();
           res.allEnrollments.forEach(m => {
+            const status = (m.status || '').toUpperCase();
+            const isActive = status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+            if (!isActive) return;
             const cId = m.courseId ? Number(m.courseId) : (m.course ? Number(m.course.id) : null);
             const sId = m.studentId ? Number(m.studentId) : (m.student ? Number(m.student.id) : null);
             if (cId && sId && teacherCourseIds.includes(cId)) {
@@ -241,6 +244,9 @@ export class DashboardComponent implements OnInit {
     if (myCourses.length > 0) {
       const counts = myCourses.map(course => {
         const enrolls = allEnrollments.filter(m => {
+          const status = (m.status || '').toUpperCase();
+          const isActive = status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+          if (!isActive) return false;
           const cId = m.courseId ? Number(m.courseId) : (m.course ? Number(m.course.id) : null);
           return cId === Number(course.id);
         });
@@ -321,10 +327,15 @@ export class DashboardComponent implements OnInit {
     this.studentSummary = allStudents.find(s => s.id === userId);
 
     
-    this.studentEnrolledCoursesCount = myEnrollments.length;
+    const activeEnrollments = myEnrollments.filter(m => {
+      const status = (m.status || '').toUpperCase();
+      return status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+    });
+
+    this.studentEnrolledCoursesCount = activeEnrollments.length;
     let sumAttended = 0;
     let sumTotal = 0;
-    myEnrollments.forEach(m => {
+    activeEnrollments.forEach(m => {
       sumAttended += m.attendedClasses || 0;
       sumTotal += m.totalClasses || 0;
     });

@@ -90,8 +90,42 @@ export class RecursosComponent implements OnInit {
     }
   }
 
+  compressImage(dataUrl: string, callback: (res: string) => void) {
+    const img = new window.Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+      const MAX_SIZE = 800;
+
+      if (width > height) {
+        if (width > MAX_SIZE) {
+          height = Math.round((height * MAX_SIZE) / width);
+          width = MAX_SIZE;
+        }
+      } else {
+        if (height > MAX_SIZE) {
+          width = Math.round((width * MAX_SIZE) / height);
+          height = MAX_SIZE;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressed = canvas.toDataURL('image/jpeg', 0.7);
+        callback(compressed);
+      } else {
+        callback(dataUrl);
+      }
+    };
+    img.onerror = () => callback(dataUrl);
+    img.src = dataUrl;
+  }
+
   private handleFile(file: File) {
-    
     const MAX_SIZE_KB = 500;
     if (file.size > MAX_SIZE_KB * 1024) {
       this.notificationService.showError(`El archivo es demasiado grande (${(file.size / 1024).toFixed(1)}KB). Límite permitido: ${MAX_SIZE_KB}KB.`, 'Archivo excedido');
@@ -105,9 +139,16 @@ export class RecursosComponent implements OnInit {
 
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      
-      this.nuevoRecurso.img = e.target.result;
-      this.cdr.detectChanges();
+      const base64Str = e.target.result as string;
+      if (file.type.startsWith('image/')) {
+        this.compressImage(base64Str, (compressed) => {
+          this.nuevoRecurso.img = compressed;
+          this.cdr.detectChanges();
+        });
+      } else {
+        this.nuevoRecurso.img = base64Str;
+        this.cdr.detectChanges();
+      }
     };
     reader.readAsDataURL(file);
   }
@@ -130,18 +171,22 @@ export class RecursosComponent implements OnInit {
 
     this.http.post('https://edubridge-backend-v2.onrender.com/api/resources', payload).subscribe({
       next: () => {
-        this.notificationService.showSuccess("El recurso ha sido publicado exitosamente.");
-        this.showModal = false;
-        this.cargarDatos();
-        this.resetForm();
+        setTimeout(() => {
+          this.notificationService.showSuccess("El recurso ha sido publicado exitosamente.");
+          this.showModal = false;
+          this.cargarDatos();
+          this.resetForm();
+        });
       },
       error: (err) => {
         console.error("Error al subir:", err);
-        if (err.status === 500) {
-          this.notificationService.showError("El servidor no pudo guardar el archivo. Verifica el tamaño o formato.", "Error de Servidor (500)");
-        } else {
-          this.notificationService.showError(`No se pudo subir el recurso (Error ${err.status}).`, "Error al publicar");
-        }
+        setTimeout(() => {
+          if (err.status === 500) {
+            this.notificationService.showError("El servidor no pudo guardar el archivo. Verifica el tamaño o formato.", "Error de Servidor (500)");
+          } else {
+            this.notificationService.showError(`No se pudo subir el recurso (Error ${err.status}).`, "Error al publicar");
+          }
+        });
       }
     });
   }
@@ -251,7 +296,11 @@ export class RecursosComponent implements OnInit {
         if (role === 'estudiante' || role === 'student') {
           this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/enrollments/student/${this.user.id}`).subscribe({
             next: (dataMatriculas) => {
-              const cursosMatriculados = dataMatriculas.map(m => m.course?.name?.toLowerCase().trim());
+              const activeMatriculas = dataMatriculas.filter(m => {
+                const status = (m.status || '').toUpperCase();
+                return status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+              });
+              const cursosMatriculados = activeMatriculas.map(m => m.course?.name?.toLowerCase().trim());
               this.recursos = dataRecursos.filter(r => {
                 const subjectLower = r.subject ? r.subject.toLowerCase().trim() : '';
                 return cursosMatriculados.includes(subjectLower);

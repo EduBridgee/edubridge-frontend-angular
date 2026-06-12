@@ -66,13 +66,17 @@ export class TutoriasComponent implements OnInit {
         next: (data) => {
           const isDocente = this.roleService.isDocente(this.user.role);
           if (isDocente) {
-            this.sessions = data.filter(s => s.teacherName === this.user.name && s.status !== 'Cancelada');
+            this.sessions = data.filter(s => {
+              const sName = s.teacherName ? s.teacherName.trim() : '';
+              const uName = this.user.name ? this.user.name.trim() : '';
+              return sName === uName && s.status !== 'Cancelada';
+            });
             this.calcularKpisDocente();
           } else {
             this.sessions = data.filter(s => s.status !== 'Cancelada');
           }
 
-          this.filteredSessions = [...this.sessions];
+          this.filtrarTutorias();
           this.loading = false;
           this.cdr.detectChanges();
         },
@@ -142,10 +146,17 @@ export class TutoriasComponent implements OnInit {
     const term = this.searchTerm.toLowerCase().trim();
     let base = [...this.sessions];
 
-    if (this.roleService.isDocente(this.user.role)) {
+    const isDocente = this.roleService.isDocente(this.user.role);
+    if (isDocente) {
       if (this.activeTab === 'proximas' || this.activeTab === 'mis-tutorias') {
         base = base.filter(s => s.status === 'Pendiente' || s.status === 'Confirmada');
       } else if (this.activeTab === 'historial-docente') {
+        base = base.filter(s => s.status === 'Finalizada');
+      }
+    } else {
+      if (this.activeTab === 'mis-tutorias') {
+        base = base.filter(s => s.status === 'Pendiente' || s.status === 'Confirmada');
+      } else if (this.activeTab === 'historial') {
         base = base.filter(s => s.status === 'Finalizada');
       }
     }
@@ -263,6 +274,23 @@ export class TutoriasComponent implements OnInit {
         this.notificationService.showSuccess("La tutoría ha sido reprogramada para la próxima semana.");
       },
       error: (err) => this.notificationService.showError('No se pudo reprogramar la sesión automáticamente.')
+    });
+  }
+
+  calificarSesion(id: number, rating: number) {
+    this.http.patch(`${this.apiUrl}/${id}/rate`, { rating: rating }).subscribe({
+      next: (res: any) => {
+        const session = this.sessions.find(s => s.id === id);
+        if (session) {
+          session.rating = rating;
+        }
+        this.filtrarTutorias();
+        this.notificationService.showSuccess("¡Muchas gracias por calificar la tutoría!");
+      },
+      error: (err) => {
+        console.error("Error al calificar:", err);
+        this.notificationService.showError("No se pudo registrar la calificación.");
+      }
     });
   }
 
