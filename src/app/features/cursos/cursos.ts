@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +17,7 @@ export class CursosComponent implements OnInit {
 
   promedioGeneral: number = 0;
   totalCreditos: number = 0;
-
+  diasSemana = ['l', 'm', 'mi', 'j', 'v'] as const;
   colores = [
     "from-blue-600 to-blue-400",
     "from-purple-600 to-purple-400",
@@ -42,7 +42,7 @@ export class CursosComponent implements OnInit {
     { time: "16:00-17:30", l: "Inglés", m: "", mi: "Inglés", j: "", v: "Inglés" }
   ];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.cargarCursosDesdeBD();
@@ -51,10 +51,10 @@ export class CursosComponent implements OnInit {
   cargarCursosDesdeBD() {
     this.loading = true;
 
-    this.http.get<any[]>('http://localhost:8081/api/courses').subscribe({
+    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').subscribe({
       next: (dataCursos) => {
 
-        this.http.get<any[]>(`http://localhost:8081/api/grades/student/${this.user.id}`).subscribe({
+        this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/grades/student/${this.user.id}`).subscribe({
           next: (notas) => {
 
             this.cursos = dataCursos.map((curso, index) => {
@@ -71,12 +71,14 @@ export class CursosComponent implements OnInit {
             });
             this.calcularTotales();
             this.loading = false;
+            this.cdr.detectChanges();
           }
         });
       },
       error: (err) => {
         console.error("Error:", err);
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

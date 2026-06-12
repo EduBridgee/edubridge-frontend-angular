@@ -1,0 +1,68 @@
+<div class="fixed bottom-8 right-8 z-[200] font-['Inter']">
+  
+  <button (click)="toggleChat()" 
+          class="w-16 h-16 bg-blue-600 rounded-[2rem] shadow-[0_20px_50px_rgba(37,99,235,0.4)] flex items-center justify-center text-3xl hover:scale-110 active:scale-95 transition-all text-white border-4 border-white">
+    <span *ngIf="!isOpen">🤖</span>
+    <span *ngIf="isOpen" class="text-2xl font-black">×</span>
+  </button>
+
+  <div *ngIf="isOpen" 
+       class="absolute bottom-24 right-0 w-[420px] h-[650px] bg-white rounded-[3rem] shadow-[0_35px_80px_rgba(0,0,0,0.25)] border border-slate-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-12 duration-500">
+    
+    <div class="p-8 bg-slate-900 text-white flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-2xl shadow-inner shadow-blue-400">🤖</div>
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 leading-none mb-1">EduBridge AI</p>
+          <p class="text-sm font-bold opacity-90 italic">Asistente de {{ user?.name || 'Estudiante' }}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full">
+        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+        <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Online</span>
+      </div>
+    </div>
+
+    <div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50 scroll-smooth">
+      <div *ngFor="let msg of chatMessages" 
+           [ngClass]="msg.role === 'assistant' ? 'justify-start' : 'justify-end'" 
+           class="flex w-full message-fade-in">
+        
+        <div [ngClass]="msg.role === 'assistant' 
+                ? 'bg-white text-slate-700 rounded-tr-[1.8rem] rounded-bl-[1.8rem] rounded-br-[1.8rem] shadow-sm border border-slate-200' 
+                : 'bg-blue-600 text-white rounded-tl-[1.8rem] rounded-bl-[1.8rem] rounded-br-[1.8rem] shadow-blue-200 shadow-lg'"
+             class="max-w-[88%] p-5 text-[13px] font-medium leading-relaxed tracking-tight message-content">
+          
+          <div [innerHTML]="msg.content"></div>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="flex justify-start animate-pulse">
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-2">
+          <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-duration:0.6s]"></div>
+          <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.2s]"></div>
+          <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.4s]"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-6 bg-white border-t border-slate-100">
+      <form (ngSubmit)="enviarMensaje()" class="relative flex items-center gap-3">
+        <input type="text" name="msg" [(ngModel)]="mensajeUser"
+               placeholder="Escribe tu duda aquí..." 
+               class="flex-1 bg-slate-100 border-none p-4 rounded-2xl text-[13px] font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all shadow-inner" />
+        
+        <button type="submit" 
+                [disabled]="!mensajeUser.trim() || loading"
+                class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center hover:bg-blue-700 transition-all active:scale-90 disabled:opacity-30 shadow-lg shadow-blue-200">
+          <span class="text-xl">🚀</span>
+        </button>
+      </form>
+      <div class="mt-4 flex items-center justify-center gap-2 grayscale opacity-30">
+        <p class="text-[8px] font-black uppercase tracking-[0.3em] text-slate-500 text-center">
+          Powered by Gemini 3 Flash for EduBridge
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
