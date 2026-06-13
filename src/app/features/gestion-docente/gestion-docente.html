@@ -53,7 +53,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div (click)="showNotasModal = true"
           class="p-6 rounded-[2rem] bg-blue-50 text-blue-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
           <lucide-icon [img]="Star" [size]="24"
@@ -85,7 +85,12 @@
           <span
             class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">Participación</span>
         </div>
-
+        <div (click)="toggleTwoFactorSwitch()"
+          class="p-6 rounded-[2rem] bg-indigo-50 text-indigo-600 flex flex-col items-center justify-center gap-4 cursor-pointer hover:shadow-xl transition-all active:scale-95 group">
+          <lucide-icon [img]="Shield" [size]="24" class="md:text-3xl group-hover:scale-110"></lucide-icon>
+          <span
+            class="text-[9px] md:text-[10px] font-black uppercase text-center leading-tight tracking-[0.1em]">{{ twoFactorAuth ? '2FA Activo' : 'Activar 2FA' }}</span>
+        </div>
       </div>
 
       <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 p-6 md:p-8 shadow-sm text-left">
@@ -425,6 +430,63 @@
           Registrar Compromiso
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- 2FA TOTP Setup Modal -->
+  <div *ngIf="show2faSetupModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
+    <div
+      class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
+      
+      <div class="p-6 md:p-8 border-b border-slate-50 flex justify-between items-center bg-indigo-50/50">
+        <h3 class="font-black text-slate-800 text-lg md:text-xl uppercase tracking-tighter flex items-center gap-2 leading-none">
+          <lucide-icon [img]="Shield" [size]="20" class="text-indigo-600"></lucide-icon>
+          Configurar 2FA
+        </h3>
+        <button (click)="cancelarActivacion2fa()" class="text-slate-400 hover:text-slate-600 transition-colors">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="p-6 md:p-8 space-y-6 text-left max-h-[80vh] overflow-y-auto">
+        <div class="space-y-2">
+          <span class="bg-indigo-100 text-indigo-800 text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">Paso 1: Escanear Código QR</span>
+          <p class="text-[11px] text-slate-500 leading-relaxed font-medium">Escanea este código QR con tu aplicación autenticadora (Google Authenticator, Authy, etc.):</p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-2xl border border-slate-100 relative">
+          <img [src]="scanned2faQRCodeUrl" alt="QR Code" class="w-40 h-40 object-contain shadow-inner bg-white p-2 rounded-xl" />
+          <div class="mt-4 text-center">
+            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Clave de Configuración Manual</span>
+            <code class="text-xs font-black text-slate-700 select-all block mt-1 tracking-wider uppercase bg-white px-3 py-1.5 rounded-lg border border-slate-100">{{totpSecretKey}}</code>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="space-y-1">
+            <span class="bg-indigo-100 text-indigo-800 text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">Paso 2: Confirmar Activación</span>
+            <p class="text-[11px] text-slate-500 leading-relaxed font-medium mt-1">Ingresa el código temporal de 6 dígitos generado por tu aplicación para confirmar la sincronización:</p>
+          </div>
+          <div class="relative flex items-center">
+            <input type="text" [(ngModel)]="totpVerificationCode" name="totpCodeInput" maxlength="6" placeholder="Ej: 123456"
+              class="w-full bg-slate-50 border border-slate-200 p-4 pl-12 rounded-2xl text-sm font-black tracking-[0.2em] text-center outline-none focus:border-indigo-500 focus:bg-white transition-colors" />
+            <lucide-icon [img]="Shield" [size]="18" class="absolute left-4 opacity-30 text-indigo-600"></lucide-icon>
+          </div>
+        </div>
+
+        <div class="flex gap-4 pt-2">
+          <button type="button" (click)="cancelarActivacion2fa()"
+            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">
+            Cancelar
+          </button>
+          <button type="button" (click)="confirmarActivacion2fa()"
+            class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-100 active:scale-95 transition-all">
+            Confirmar
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 

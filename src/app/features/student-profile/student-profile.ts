@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../core/services/notification';
-import { LucideAngularModule, Settings, Mail, Phone, MapPin, Award, Calendar, X, FileText, Check } from 'lucide-angular';
+import { TotpService } from '../../core/services/totp';
+import { LucideAngularModule, Settings, Mail, Phone, MapPin, Award, Calendar, X, FileText, Check, Shield } from 'lucide-angular';
 
 @Component({
   selector: 'app-student-profile',
@@ -22,13 +23,14 @@ export class StudentProfileComponent implements OnInit {
   readonly X = X;
   readonly FileText = FileText;
   readonly Check = Check;
+  readonly Shield = Shield;
 
   
   user: any = {
     id: localStorage.getItem('user_id'),
     name: localStorage.getItem('user_name'),
     role: localStorage.getItem('user_role'),
-    email: localStorage.getItem('user_email') 
+    email: localStorage.getItem('user_email') || (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).email : '')
   };
 
   students: any[] = [];
@@ -48,6 +50,13 @@ export class StudentProfileComponent implements OnInit {
   
   promedioGeneralReal: number = 0;
   faltasTotalesReales: number = 0;
+
+  // 2FA TOTP state
+  twoFactorAuth: boolean = false;
+  show2faSetupModal: boolean = false;
+  totpVerificationCode: string = '';
+  totpSecretKey: string = 'JBSWY3DPEHPK3PXP';
+  scanned2faQRCodeUrl: string = '';
 
   academicHistory = [
     {
@@ -92,12 +101,36 @@ export class StudentProfileComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private totpService: TotpService
   ) { }
 
   ngOnInit() {
     this.cargarEstudiantes();
     this.cargarCursosDesdeBD();
+    const email = this.user.email || localStorage.getItem('user_email') || '';
+    if (email) {
+      const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+      this.http.get<any>(`${authUrl}/2fa/status?email=${encodeURIComponent(email)}`).subscribe({
+        next: (res) => {
+          this.twoFactorAuth = res.enabled;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.warn("No se pudo obtener el estado 2FA del backend, usando fallback local", err);
+          this.twoFactorAuth = localStorage.getItem('twoFactorAuth_enabled_' + email.toLowerCase().trim()) === 'true';
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      this.twoFactorAuth = false;
+    }
+    this.updateQRCodeUrl();
+  }
+
+  updateQRCodeUrl() {
+    const email = this.user.email ? this.user.email.toLowerCase().trim() : 'student@edubridge.com';
+    this.scanned2faQRCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=otpauth://totp/EduBridge:${email}?secret=${this.totpSecretKey}%26issuer=EduBridge`;
   }
 
   cargarEstudiantes() {
@@ -301,5 +334,67 @@ export class StudentProfileComponent implements OnInit {
         this.notificationService.showError("Hubo un error al intentar registrar la nota.");
       }
     });
+  }
+
+  toggleTwoFactorSwitch() {
+    if (!this.twoFactorAuth) {
+      this.totpVerificationCode = '';
+      this.updateQRCodeUrl();
+      this.show2faSetupModal = true;
+    } else {
+      if (confirm("¿Estás seguro de que deseas desactivar la Autenticación de Dos Factores? Esto reducirá drásticamente la seguridad de tu cuenta.")) {
+        const email = this.user.email || localStorage.getItem('user_email') || '';
+        const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+        this.http.post(`${authUrl}/2fa/disable`, { email }).subscribe({
+          next: () => {
+            this.twoFactorAuth = false;
+            localStorage.removeItem('twoFactorAuth_enabled_' + email.toLowerCase().trim());
+            localStorage.removeItem('twoFactorAuth_secret_' + email.toLowerCase().trim());
+            this.notificationService.showSuccess("Autenticación de Dos Factores desactivada con éxito.");
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            console.error("Error al desactivar 2FA en el servidor", err);
+            this.notificationService.showError("No se pudo desactivar la Autenticación de Dos Factores en el servidor.");
+          }
+        });
+      }
+    }
+    this.cdr.detectChanges();
+  }
+
+  confirmarActivacion2fa() {
+    if (!this.totpVerificationCode || this.totpVerificationCode.length !== 6 || isNaN(Number(this.totpVerificationCode))) {
+      this.notificationService.showError("Por favor, ingresa el código de 6 dígitos que se muestra en tu aplicación autenticadora.", "Código Inválido");
+      return;
+    }
+
+    const email = this.user.email || localStorage.getItem('user_email') || '';
+    const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+
+    this.http.post(`${authUrl}/2fa/enable`, {
+      email: email,
+      secret: this.totpSecretKey,
+      code: this.totpVerificationCode
+    }).subscribe({
+      next: () => {
+        this.twoFactorAuth = true;
+        localStorage.setItem('twoFactorAuth_enabled_' + email.toLowerCase().trim(), 'true');
+        localStorage.setItem('twoFactorAuth_secret_' + email.toLowerCase().trim(), this.totpSecretKey);
+        this.show2faSetupModal = false;
+        this.notificationService.showSuccess("¡Autenticación de Dos Factores (TOTP) configurada y activada con éxito!");
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error("Error al activar 2FA en el servidor", err);
+        this.notificationService.showError(err.error?.message || "El código ingresado es incorrecto o ha expirado.", "Código Inválido");
+      }
+    });
+  }
+
+  cancelarActivacion2fa() {
+    this.show2faSetupModal = false;
+    this.twoFactorAuth = false;
+    this.cdr.detectChanges();
   }
 }

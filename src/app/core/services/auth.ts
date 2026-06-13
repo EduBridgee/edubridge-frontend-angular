@@ -4,18 +4,21 @@ import { Observable, tap } from 'rxjs';
 
 
 export interface LoginResponse {
-  token: string;
+  token?: string;
   id: number;
   name: string;
   email: string;
   role: string;
+  requires2fa?: boolean;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'https://edubridge-backend-v2.onrender.com/api/auth';
+  private readonly API_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:8081/api/auth' 
+    : 'https://edubridge-backend-v2.onrender.com/api/auth';
   private http = inject(HttpClient);
 
   constructor() { }
@@ -23,7 +26,7 @@ export class AuthService {
   
 
 
-  login(credentials: { email: string; password: string }): Observable<LoginResponse> {
+  login(credentials: { email: string; password: string; twoFactorCode?: string }): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials).pipe(
       
       tap((response: LoginResponse) => {

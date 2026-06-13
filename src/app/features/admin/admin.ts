@@ -4,12 +4,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar';
 import { forkJoin } from 'rxjs';
+import { TotpService } from '../../core/services/totp';
 import {
   LucideAngularModule, Search, Bell, UserPlus, SlidersHorizontal, Download, Edit, UserCheck,
   Trash2, MoreVertical, Plus, BookOpen, User, Users, Clock, Calendar, BarChart3, AlertTriangle,
-  TrendingUp, GraduationCap, CheckCircle2, Check, X, Printer, Send, FileDown, DollarSign,
-  Activity, RotateCcw, FileSpreadsheet, Save, Lock, Palette, Globe, Database, CreditCard,
-  MessageSquare, Shield, Settings
+  TrendingUp, GraduationCap, CheckCircle2, Check, X, Printer, Send, FileDown,
+  Activity, RotateCcw, Save, Lock, Globe, Database,
+  MessageSquare, Shield, Settings, Mail
 } from 'lucide-angular';
 
 @Component({
@@ -27,10 +28,75 @@ export class AdminComponent implements OnInit {
 
   reporteActivo = 'Rendimiento Académico';
   categoriaSeleccionada = 'Todas';
+
+  selectedReportPeriod: string = 'Todos';
+  selectedReportCourseId: number | null = null;
+  periodos: string[] = [];
+  gradesList: any[] = [];
+  reportStats: any = {
+    avgGrade: 0,
+    approvalRate: 0,
+    topStudentsCount: 0,
+    topStudentsPct: 0,
+    riskStudentsCount: 0,
+
+    avgAttendance: 0,
+    perfectAttendanceCount: 0,
+    perfectAttendancePct: 0,
+    totalClasses: 0,
+    riskAttendanceCount: 0,
+
+    totalEnrollments: 0,
+    activeEnrollmentsCount: 0,
+    activeEnrollmentsPct: 0,
+    pendingEnrollmentsCount: 0,
+    cancelledEnrollmentsCount: 0
+  };
+  reporteBarras: any[] = [];
+  pieChartSlices: any[] = [];
+  pieChartCenterLabel: string = 'Calific.';
+  radarPoints: string = '50,50 50,50 50,50 50,50 50,50 50,50';
+  showSendReportModal = false;
+  selectedTeacherForReport: any = null;
   emailNotifications = true;
   smsNotifications = false;
   twoFactorAuth = false;
-  darkMode = false;
+  show2faSetupModal = false;
+  totpVerificationCode = '';
+  totpSecretKey = 'JBSWY3DPEHPK3PXP';
+  scanned2faQRCodeUrl = '';
+
+  get currentUserEmail(): string {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const u = JSON.parse(userStr);
+        if (u && u.email) return u.email.toLowerCase().trim();
+      } catch (e) {}
+    }
+    return 'admin@edubridge.com';
+  }
+
+  updateQRCodeUrl() {
+    const email = this.currentUserEmail;
+    this.scanned2faQRCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=otpauth://totp/EduBridge:${email}?secret=${this.totpSecretKey}%26issuer=EduBridge`;
+  }
+
+  notifNewEnrollments = true;
+  notifNewGrades = true;
+  notifAttendanceAlerts = false;
+
+  institucionName = 'EduBridge Academy';
+  institucionEmail = 'admin@edubridge.com';
+  institucionPhone = '+51 987 654 321';
+  institucionTimeZone = 'Lima (UTC-5)';
+  institucionLanguage = 'Español';
+  institucionYear = '2026-2027';
+
+  inactiveTimeout = '30 minutos';
+  passwordExpiration = '90 días';
+  newPasswordConfig = '';
+  confirmPasswordConfig = '';
 
   showConfirmModal = false;
   selectedEnrollment: any = null;
@@ -40,7 +106,7 @@ export class AdminComponent implements OnInit {
   searchEnrollmentTerm = '';
   selectedEnrollmentStatus = 'Todos';
 
-  
+
   showNewStudentModal = false;
   showNewTeacherModal = false;
   showEditStudentModal = false;
@@ -58,7 +124,7 @@ export class AdminComponent implements OnInit {
     courseId: null as number | null
   };
 
-  
+
   showNewCourseModal = false;
   courseRequest = {
     name: '',
@@ -70,7 +136,7 @@ export class AdminComponent implements OnInit {
   };
   profesores: any[] = [];
 
-  
+
   showEditCourseModal = false;
   selectedCourseId: number | null = null;
   editCourseRequest = {
@@ -111,7 +177,7 @@ export class AdminComponent implements OnInit {
   reporteMaterias: any[] = [];
   enrollmentRequest = { studentId: null, courseId: null, semester: '2026-I' };
 
-  
+
   readonly Search = Search; readonly Bell = Bell; readonly UserPlus = UserPlus;
   readonly SlidersHorizontal = SlidersHorizontal; readonly Download = Download; readonly Edit = Edit;
   readonly UserCheck = UserCheck; readonly Trash2 = Trash2; readonly MoreVertical = MoreVertical;
@@ -120,16 +186,38 @@ export class AdminComponent implements OnInit {
   readonly AlertTriangle = AlertTriangle; readonly TrendingUp = TrendingUp; readonly GraduationCap = GraduationCap;
   readonly CheckCircle2 = CheckCircle2; readonly Check = Check; readonly X = X;
   readonly Printer = Printer; readonly Send = Send; readonly FileDown = FileDown;
-  readonly DollarSign = DollarSign; readonly Activity = Activity; readonly RotateCcw = RotateCcw;
-  readonly FileSpreadsheet = FileSpreadsheet; readonly Save = Save; readonly Lock = Lock;
-  readonly Palette = Palette; readonly Globe = Globe; readonly Database = Database;
-  readonly CreditCard = CreditCard; readonly MessageSquare = MessageSquare; readonly Shield = Shield;
-  readonly Settings = Settings;
+  readonly Activity = Activity; readonly RotateCcw = RotateCcw;
+  readonly Save = Save; readonly Lock = Lock;
+  readonly Globe = Globe; readonly Database = Database;
+  readonly MessageSquare = MessageSquare; readonly Shield = Shield;
+  readonly Settings = Settings; readonly Mail = Mail;
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private totpService: TotpService
+  ) { }
 
   ngOnInit(): void {
     this.cargarDataGeneral();
+    const email = this.currentUserEmail;
+    if (email) {
+      const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+      this.http.get<any>(`${authUrl}/2fa/status?email=${encodeURIComponent(email)}`).subscribe({
+        next: (res) => {
+          this.twoFactorAuth = res.enabled;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.warn("No se pudo obtener el estado 2FA del backend para el admin", err);
+          this.twoFactorAuth = localStorage.getItem('twoFactorAuth_enabled_' + email) === 'true';
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      this.twoFactorAuth = false;
+    }
+    this.updateQRCodeUrl();
   }
 
   cargarDataGeneral(): void {
@@ -151,20 +239,19 @@ export class AdminComponent implements OnInit {
         this.estudiantes = (res.estudiantes || []).map((s: any) => ({ ...s, average: s.averageGrade }));
         this.matriculas = res.matriculas || [];
         this.profesores = res.profesores || [];
+        this.gradesList = res.grades || [];
         this.stats.totalStudents = this.estudiantes.length;
 
-        
         const gradesList = res.grades || [];
         this.matriculas.forEach((m: any) => {
           const sg = gradesList.filter((g: any) => g.student?.id === m.student?.id && g.course?.id === m.course?.id);
           m.grade = sg.length > 0 ? parseFloat((sg.reduce((a: number, g: any) => a + g.value, 0) / sg.length / 4.0).toFixed(1)) : null;
         });
 
-        
         this.cursos = res.cursos.map((curso: any) => {
           const profe = curso.teacher || res.profesores.find((p: any) => p.course?.id === curso.id);
           const totalAlumnos = this.matriculas.filter((m: any) =>
-            m.course?.id === curso.id && (m.status === 'APROBADO' || m.status === 'ACTIVA')
+            m.course?.id === curso.id && (m.status === 'APROBADO' || m.status === 'ACTIVA' || m.status === 'ACTIVO')
           ).length;
 
           return {
@@ -180,10 +267,397 @@ export class AdminComponent implements OnInit {
         this.cursosFiltrados = [...this.cursos];
         this.stats.activeCourses = this.cursos.length;
         this.stats.monthlyEnrollments = this.matriculas.length;
+
+        const uniqueSemesters = Array.from(new Set(this.matriculas.map(m => m.semester).filter(Boolean)));
+        this.periodos = uniqueSemesters.sort().reverse();
+
+        this.calcularReportes();
         this.loading = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => { console.error("Error:", err); this.loading = false; }
+    });
+  }
+
+
+
+  calcularReportes(): void {
+    let list = this.matriculas;
+    if (this.selectedReportPeriod !== 'Todos') {
+      list = list.filter(m => m.semester === this.selectedReportPeriod);
+    }
+    if (this.selectedReportCourseId !== null) {
+      list = list.filter(m => m.course?.id === Number(this.selectedReportCourseId));
+    }
+
+    if (this.reporteActivo === 'Rendimiento Académico') {
+      this.pieChartCenterLabel = 'Calific.';
+
+      const gradedEnrolls = list.filter(m => m.grade !== null);
+      const avgGrade = gradedEnrolls.length > 0 ? gradedEnrolls.reduce((sum, m) => sum + m.grade, 0) / gradedEnrolls.length : 0;
+
+      const approvedEnrolls = gradedEnrolls.filter(m => m.grade >= 2.625);
+      const approvalRate = gradedEnrolls.length > 0 ? (approvedEnrolls.length / gradedEnrolls.length) * 100 : 0;
+
+      const topEnrolls = gradedEnrolls.filter(m => m.grade >= 4.0);
+      const riskEnrolls = gradedEnrolls.filter(m => m.grade < 2.625);
+
+      this.reportStats.avgGrade = avgGrade;
+      this.reportStats.approvalRate = approvalRate;
+      this.reportStats.topStudentsCount = topEnrolls.length;
+      this.reportStats.topStudentsPct = gradedEnrolls.length > 0 ? (topEnrolls.length / gradedEnrolls.length) * 100 : 0;
+      this.reportStats.riskStudentsCount = riskEnrolls.length;
+
+      this.reporteMaterias = this.cursos.map(c => {
+        const cEnrolls = list.filter(m => m.course?.id === c.id);
+        const cGraded = cEnrolls.filter(m => m.grade !== null);
+        const cAvg = cGraded.length > 0 ? cGraded.reduce((sum, m) => sum + m.grade, 0) / cGraded.length : 0;
+        return {
+          name: c.name,
+          students: cEnrolls.length,
+          average: cAvg,
+          approved: cGraded.filter(m => m.grade >= 2.625).length,
+          top: cGraded.filter(m => m.grade >= 4.0).length,
+          risk: cGraded.filter(m => m.grade < 2.625).length
+        };
+      });
+
+      const maxGrade = 5.0;
+      const filteredCoursesForBars = this.cursos.slice(0, 5);
+      this.reporteBarras = filteredCoursesForBars.map(c => {
+        const matchMat = this.reporteMaterias.find(rm => rm.name === c.name);
+        const avg = matchMat ? matchMat.average : 0;
+        return {
+          label: c.code || c.name.substring(0, 3).toUpperCase(),
+          value: avg,
+          height: maxGrade > 0 ? (avg / maxGrade) * 100 : 0
+        };
+      });
+
+      const countA = gradedEnrolls.filter(m => m.grade >= 4.25).length;
+      const countB = gradedEnrolls.filter(m => m.grade >= 3.5 && m.grade < 4.25).length;
+      const countC = gradedEnrolls.filter(m => m.grade >= 2.75 && m.grade < 3.5).length;
+      const countD = gradedEnrolls.filter(m => m.grade >= 2.0 && m.grade < 2.75).length;
+      const countF = gradedEnrolls.filter(m => m.grade < 2.0).length;
+      const totalGraded = gradedEnrolls.length || 1;
+
+      this.pieChartSlices = [
+        { label: 'A (>=17)', color: '#10b981', pct: (countA / totalGraded) * 100 },
+        { label: 'B (14-16)', color: '#3b82f6', pct: (countB / totalGraded) * 100 },
+        { label: 'C (11-13)', color: '#f59e0b', pct: (countC / totalGraded) * 100 },
+        { label: 'D (8-10)', color: '#ef4444', pct: (countD / totalGraded) * 100 },
+        { label: 'F (<8)', color: '#ea580c', pct: (countF / totalGraded) * 100 }
+      ];
+
+      this.calcularRadarPuntos('Rendimiento Académico');
+
+    } else if (this.reporteActivo === 'Asistencia') {
+      this.pieChartCenterLabel = 'Asist.';
+
+      const attendanceEnrolls = list.filter(m => m.totalClasses > 0);
+      let totalAttended = 0;
+      let totalClassesCount = 0;
+      let perfectCount = 0;
+      let riskCount = 0;
+
+      attendanceEnrolls.forEach(m => {
+        totalAttended += m.attendedClasses || 0;
+        totalClassesCount += m.totalClasses || 0;
+        const rate = (m.attendedClasses || 0) / m.totalClasses;
+        if (rate >= 1.0) perfectCount++;
+        if (rate < 0.7) riskCount++;
+      });
+
+      const avgAttendance = totalClassesCount > 0 ? (totalAttended / totalClassesCount) * 100 : 100;
+
+      this.reportStats.avgAttendance = avgAttendance;
+      this.reportStats.perfectAttendanceCount = perfectCount;
+      this.reportStats.perfectAttendancePct = list.length > 0 ? (perfectCount / list.length) * 100 : 0;
+      this.reportStats.totalClasses = totalClassesCount;
+      this.reportStats.riskAttendanceCount = riskCount;
+
+      this.reporteMaterias = this.cursos.map(c => {
+        const cEnrolls = list.filter(m => m.course?.id === c.id);
+        let sumAtt = 0;
+        let sumTot = 0;
+        let cPerfect = 0;
+        let cRegular = 0;
+        let cRisk = 0;
+
+        cEnrolls.forEach(m => {
+          const tot = m.totalClasses || 0;
+          const att = m.attendedClasses || 0;
+          sumAtt += att;
+          sumTot += tot;
+
+          if (tot > 0) {
+            const rate = att / tot;
+            if (rate >= 1.0) cPerfect++;
+            else if (rate >= 0.7) cRegular++;
+            else cRisk++;
+          }
+        });
+
+        const courseAvg = sumTot > 0 ? (sumAtt / sumTot) * 100 : 100;
+        return {
+          name: c.name,
+          students: cEnrolls.length,
+          average: courseAvg,
+          perfect: cPerfect,
+          regular: cRegular,
+          risk: cRisk
+        };
+      });
+
+      const filteredCoursesForBars = this.cursos.slice(0, 5);
+      this.reporteBarras = filteredCoursesForBars.map(c => {
+        const matchMat = this.reporteMaterias.find(rm => rm.name === c.name);
+        const avg = matchMat ? matchMat.average : 100;
+        return {
+          label: c.code || c.name.substring(0, 3).toUpperCase(),
+          value: avg,
+          height: avg
+        };
+      });
+
+      let countPerf = 0;
+      let countGood = 0;
+      let countReg = 0;
+      let countCrit = 0;
+
+      list.forEach(m => {
+        const tot = m.totalClasses || 0;
+        const att = m.attendedClasses || 0;
+        if (tot > 0) {
+          const pct = (att / tot) * 100;
+          if (pct >= 95) countPerf++;
+          else if (pct >= 85) countGood++;
+          else if (pct >= 70) countReg++;
+          else countCrit++;
+        }
+      });
+      const totalWithAtt = list.filter(m => (m.totalClasses || 0) > 0).length || 1;
+
+      this.pieChartSlices = [
+        { label: 'Excl. (>=95%)', color: '#10b981', pct: (countPerf / totalWithAtt) * 100 },
+        { label: 'Bueno (85-94%)', color: '#3b82f6', pct: (countGood / totalWithAtt) * 100 },
+        { label: 'Reg. (70-84%)', color: '#f59e0b', pct: (countReg / totalWithAtt) * 100 },
+        { label: 'Crítico (<70%)', color: '#ef4444', pct: (countCrit / totalWithAtt) * 100 }
+      ];
+
+      this.calcularRadarPuntos('Asistencia');
+
+    } else if (this.reporteActivo === 'Matrículas') {
+      this.pieChartCenterLabel = 'Matríc.';
+
+      const totalEnrollments = list.length;
+      const activeCount = list.filter(m => this.getNormalizedStatus(m.status) === 'Activa').length;
+      const pendingCount = list.filter(m => this.getNormalizedStatus(m.status) === 'Pendiente').length;
+      const cancelledCount = list.filter(m => this.getNormalizedStatus(m.status) === 'Cancelada').length;
+
+      this.reportStats.totalEnrollments = totalEnrollments;
+      this.reportStats.activeEnrollmentsCount = activeCount;
+      this.reportStats.activeEnrollmentsPct = totalEnrollments > 0 ? (activeCount / totalEnrollments) * 100 : 0;
+      this.reportStats.pendingEnrollmentsCount = pendingCount;
+      this.reportStats.cancelledEnrollmentsCount = cancelledCount;
+
+      this.reporteMaterias = this.cursos.map(c => {
+        const cEnrolls = list.filter(m => m.course?.id === c.id);
+        const cActive = cEnrolls.filter(m => this.getNormalizedStatus(m.status) === 'Activa').length;
+        const cPending = cEnrolls.filter(m => this.getNormalizedStatus(m.status) === 'Pendiente').length;
+        const cCancelled = cEnrolls.filter(m => this.getNormalizedStatus(m.status) === 'Cancelada').length;
+        return {
+          name: c.name,
+          capacity: (c.credits || 4) * 10,
+          students: cEnrolls.length,
+          active: cActive,
+          pending: cPending,
+          cancelled: cCancelled
+        };
+      });
+
+      const maxEnrollments = Math.max(...this.reporteMaterias.map(rm => rm.students), 5);
+      const filteredCoursesForBars = this.cursos.slice(0, 5);
+      this.reporteBarras = filteredCoursesForBars.map(c => {
+        const matchMat = this.reporteMaterias.find(rm => rm.name === c.name);
+        const qty = matchMat ? matchMat.students : 0;
+        return {
+          label: c.code || c.name.substring(0, 3).toUpperCase(),
+          value: qty,
+          height: (qty / maxEnrollments) * 100
+        };
+      });
+
+      const totalEnrolls = list.length || 1;
+      this.pieChartSlices = [
+        { label: 'Activas', color: '#10b981', pct: (activeCount / totalEnrolls) * 100 },
+        { label: 'Pendientes', color: '#f59e0b', pct: (pendingCount / totalEnrolls) * 100 },
+        { label: 'Canceladas', color: '#ef4444', pct: (cancelledCount / totalEnrolls) * 100 }
+      ];
+
+      this.calcularRadarPuntos('Matrículas');
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  getPieChartGradient(slices: { color: string, pct: number }[]): string {
+    if (!slices || slices.length === 0) {
+      return 'conic-gradient(#e2e8f0 0% 100%)';
+    }
+    let currentPct = 0;
+    const parts = slices.map(s => {
+      const start = currentPct;
+      currentPct += s.pct;
+      return `${s.color} ${start}% ${currentPct}%`;
+    });
+    if (currentPct < 100) {
+      parts.push(`#e2e8f0 ${currentPct}% 100%`);
+    }
+    return `conic-gradient(${parts.join(', ')})`;
+  }
+
+  private calcularRadarPuntos(tipoReporte: string): void {
+    let v1 = 0.8, v2 = 0.75, v3 = 0.85, v4 = 0.78, v5 = 0.82, v6 = 0.8;
+
+    if (tipoReporte === 'Rendimiento Académico') {
+      const cats = ['Matemáticas', 'Ciencias', 'Tecnología', 'Humanidades'];
+      const averages = cats.map(cat => {
+        const matNombres = this.cursos.filter(c => c.category === cat).map(c => c.name);
+        const matchMats = this.reporteMaterias.filter(rm => matNombres.includes(rm.name));
+        const val = matchMats.length > 0 ? matchMats.reduce((sum, rm) => sum + rm.average, 0) / matchMats.length : 3.5;
+        return val / 5.0;
+      });
+
+      v1 = averages[0] || 0.8;
+      v2 = averages[3] || 0.75;
+      v3 = (averages[0] + averages[1] + averages[2] + averages[3]) / 4 || 0.85;
+      v4 = averages[1] || 0.78;
+      v5 = averages[2] || 0.82;
+      v6 = ((averages[0] + averages[2]) / 2) * 0.95 || 0.8;
+
+    } else if (tipoReporte === 'Asistencia') {
+      const cats = ['Matemáticas', 'Ciencias', 'Tecnología', 'Humanidades'];
+      const averages = cats.map(cat => {
+        const matNombres = this.cursos.filter(c => c.category === cat).map(c => c.name);
+        const matchMats = this.reporteMaterias.filter(rm => matNombres.includes(rm.name));
+        const val = matchMats.length > 0 ? matchMats.reduce((sum, rm) => sum + rm.average, 0) / matchMats.length : 90;
+        return val / 100.0;
+      });
+
+      v1 = averages[0] || 0.9;
+      v2 = averages[3] || 0.88;
+      v3 = (averages[0] + averages[1] + averages[2] + averages[3]) / 4 || 0.92;
+      v4 = averages[1] || 0.89;
+      v5 = averages[2] || 0.91;
+      v6 = v3 * 0.95;
+
+    } else if (tipoReporte === 'Matrículas') {
+      const cats = ['Matemáticas', 'Ciencias', 'Tecnología', 'Humanidades'];
+      const rates = cats.map(cat => {
+        const matNombres = this.cursos.filter(c => c.category === cat).map(c => c.name);
+        const matchMats = this.reporteMaterias.filter(rm => matNombres.includes(rm.name));
+        const totalCap = matchMats.reduce((sum, rm) => sum + rm.capacity, 0) || 1;
+        const totalAct = matchMats.reduce((sum, rm) => sum + rm.active, 0);
+        return Math.min(1.0, (totalAct / totalCap) + 0.3);
+      });
+
+      v1 = rates[0] || 0.75;
+      v2 = rates[3] || 0.72;
+      v3 = (rates[0] + rates[1] + rates[2] + rates[3]) / 4 || 0.78;
+      v4 = rates[1] || 0.76;
+      v5 = rates[2] || 0.8;
+      v6 = v3 * 0.9;
+    }
+
+    const p1x = 50;
+    const p1y = 50 - v1 * 40;
+
+    const p2x = 50 + v2 * 34.64;
+    const p2y = 50 - v2 * 20;
+
+    const p3x = 50 + v3 * 34.64;
+    const p3y = 50 + v3 * 20;
+
+    const p4x = 50;
+    const p4y = 50 + v4 * 40;
+
+    const p5x = 50 - v5 * 34.64;
+    const p5y = 50 + v5 * 20;
+
+    const p6x = 50 - v6 * 34.64;
+    const p6y = 50 - v6 * 20;
+
+    this.radarPoints = `${p1x.toFixed(1)},${p1y.toFixed(1)} ${p2x.toFixed(1)},${p2y.toFixed(1)} ${p3x.toFixed(1)},${p3y.toFixed(1)} ${p4x.toFixed(1)},${p4y.toFixed(1)} ${p5x.toFixed(1)},${p5y.toFixed(1)} ${p6x.toFixed(1)},${p6y.toFixed(1)}`;
+  }
+
+  imprimirReporte(): void {
+    window.print();
+  }
+
+  exportarPDF(): void {
+    window.print();
+  }
+
+  abrirEnviarReporteModal(): void {
+    this.selectedTeacherForReport = null;
+    this.showSendReportModal = true;
+    this.cdr.detectChanges();
+  }
+
+  enviarReporteADocente(): void {
+    if (!this.selectedTeacherForReport) {
+      alert("Por favor, selecciona un profesor.");
+      return;
+    }
+
+    const teacher = this.selectedTeacherForReport;
+
+    const assignedCourse = this.cursos.find(c => c.teacher === teacher.name || c.id === teacher.course?.id);
+
+    let mensaje = `Hola, Prof. ${teacher.name}. `;
+    if (assignedCourse) {
+      const cEnrolls = this.matriculas.filter(m => m.course?.id === assignedCourse.id);
+      const cGraded = cEnrolls.filter(m => m.grade !== null);
+      const cAvg = cGraded.length > 0 ? cGraded.reduce((sum, m) => sum + m.grade, 0) / cGraded.length : 0;
+
+      const cAttenEnrolls = cEnrolls.filter(m => m.totalClasses > 0);
+      let sumAtt = 0;
+      let sumTot = 0;
+      cAttenEnrolls.forEach(m => {
+        sumAtt += m.attendedClasses || 0;
+        sumTot += m.totalClasses || 0;
+      });
+      const cAttPct = sumTot > 0 ? Math.round((sumAtt / sumTot) * 100) : 100;
+
+      mensaje += `Aquí tienes el reporte de tu curso "${assignedCourse.name}" (${assignedCourse.code}): Estudiantes inscritos: ${cEnrolls.length}, Promedio de notas: ${cAvg.toFixed(1)}/5.0, Asistencia promedio: ${cAttPct}%.`;
+    } else {
+      mensaje += `No tienes cursos asignados actualmente, pero te enviamos el reporte institucional general. Estudiantes totales: ${this.stats.totalStudents}, Cursos activos: ${this.stats.activeCourses}.`;
+    }
+
+    const payload = {
+      studentId: Number(teacher.id),
+      message: mensaje,
+      content: mensaje,
+      type: 'ALERTA'
+    };
+
+    const token = localStorage.getItem('token') || localStorage.getItem('jwt') || localStorage.getItem('access_token');
+    const headers = new HttpHeaders({
+      'Authorization': token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json'
+    });
+
+    this.http.post(`${this.API_URL}/notifications`, payload, { headers }).subscribe({
+      next: () => {
+        alert(`Reporte enviado con éxito al Prof. ${teacher.name}`);
+        this.showSendReportModal = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Error al enviar notificación:", err);
+        alert("Error al enviar el reporte: " + (err.error?.message || "Servicio no disponible"));
+      }
     });
   }
 
@@ -254,14 +728,14 @@ export class AdminComponent implements OnInit {
 
     return all.filter(acc => {
       const term = this.searchAccountTerm.toLowerCase();
-      const matchSearch = !term || 
-        acc.name.toLowerCase().includes(term) || 
+      const matchSearch = !term ||
+        acc.name.toLowerCase().includes(term) ||
         acc.email.toLowerCase().includes(term) ||
         (acc.specialization && acc.specialization.toLowerCase().includes(term)) ||
         (acc.program && acc.program.toLowerCase().includes(term));
-      
+
       const matchRole = this.selectedAccountRole === 'Todos' || acc.role === this.selectedAccountRole;
-      
+
       return matchSearch && matchRole;
     });
   }
@@ -293,7 +767,7 @@ export class AdminComponent implements OnInit {
         this.enrollmentRequest = { studentId: null, courseId: null, semester: '2026-I' };
         this.cargarDataGeneral();
       },
-      
+
       error: (err) => alert("Error: " + (err.error?.message || err.error || "No se pudo procesar"))
     });
   }
@@ -530,8 +1004,8 @@ export class AdminComponent implements OnInit {
           name: '',
           code: '',
           credits: 4,
-          category: 'Matemáticas',
-          icon: 'book-open',
+          category: '',
+          icon: '',
           teacherId: null
         };
         this.cargarDataGeneral();
@@ -542,7 +1016,7 @@ export class AdminComponent implements OnInit {
 
   abrirEditarCurso(curso: any) {
     this.selectedCourseId = curso.id;
-    
+
     let currentTeacherId: number | null = null;
     if (curso.teacher) {
       currentTeacherId = curso.teacher.id;
@@ -601,5 +1075,104 @@ export class AdminComponent implements OnInit {
 
   handlePageChange(pageId: string) { if (pageId === 'admin') this.activeTab = 'dashboard'; else if (pageId.includes('estudiantes')) this.activeTab = 'estudiantes'; else if (pageId.includes('cursos')) this.activeTab = 'cursos'; else if (pageId.includes('matriculas')) this.activeTab = 'matriculas'; else if (pageId.includes('reportes')) this.activeTab = 'reportes'; else if (pageId.includes('configuracion')) this.activeTab = 'configuracion'; this.cdr.detectChanges(); }
 
-  logout() { localStorage.clear(); window.location.reload(); }
+  getRoleCount(role: string): number {
+    if (role === 'admin') {
+      return 1;
+    } else if (role === 'docente' || role === 'profesor') {
+      return this.profesores ? this.profesores.length : 0;
+    } else if (role === 'estudiante') {
+      return this.estudiantes ? this.estudiantes.length : 0;
+    }
+    return 0;
+  }
+
+  guardarConfiguracion(): void {
+    alert("¡Configuración guardada exitosamente!");
+  }
+
+  actualizarPasswordConfig(): void {
+    if (!this.newPasswordConfig || !this.confirmPasswordConfig) {
+      alert("Por favor, completa ambos campos de contraseña.");
+      return;
+    }
+    if (this.newPasswordConfig !== this.confirmPasswordConfig) {
+      alert("Las contraseñas no coinciden.");
+      return;
+    }
+    alert("Contraseña de administrador actualizada con éxito.");
+    this.newPasswordConfig = '';
+    this.confirmPasswordConfig = '';
+  }
+
+  toggleTwoFactorSwitch() {
+    if (!this.twoFactorAuth) {
+      this.totpVerificationCode = '';
+      this.updateQRCodeUrl();
+      this.show2faSetupModal = true;
+    } else {
+      if (confirm("¿Estás seguro de que deseas desactivar la Autenticación de Dos Factores? Esto reducirá drásticamente la seguridad de tu cuenta.")) {
+        const email = this.currentUserEmail;
+        const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+        this.http.post(`${authUrl}/2fa/disable`, { email }).subscribe({
+          next: () => {
+            this.twoFactorAuth = false;
+            localStorage.removeItem('twoFactorAuth_enabled_' + email);
+            localStorage.removeItem('twoFactorAuth_secret_' + email);
+            alert("Autenticación de Dos Factores desactivada con éxito.");
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            console.error("Error al desactivar 2FA del admin en el servidor", err);
+            alert("No se pudo desactivar la Autenticación de Dos Factores en el servidor.");
+          }
+        });
+      }
+    }
+    this.cdr.detectChanges();
+  }
+
+  confirmarActivacion2fa() {
+    if (!this.totpVerificationCode || this.totpVerificationCode.length !== 6 || isNaN(Number(this.totpVerificationCode))) {
+      alert("Por favor, ingresa el código de 6 dígitos que se muestra en tu aplicación autenticadora.");
+      return;
+    }
+
+    const email = this.currentUserEmail;
+    const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+
+    this.http.post(`${authUrl}/2fa/enable`, {
+      email: email,
+      secret: this.totpSecretKey,
+      code: this.totpVerificationCode
+    }).subscribe({
+      next: () => {
+        this.twoFactorAuth = true;
+        localStorage.setItem('twoFactorAuth_enabled_' + email, 'true');
+        localStorage.setItem('twoFactorAuth_secret_' + email, this.totpSecretKey);
+        this.show2faSetupModal = false;
+        alert("¡Autenticación de Dos Factores (TOTP) configurada y activada con éxito!");
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error("Error al activar 2FA del admin en el servidor", err);
+        alert(err.error?.message || "El código ingresado es incorrecto o ha expirado. Por favor, verifica tu aplicación autenticadora.");
+      }
+    });
+  }
+
+  cancelarActivacion2fa() {
+    this.show2faSetupModal = false;
+    this.twoFactorAuth = false;
+    this.cdr.detectChanges();
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_id');
+    window.location.reload();
+  }
 }

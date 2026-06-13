@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 import { NotificationService } from '../../../core/services/notification';
+import { TotpService } from '../../../core/services/totp';
 import { RoleService, UserRole } from '../../../core/services/role';
 import { LucideAngularModule, GraduationCap, BarChart3, Users, BookOpen, Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from 'lucide-angular';
 
@@ -40,6 +41,11 @@ export class LoginComponent implements OnInit {
   showNewPassword = false;
   showConfirmNewPassword = false;
 
+  // 2FA TOTP state
+  show2faVerification = false;
+  otpCode = '';
+  tempUserResponseData: any = null;
+
   private readonly REMEMBER_KEY_EMAIL = 'eb_user_email';
   private readonly REMEMBER_KEY_ROLE = 'eb_user_role';
 
@@ -48,7 +54,8 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService,
-    private roleService: RoleService
+    private roleService: RoleService,
+    private totpService: TotpService
   ) { }
 
   ngOnInit() {
@@ -78,10 +85,18 @@ export class LoginComponent implements OnInit {
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (userData: any) => {
+        const is2faActive = localStorage.getItem('twoFactorAuth_enabled_' + this.email.toLowerCase().trim()) === 'true';
+        if (userData.requires2fa || is2faActive) {
+          this.tempUserResponseData = userData;
+          this.show2faVerification = true;
+          this.loading = false;
+          this.cdr.detectChanges();
+          return;
+        }
+
         const normalizedUserRole = this.roleService.normalizeRole(userData.role);
         const normalizedSelectedRole = this.roleService.normalizeRole(this.role);
 
-        
         if (normalizedUserRole !== UserRole.ADMIN) {
           if (normalizedUserRole !== normalizedSelectedRole) {
             this.loading = false;
@@ -221,5 +236,80 @@ export class LoginComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  confirmOtpVerification(event: Event) {
+    event.preventDefault();
+    this.loading = true;
+
+    if (!this.otpCode || this.otpCode.length !== 6 || isNaN(Number(this.otpCode))) {
+      this.loading = false;
+      this.notificationService.showError("El código debe ser de 6 números.", "Código Inválido");
+      return;
+    }
+
+    const email = this.email;
+    const password = this.password;
+
+    this.authService.login({ email, password, twoFactorCode: this.otpCode }).subscribe({
+      next: (userData: any) => {
+        this.loading = false;
+        const token = userData.token || userData.accessToken || userData.jwt;
+        if (token) {
+          localStorage.setItem('token', token);
+          localStorage.setItem('auth_token', token);
+        }
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('user_id', userData.id.toString());
+        localStorage.setItem('user_name', userData.name);
+        localStorage.setItem('user_role', userData.role);
+        localStorage.setItem('user_email', userData.email);
+
+        if (this.rememberMe) {
+          localStorage.setItem(this.REMEMBER_KEY_EMAIL, this.email);
+          localStorage.setItem(this.REMEMBER_KEY_ROLE, this.role);
+        } else {
+          localStorage.removeItem(this.REMEMBER_KEY_EMAIL);
+          localStorage.removeItem(this.REMEMBER_KEY_ROLE);
+        }
+
+        const normalizedUserRole = this.roleService.normalizeRole(userData.role);
+        if (normalizedUserRole === UserRole.ADMIN) {
+          this.router.navigate(['/admin']);
+        } else if (normalizedUserRole === UserRole.DOCENTE) {
+          this.router.navigate(['/gestion']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+        this.notificationService.showSuccess("Autenticación de dos factores exitosa.", "Acceso Concedido");
+        this.show2faVerification = false;
+        this.otpCode = '';
+        this.tempUserResponseData = null;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.loading = false;
+        this.notificationService.showError(err.error?.message || "El código es incorrecto o ha expirado.", "Código Inválido");
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cancelOtpVerification() {
+    this.show2faVerification = false;
+    this.otpCode = '';
+    this.tempUserResponseData = null;
+    this.loading = false;
+    this.cdr.detectChanges();
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_id');
+    window.location.reload();
   }
 }

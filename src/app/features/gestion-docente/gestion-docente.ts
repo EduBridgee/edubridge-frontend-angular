@@ -5,8 +5,9 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell';
 import { NotificationService } from '../../core/services/notification';
 import { RoleService, UserRole } from '../../core/services/role';
-import { LucideAngularModule, Search, BarChart3, Users, Calendar, Clock, Star, User, UserPlus, Edit, Bell, Download, Check, Plus, X } from 'lucide-angular';
+import { LucideAngularModule, Search, BarChart3, Users, Calendar, Clock, Star, User, UserPlus, Edit, Bell, Download, Check, Plus, X, Shield } from 'lucide-angular';
 import { firstValueFrom } from 'rxjs'; 
+import { TotpService } from '../../core/services/totp';
 
 @Component({
   selector: 'app-gestion-docente',
@@ -30,12 +31,36 @@ export class GestionDocenteComponent implements OnInit {
   readonly Check = Check;
   readonly Plus = Plus;
   readonly X = X;
+  readonly Shield = Shield;
 
   user: any = {
     id: localStorage.getItem('user_id'),
     name: localStorage.getItem('user_name'),
     role: localStorage.getItem('user_role')
   };
+
+  // 2FA TOTP state
+  twoFactorAuth: boolean = false;
+  show2faSetupModal: boolean = false;
+  totpVerificationCode = '';
+  totpSecretKey = 'JBSWY3DPEHPK3PXP';
+  scanned2faQRCodeUrl = '';
+
+  get userEmail(): string {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const u = JSON.parse(userStr);
+        if (u && u.email) return u.email.toLowerCase().trim();
+      } catch (e) {}
+    }
+    return 'teacher@edubridge.com';
+  }
+
+  updateQRCodeUrl() {
+    const email = this.userEmail;
+    this.scanned2faQRCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=otpauth://totp/EduBridge:${email}?secret=${this.totpSecretKey}%26issuer=EduBridge`;
+  }
 
   loading: boolean = true;
   estudiantes: any[] = [];         
@@ -83,7 +108,8 @@ export class GestionDocenteComponent implements OnInit {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService,
-    private roleService: RoleService
+    private roleService: RoleService,
+    private totpService: TotpService
   ) { }
 
   ngOnInit(): void {
@@ -92,6 +118,24 @@ export class GestionDocenteComponent implements OnInit {
     setTimeout(() => {
       this.inicializarPanel();
     }, 100);
+    const email = this.userEmail;
+    if (email) {
+      const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+      this.http.get<any>(`${authUrl}/2fa/status?email=${encodeURIComponent(email)}`).subscribe({
+        next: (res) => {
+          this.twoFactorAuth = res.enabled;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.warn("No se pudo obtener el estado 2FA del backend para el docente", err);
+          this.twoFactorAuth = localStorage.getItem('twoFactorAuth_enabled_' + email) === 'true';
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      this.twoFactorAuth = false;
+    }
+    this.updateQRCodeUrl();
   }
 
   
@@ -463,5 +507,67 @@ export class GestionDocenteComponent implements OnInit {
         this.notificationService.showError("No se pudo enviar la notificación.");
       }
     });
+  }
+
+  toggleTwoFactorSwitch() {
+    if (!this.twoFactorAuth) {
+      this.totpVerificationCode = '';
+      this.updateQRCodeUrl();
+      this.show2faSetupModal = true;
+    } else {
+      if (confirm("¿Estás seguro de que deseas desactivar la Autenticación de Dos Factores? Esto reducirá drásticamente la seguridad de tu cuenta.")) {
+        const email = this.userEmail;
+        const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+        this.http.post(`${authUrl}/2fa/disable`, { email }).subscribe({
+          next: () => {
+            this.twoFactorAuth = false;
+            localStorage.removeItem('twoFactorAuth_enabled_' + email);
+            localStorage.removeItem('twoFactorAuth_secret_' + email);
+            this.notificationService.showSuccess("Autenticación de Dos Factores desactivada con éxito.");
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            console.error("Error al desactivar 2FA del docente en el servidor", err);
+            this.notificationService.showError("No se pudo desactivar la Autenticación de Dos Factores en el servidor.");
+          }
+        });
+      }
+    }
+    this.cdr.detectChanges();
+  }
+
+  confirmarActivacion2fa() {
+    if (!this.totpVerificationCode || this.totpVerificationCode.length !== 6 || isNaN(Number(this.totpVerificationCode))) {
+      this.notificationService.showError("Por favor, ingresa el código de 6 dígitos que se muestra en tu aplicación autenticadora.", "Código Inválido");
+      return;
+    }
+
+    const email = this.userEmail;
+    const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+
+    this.http.post(`${authUrl}/2fa/enable`, {
+      email: email,
+      secret: this.totpSecretKey,
+      code: this.totpVerificationCode
+    }).subscribe({
+      next: () => {
+        this.twoFactorAuth = true;
+        localStorage.setItem('twoFactorAuth_enabled_' + email, 'true');
+        localStorage.setItem('twoFactorAuth_secret_' + email, this.totpSecretKey);
+        this.show2faSetupModal = false;
+        this.notificationService.showSuccess("¡Autenticación de Dos Factores (TOTP) configurada y activada con éxito!");
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error("Error al activar 2FA del docente en el servidor", err);
+        this.notificationService.showError(err.error?.message || "El código ingresado es incorrecto o ha expirado.", "Código Inválido");
+      }
+    });
+  }
+
+  cancelarActivacion2fa() {
+    this.show2faSetupModal = false;
+    this.twoFactorAuth = false;
+    this.cdr.detectChanges();
   }
 }
