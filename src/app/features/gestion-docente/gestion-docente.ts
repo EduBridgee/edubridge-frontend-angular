@@ -43,10 +43,12 @@ export class GestionDocenteComponent implements OnInit {
   twoFactorAuth: boolean = false;
   show2faSetupModal: boolean = false;
   totpVerificationCode = '';
-  totpSecretKey = 'JBSWY3DPEHPK3PXP';
+  totpSecretKey = '';
   scanned2faQRCodeUrl = '';
 
   get userEmail(): string {
+    const email = localStorage.getItem('user_email');
+    if (email) return email.toLowerCase().trim();
     const userStr = localStorage.getItem('user');
     if (userStr) {
       try {
@@ -55,6 +57,10 @@ export class GestionDocenteComponent implements OnInit {
       } catch (e) {}
     }
     return 'teacher@edubridge.com';
+  }
+
+  get apiBaseUrl(): string {
+    return window.location.hostname === 'localhost' ? 'http://localhost:8081/api' : 'https://edubridge-backend-v2.onrender.com/api';
   }
 
   updateQRCodeUrl() {
@@ -174,7 +180,7 @@ export class GestionDocenteComponent implements OnInit {
   
   cargarNotasPersonales(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/grades/student/${this.user.id}`).subscribe({
+      this.http.get<any[]>(`${this.apiBaseUrl}/grades/student/${this.user.id}`).subscribe({
         next: (data) => {
           this.notasEstudiante = data.map(n => ({
             valor: n.value,
@@ -193,8 +199,8 @@ export class GestionDocenteComponent implements OnInit {
 
   async cargarCursosDelProfesor(): Promise<void> {
     try {
-      const profesores = await firstValueFrom(this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teachers'));
-      const allCourses = await firstValueFrom(this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses'));
+      const profesores = await firstValueFrom(this.http.get<any[]>(`${this.apiBaseUrl}/teachers`));
+      const allCourses = await firstValueFrom(this.http.get<any[]>(`${this.apiBaseUrl}/courses`));
       
       const profReal = profesores.find(p => Number(p.id) === Number(this.user.id));
 
@@ -239,7 +245,7 @@ export class GestionDocenteComponent implements OnInit {
     this.loading = true;
     this.cursoSeleccionadoId = Number(courseId);
 
-    this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/enrollments/course/${this.cursoSeleccionadoId}`).subscribe({
+    this.http.get<any[]>(`${this.apiBaseUrl}/enrollments/course/${this.cursoSeleccionadoId}`).subscribe({
       next: (matriculas) => {
         const activeMatriculas = matriculas.filter(m => {
           const status = (m.status || '').toUpperCase();
@@ -286,7 +292,7 @@ export class GestionDocenteComponent implements OnInit {
 
   async cargarEstudiantesGlobales(): Promise<void> {
     try {
-      this.estudiantes = await firstValueFrom(this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/students'));
+      this.estudiantes = await firstValueFrom(this.http.get<any[]>(`${this.apiBaseUrl}/students`));
     } catch (err) {
       console.error("Error al recuperar estudiantes globales:", err);
     }
@@ -297,7 +303,7 @@ export class GestionDocenteComponent implements OnInit {
 
   async cargarTareasServidor(): Promise<void> {
     try {
-      this.tasks = await firstValueFrom(this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teacher-tasks'));
+      this.tasks = await firstValueFrom(this.http.get<any[]>(`${this.apiBaseUrl}/teacher-tasks`));
     } catch (err) {
       console.error("Error al recuperar tareas administrativas:", err);
     }
@@ -331,7 +337,7 @@ export class GestionDocenteComponent implements OnInit {
       type: this.nuevaNota.type
     };
 
-    this.http.post('https://edubridge-backend-v2.onrender.com/api/grades', payload).subscribe({
+    this.http.post(`${this.apiBaseUrl}/grades`, payload).subscribe({
       next: () => {
         const tempCourseId = this.nuevaNota.courseId;
         this.nuevaNota = { studentId: null, courseId: tempCourseId, score: null, type: null };
@@ -381,7 +387,7 @@ export class GestionDocenteComponent implements OnInit {
     const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
 
     
-    this.http.post('https://edubridge-backend-v2.onrender.com/api/enrollments/participations/bulk', payload, options).subscribe({
+    this.http.post(`${this.apiBaseUrl}/enrollments/participations/bulk`, payload, options).subscribe({
       next: () => {
         setTimeout(() => {
           this.showParticipacionModal = false;
@@ -408,7 +414,7 @@ export class GestionDocenteComponent implements OnInit {
       return;
     }
 
-    this.http.post('https://edubridge-backend-v2.onrender.com/api/students', this.nuevoEstudiante).subscribe({
+    this.http.post(`${this.apiBaseUrl}/students`, this.nuevoEstudiante).subscribe({
       next: () => {
         this.cargarEstudiantesGlobales().then(() => {
           setTimeout(() => {
@@ -454,7 +460,7 @@ export class GestionDocenteComponent implements OnInit {
     const token = localStorage.getItem('token') || localStorage.getItem('jwt') || localStorage.getItem('access_token');
     const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
 
-    this.http.post('https://edubridge-backend-v2.onrender.com/api/enrollments/attendance/bulk', payload, options).subscribe({
+    this.http.post(`${this.apiBaseUrl}/enrollments/attendance/bulk`, payload, options).subscribe({
       next: () => {
         if (this.cursoSeleccionadoId) {
           this.onCursoSeleccionadoChange(this.cursoSeleccionadoId);
@@ -493,7 +499,7 @@ export class GestionDocenteComponent implements OnInit {
     const token = localStorage.getItem('token') || localStorage.getItem('jwt') || localStorage.getItem('access_token');
     const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
 
-    this.http.post('https://edubridge-backend-v2.onrender.com/api/notifications', payload, options).subscribe({
+    this.http.post(`${this.apiBaseUrl}/notifications`, payload, options).subscribe({
       next: () => {
         setTimeout(() => {
           this.showNotifyModal = false;

@@ -129,6 +129,7 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('user_id', userData.id.toString());
         localStorage.setItem('user_name', userData.name);
         localStorage.setItem('user_role', userData.role);
+        localStorage.setItem('user_email', userData.email);
 
         this.loading = false;
 

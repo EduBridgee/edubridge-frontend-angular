@@ -26,11 +26,27 @@ export class StudentProfileComponent implements OnInit {
   readonly Shield = Shield;
 
   
+  get userEmail(): string {
+    const email = localStorage.getItem('user_email');
+    if (email) return email.toLowerCase().trim();
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const u = JSON.parse(userStr);
+        if (u && u.email) return u.email.toLowerCase().trim();
+      } catch (e) {}
+    }
+    return '';
+  }
+
+  get apiBaseUrl(): string {
+    return window.location.hostname === 'localhost' ? 'http://localhost:8081/api' : 'https://edubridge-backend-v2.onrender.com/api';
+  }
+
   user: any = {
     id: localStorage.getItem('user_id'),
     name: localStorage.getItem('user_name'),
-    role: localStorage.getItem('user_role'),
-    email: localStorage.getItem('user_email') || (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).email : '')
+    role: localStorage.getItem('user_role')
   };
 
   students: any[] = [];
@@ -55,7 +71,7 @@ export class StudentProfileComponent implements OnInit {
   twoFactorAuth: boolean = false;
   show2faSetupModal: boolean = false;
   totpVerificationCode: string = '';
-  totpSecretKey: string = 'JBSWY3DPEHPK3PXP';
+  totpSecretKey: string = '';
   scanned2faQRCodeUrl: string = '';
 
   academicHistory = [
@@ -108,7 +124,7 @@ export class StudentProfileComponent implements OnInit {
   ngOnInit() {
     this.cargarEstudiantes();
     this.cargarCursosDesdeBD();
-    const email = this.user.email || localStorage.getItem('user_email') || '';
+    const email = this.userEmail;
     if (email) {
       const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
       this.http.get<any>(`${authUrl}/2fa/status?email=${encodeURIComponent(email)}`).subscribe({
@@ -118,7 +134,7 @@ export class StudentProfileComponent implements OnInit {
         },
         error: (err) => {
           console.warn("No se pudo obtener el estado 2FA del backend, usando fallback local", err);
-          this.twoFactorAuth = localStorage.getItem('twoFactorAuth_enabled_' + email.toLowerCase().trim()) === 'true';
+          this.twoFactorAuth = localStorage.getItem('twoFactorAuth_enabled_' + email) === 'true';
           this.cdr.detectChanges();
         }
       });
@@ -129,16 +145,16 @@ export class StudentProfileComponent implements OnInit {
   }
 
   updateQRCodeUrl() {
-    const email = this.user.email ? this.user.email.toLowerCase().trim() : 'student@edubridge.com';
+    const email = this.userEmail || 'student@edubridge.com';
     this.scanned2faQRCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=otpauth://totp/EduBridge:${email}?secret=${this.totpSecretKey}%26issuer=EduBridge`;
   }
 
   cargarEstudiantes() {
     this.loading = true;
-    const currentUser = this.user;
+    const currentUser = { ...this.user, email: this.userEmail };
     const currentUserIdNum = currentUser.id ? Number(currentUser.id) : null;
 
-    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/students').subscribe({
+    this.http.get<any[]>(`${this.apiBaseUrl}/students`).subscribe({
       next: (data) => {
         this.students = data;
         this.filteredStudents = data;
@@ -175,7 +191,7 @@ export class StudentProfileComponent implements OnInit {
   }
 
   cargarNotasEstudiante(studentId: number) {
-    this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/grades/student/${studentId}`).subscribe({
+    this.http.get<any[]>(`${this.apiBaseUrl}/grades/student/${studentId}`).subscribe({
       next: (notas) => {
         const cursosMap = new Map();
 
@@ -217,7 +233,7 @@ export class StudentProfileComponent implements OnInit {
   }
 
   cargarFaltasEstudiante(studentId: number) {
-    this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/enrollments/student/${studentId}`).subscribe({
+    this.http.get<any[]>(`${this.apiBaseUrl}/enrollments/student/${studentId}`).subscribe({
       next: (enrollments) => {
         let totalFaltas = 0;
         const activeEnrollments = enrollments.filter(e => {
@@ -238,7 +254,7 @@ export class StudentProfileComponent implements OnInit {
 
   cargarCursosDesdeBD() {
     this.loadingCourses = true;
-    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').subscribe({
+    this.http.get<any[]>(`${this.apiBaseUrl}/courses`).subscribe({
       next: (data) => {
         this.courses = data;
         this.loadingCourses = false;
@@ -284,7 +300,7 @@ export class StudentProfileComponent implements OnInit {
   guardarCambios() {
     if (!this.editingStudent.id) return;
     this.saving = true;
-    this.http.put(`https://edubridge-backend-v2.onrender.com/api/students/${this.editingStudent.id}`, this.editingStudent).subscribe({
+    this.http.put(`${this.apiBaseUrl}/students/${this.editingStudent.id}`, this.editingStudent).subscribe({
       next: (updated: any) => {
         const index = this.students.findIndex(s => s.id === updated.id);
         if (index !== -1) {
@@ -292,7 +308,7 @@ export class StudentProfileComponent implements OnInit {
           this.selectedStudent = updated;
         }
 
-        if (updated.email === localStorage.getItem('user_email')) {
+        if (updated.email === this.userEmail) {
           localStorage.setItem('user_name', updated.name);
           this.user.name = updated.name;
         }
@@ -323,7 +339,7 @@ export class StudentProfileComponent implements OnInit {
       value: this.newGrade.value
     };
 
-    this.http.post('https://edubridge-backend-v2.onrender.com/api/grades', payload).subscribe({
+    this.http.post(`${this.apiBaseUrl}/grades`, payload).subscribe({
       next: () => {
         this.notificationService.showSuccess("La nota ha sido sincronizada correctamente.");
         this.newGrade = { courseId: null, value: null };
@@ -344,13 +360,13 @@ export class StudentProfileComponent implements OnInit {
       this.show2faSetupModal = true;
     } else {
       if (confirm("¿Estás seguro de que deseas desactivar la Autenticación de Dos Factores? Esto reducirá drásticamente la seguridad de tu cuenta.")) {
-        const email = this.user.email || localStorage.getItem('user_email') || '';
+        const email = this.userEmail;
         const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
         this.http.post(`${authUrl}/2fa/disable`, { email }).subscribe({
           next: () => {
             this.twoFactorAuth = false;
-            localStorage.removeItem('twoFactorAuth_enabled_' + email.toLowerCase().trim());
-            localStorage.removeItem('twoFactorAuth_secret_' + email.toLowerCase().trim());
+            localStorage.removeItem('twoFactorAuth_enabled_' + email);
+            localStorage.removeItem('twoFactorAuth_secret_' + email);
             this.notificationService.showSuccess("Autenticación de Dos Factores desactivada con éxito.");
             this.cdr.detectChanges();
           },
@@ -370,7 +386,7 @@ export class StudentProfileComponent implements OnInit {
       return;
     }
 
-    const email = this.user.email || localStorage.getItem('user_email') || '';
+    const email = this.userEmail;
     const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
 
     this.http.post(`${authUrl}/2fa/enable`, {
@@ -380,8 +396,8 @@ export class StudentProfileComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.twoFactorAuth = true;
-        localStorage.setItem('twoFactorAuth_enabled_' + email.toLowerCase().trim(), 'true');
-        localStorage.setItem('twoFactorAuth_secret_' + email.toLowerCase().trim(), this.totpSecretKey);
+        localStorage.setItem('twoFactorAuth_enabled_' + email, 'true');
+        localStorage.setItem('twoFactorAuth_secret_' + email, this.totpSecretKey);
         this.show2faSetupModal = false;
         this.notificationService.showSuccess("¡Autenticación de Dos Factores (TOTP) configurada y activada con éxito!");
         this.cdr.detectChanges();

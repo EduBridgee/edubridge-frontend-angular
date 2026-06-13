@@ -20,7 +20,7 @@ import {
   templateUrl: './admin.html'
 })
 export class AdminComponent implements OnInit {
-  private readonly API_URL = 'https://edubridge-backend-v2.onrender.com/api';
+  private readonly API_URL = window.location.hostname === 'localhost' ? 'http://localhost:8081/api' : 'https://edubridge-backend-v2.onrender.com/api';
 
   activeTab = 'dashboard';
   configTab = 'general';
@@ -63,7 +63,7 @@ export class AdminComponent implements OnInit {
   twoFactorAuth = false;
   show2faSetupModal = false;
   totpVerificationCode = '';
-  totpSecretKey = 'JBSWY3DPEHPK3PXP';
+  totpSecretKey = '';
   scanned2faQRCodeUrl = '';
 
   get currentUserEmail(): string {
