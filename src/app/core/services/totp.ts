@@ -71,4 +71,14 @@ export class TotpService {
     }
     return false;
   }
+
+  generateRandomSecret(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    let secret = '';
+    for (let i = 0; i < 16; i++) {
+      const idx = Math.floor(Math.random() * chars.length);
+      secret += chars[idx];
+    }
+    return secret;
+  }
 }

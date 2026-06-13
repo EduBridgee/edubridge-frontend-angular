@@ -1107,6 +1107,7 @@ export class AdminComponent implements OnInit {
   toggleTwoFactorSwitch() {
     if (!this.twoFactorAuth) {
       this.totpVerificationCode = '';
+      this.totpSecretKey = this.totpService.generateRandomSecret();
       this.updateQRCodeUrl();
       this.show2faSetupModal = true;
     } else {
