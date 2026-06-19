@@ -5,6 +5,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RoleService, UserRole } from '../../core/services/role';
+import { API_BASE_URL } from '../../core/config/api.config';
 import { LucideAngularModule, Search, Users, Award, Target, AlertTriangle, TrendingUp, BarChart3, Check, Clock, BookOpen, Calendar } from 'lucide-angular';
 
 @Component({
@@ -82,24 +83,24 @@ export class DashboardComponent implements OnInit {
 
     const isDocente = normalizedRole === UserRole.DOCENTE;
 
-    const studentsReq = this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/students')
+    const studentsReq = this.http.get<any[]>(`${API_BASE_URL}/students`)
       .pipe(catchError(() => of([])));
 
     const coursesReq = isDocente
-      ? this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').pipe(catchError(() => of([])))
+      ? this.http.get<any[]>(`${API_BASE_URL}/courses`).pipe(catchError(() => of([])))
       : of([]);
 
     const teachersReq = isDocente
-      ? this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teachers').pipe(catchError(() => of([])))
+      ? this.http.get<any[]>(`${API_BASE_URL}/teachers`).pipe(catchError(() => of([])))
       : of([]);
 
     const enrollmentsReq = isDocente
-      ? this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/enrollments').pipe(catchError(() => of([])))
-      : this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/enrollments/student/${userId}`).pipe(catchError(() => of([])));
+      ? this.http.get<any[]>(`${API_BASE_URL}/enrollments`).pipe(catchError(() => of([])))
+      : this.http.get<any[]>(`${API_BASE_URL}/enrollments/student/${userId}`).pipe(catchError(() => of([])));
 
     const gradesReq = isDocente
-      ? this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/grades').pipe(catchError(() => of([])))
-      : this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/grades/student/${userId}`)
+      ? this.http.get<any[]>(`${API_BASE_URL}/grades`).pipe(catchError(() => of([])))
+      : this.http.get<any[]>(`${API_BASE_URL}/grades/student/${userId}`)
         .pipe(catchError(() => of([])));
 
     forkJoin({
@@ -172,8 +173,8 @@ export class DashboardComponent implements OnInit {
   private processAdminDashboard() {
     
     forkJoin({
-      allStudents: this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/students').pipe(catchError(() => of([]))),
-      allCourses: this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').pipe(catchError(() => of([])))
+      allStudents: this.http.get<any[]>(`${API_BASE_URL}/students`).pipe(catchError(() => of([]))),
+      allCourses: this.http.get<any[]>(`${API_BASE_URL}/courses`).pipe(catchError(() => of([])))
     }).subscribe({
       next: (res) => {
         this.students = res.allStudents;

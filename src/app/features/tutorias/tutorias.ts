@@ -5,7 +5,8 @@ import { FormsModule } from '@angular/forms';
 
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell';
 import { NotificationService } from '../../core/services/notification';
-import { RoleService, UserRole } from '../../core/services/role';
+import { RoleService } from '../../core/services/role';
+import { API_BASE_URL } from '../../core/config/api.config';
 import { LucideAngularModule, Search, Plus, Calendar, Users, Clock, Star, MessageCircle, Monitor, BookOpen, ChevronDown, Check, X } from 'lucide-angular';
 
 @Component({
@@ -38,7 +39,7 @@ export class TutoriasComponent implements OnInit {
   loading: boolean = true;
   activeTab: string = 'mis-tutorias';
 
-  private apiUrl = 'https://edubridge-backend-v2.onrender.com/api/tutoring';
+  private apiUrl = `${API_BASE_URL}/tutoring`;
 
   teacherKpis = {
     todaySessions: 0,
@@ -90,7 +91,7 @@ export class TutoriasComponent implements OnInit {
 
   fetchTeachers() {
     
-    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teachers').subscribe({
+    this.http.get<any[]>(`${API_BASE_URL}/teachers`).subscribe({
       next: (data) => {
         this.teachers = data.map(t => ({
           n: t.name,
@@ -339,7 +340,7 @@ export class TutoriasComponent implements OnInit {
       return;
     }
 
-    this.http.post('https://edubridge-backend-v2.onrender.com/api/tutoring/request', this.nuevaTutoria)
+    this.http.post(`${API_BASE_URL}/tutoring/request`, this.nuevaTutoria)
       .subscribe({
         next: () => {
           this.showModal = false;

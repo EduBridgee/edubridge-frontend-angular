@@ -8,6 +8,7 @@ import { RoleService, UserRole } from '../../core/services/role';
 import { LucideAngularModule, Search, BarChart3, Users, Calendar, Clock, Star, User, UserPlus, Edit, Bell, Download, Check, Plus, X, Shield } from 'lucide-angular';
 import { firstValueFrom } from 'rxjs'; 
 import { TotpService } from '../../core/services/totp';
+import { API_BASE_URL } from '../../core/config/api.config';
 
 @Component({
   selector: 'app-gestion-docente',
@@ -39,7 +40,6 @@ export class GestionDocenteComponent implements OnInit {
     role: localStorage.getItem('user_role')
   };
 
-  // 2FA TOTP state
   twoFactorAuth: boolean = false;
   show2faSetupModal: boolean = false;
   totpVerificationCode = '';
@@ -60,7 +60,7 @@ export class GestionDocenteComponent implements OnInit {
   }
 
   get apiBaseUrl(): string {
-    return window.location.hostname === 'localhost' ? 'http://localhost:8081/api' : 'https://edubridge-backend-v2.onrender.com/api';
+    return API_BASE_URL;
   }
 
   updateQRCodeUrl() {
@@ -126,7 +126,7 @@ export class GestionDocenteComponent implements OnInit {
     }, 100);
     const email = this.userEmail;
     if (email) {
-      const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+      const authUrl = `${API_BASE_URL}/auth`;
       this.http.get<any>(`${authUrl}/2fa/status?email=${encodeURIComponent(email)}`).subscribe({
         next: (res) => {
           this.twoFactorAuth = res.enabled;
@@ -524,7 +524,7 @@ export class GestionDocenteComponent implements OnInit {
     } else {
       if (confirm("¿Estás seguro de que deseas desactivar la Autenticación de Dos Factores? Esto reducirá drásticamente la seguridad de tu cuenta.")) {
         const email = this.userEmail;
-        const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+        const authUrl = `${API_BASE_URL}/auth`;
         this.http.post(`${authUrl}/2fa/disable`, { email }).subscribe({
           next: () => {
             this.twoFactorAuth = false;
@@ -550,7 +550,7 @@ export class GestionDocenteComponent implements OnInit {
     }
 
     const email = this.userEmail;
-    const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+    const authUrl = `${API_BASE_URL}/auth`;
 
     this.http.post(`${authUrl}/2fa/enable`, {
       email: email,

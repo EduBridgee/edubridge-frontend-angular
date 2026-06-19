@@ -17,7 +17,7 @@ import { EstudiantesComponent } from './features/estudiantes/estudiantes';
 import { AdminComponent } from './features/admin/admin';
 
 import { AuthService } from './core/services/auth';
-import { authGuard } from './core/auth.guard';
+import { authGuard } from './core/guards/auth.guard';
 
 const roleGuard = (allowedRoles: string[]) => {
   return () => {

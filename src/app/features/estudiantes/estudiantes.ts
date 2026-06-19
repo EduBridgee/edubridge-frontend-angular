@@ -9,6 +9,7 @@ import { LucideAngularModule, Search, BookOpen, Calendar, AlertTriangle, Smartph
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RoleService, UserRole } from '../../core/services/role';
+import { API_BASE_URL } from '../../core/config/api.config';
 
 @Component({
   selector: 'app-estudiantes',
@@ -58,7 +59,7 @@ export class EstudiantesComponent implements OnInit {
     value: null
   };
 
-  private readonly API_URL = 'https://edubridge-backend-v2.onrender.com/api';
+  private readonly API_URL = API_BASE_URL;
 
   private breakpointObserver = inject(BreakpointObserver);
   private http = inject(HttpClient);

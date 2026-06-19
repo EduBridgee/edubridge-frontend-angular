@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 import { NotificationService } from '../../../core/services/notification';
-import { TotpService } from '../../../core/services/totp';
 import { RoleService, UserRole } from '../../../core/services/role';
 import { LucideAngularModule, GraduationCap, BarChart3, Users, BookOpen, Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from 'lucide-angular';
 
@@ -41,10 +40,8 @@ export class LoginComponent implements OnInit {
   showNewPassword = false;
   showConfirmNewPassword = false;
 
-  // 2FA TOTP state
   show2faVerification = false;
   otpCode = '';
-  tempUserResponseData: any = null;
 
   private readonly REMEMBER_KEY_EMAIL = 'eb_user_email';
   private readonly REMEMBER_KEY_ROLE = 'eb_user_role';
@@ -54,8 +51,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService,
-    private roleService: RoleService,
-    private totpService: TotpService
+    private roleService: RoleService
   ) { }
 
   ngOnInit() {
@@ -87,7 +83,6 @@ export class LoginComponent implements OnInit {
       next: (userData: any) => {
         const is2faActive = localStorage.getItem('twoFactorAuth_enabled_' + this.email.toLowerCase().trim()) === 'true';
         if (userData.requires2fa || is2faActive) {
-          this.tempUserResponseData = userData;
           this.show2faVerification = true;
           this.loading = false;
           this.cdr.detectChanges();
@@ -106,7 +101,7 @@ export class LoginComponent implements OnInit {
           }
         }
 
-        
+
         if (this.rememberMe) {
           localStorage.setItem(this.REMEMBER_KEY_EMAIL, this.email);
           localStorage.setItem(this.REMEMBER_KEY_ROLE, this.role);
@@ -115,8 +110,8 @@ export class LoginComponent implements OnInit {
           localStorage.removeItem(this.REMEMBER_KEY_ROLE);
         }
 
-        
-        
+
+
         const token = userData.token || userData.accessToken || userData.jwt;
 
         if (token) {
@@ -133,7 +128,7 @@ export class LoginComponent implements OnInit {
 
         this.loading = false;
 
-        
+
         if (normalizedUserRole === UserRole.ADMIN) {
           this.router.navigate(['/admin']);
         } else if (normalizedUserRole === UserRole.DOCENTE) {
@@ -191,7 +186,7 @@ export class LoginComponent implements OnInit {
       next: () => {
         this.loading = false;
         this.isRecovering = false;
-        this.isResetting = true; 
+        this.isResetting = true;
         this.notificationService.showSuccess("Código de verificación enviado a tu correo.", "Correo Enviado");
         this.cdr.detectChanges();
       },
@@ -285,7 +280,6 @@ export class LoginComponent implements OnInit {
         this.notificationService.showSuccess("Autenticación de dos factores exitosa.", "Acceso Concedido");
         this.show2faVerification = false;
         this.otpCode = '';
-        this.tempUserResponseData = null;
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -299,18 +293,7 @@ export class LoginComponent implements OnInit {
   cancelOtpVerification() {
     this.show2faVerification = false;
     this.otpCode = '';
-    this.tempUserResponseData = null;
     this.loading = false;
     this.cdr.detectChanges();
-  }
-
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('user_name');
-    localStorage.removeItem('user_id');
-    window.location.reload();
   }
 }

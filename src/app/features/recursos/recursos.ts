@@ -5,7 +5,8 @@ import { FormsModule } from '@angular/forms';
 
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell';
 import { NotificationService } from '../../core/services/notification';
-import { LucideAngularModule, Search, Plus, FileText, Video, Image, Music, Presentation, Globe, Upload, Download, Link, Rocket, X } from 'lucide-angular';
+import { LucideAngularModule, Search, Plus, FileText, Video, Image, Music, Presentation, Globe, Download, Link, Rocket, X } from 'lucide-angular';
+import { API_BASE_URL } from '../../core/config/api.config';
 
 @Component({
   selector: 'app-recursos',
@@ -25,7 +26,6 @@ export class RecursosComponent implements OnInit {
   readonly Music = Music;
   readonly Presentation = Presentation;
   readonly Globe = Globe;
-  readonly Upload = Upload;
   readonly Download = Download;
   readonly Link = Link;
   readonly Rocket = Rocket;
@@ -169,7 +169,7 @@ export class RecursosComponent implements OnInit {
 
     console.log('Enviando recurso al backend (Modelo exacto):', { ...payload, img: payload.img?.substring(0, 50) + '...' });
 
-    this.http.post('https://edubridge-backend-v2.onrender.com/api/resources', payload).subscribe({
+    this.http.post(`${API_BASE_URL}/resources`, payload).subscribe({
       next: () => {
         setTimeout(() => {
           this.notificationService.showSuccess("El recurso ha sido publicado exitosamente.");
@@ -221,10 +221,10 @@ export class RecursosComponent implements OnInit {
 
   cargarCursos() {
     const role = this.user.role ? this.user.role.toLowerCase() : '';
-    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/courses').subscribe({
+    this.http.get<any[]>(`${API_BASE_URL}/courses`).subscribe({
       next: (data) => {
         if (role === 'docente' || role === 'teacher') {
-          this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/teachers').subscribe({
+          this.http.get<any[]>(`${API_BASE_URL}/teachers`).subscribe({
             next: (profesores) => {
               const misCursos = data.filter(c => c.teacher && Number(c.teacher.id) === Number(this.user.id));
               const viejosCursos = profesores.filter(p => Number(p.id) === Number(this.user.id) && p.course).map(p => p.course);
@@ -291,10 +291,10 @@ export class RecursosComponent implements OnInit {
     this.loading = true;
     const role = this.user.role ? this.user.role.toLowerCase() : '';
     
-    this.http.get<any[]>('https://edubridge-backend-v2.onrender.com/api/resources').subscribe({
+    this.http.get<any[]>(`${API_BASE_URL}/resources`).subscribe({
       next: (dataRecursos) => {
         if (role === 'estudiante' || role === 'student') {
-          this.http.get<any[]>(`https://edubridge-backend-v2.onrender.com/api/enrollments/student/${this.user.id}`).subscribe({
+          this.http.get<any[]>(`${API_BASE_URL}/enrollments/student/${this.user.id}`).subscribe({
             next: (dataMatriculas) => {
               const activeMatriculas = dataMatriculas.filter(m => {
                 const status = (m.status || '').toUpperCase();

@@ -62,7 +62,6 @@ export class TotpService {
     if (!token || token.length !== 6 || isNaN(Number(token))) {
       return false;
     }
-    // Check window -1, 0, and 1 to account for 30s clock drift
     for (let i = -1; i <= 1; i++) {
       const code = await this.generateTotp(secretBase32, i);
       if (code === token) {

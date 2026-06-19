@@ -404,7 +404,7 @@
             <div *ngIf="activeTab === 'matriculas'"
                 class="space-y-6 animate-in fade-in duration-300 w-full min-w-0 block">
 
-                <!-- CABECERA: TÍTULO Y BOTÓN NUEVA MATRÍCULA -->
+                
                 <div class="flex justify-between items-center w-full">
                     <div>
                         <h1 class="text-2xl font-black text-slate-900 tracking-tight">Gestión de Matrículas</h1>
@@ -418,9 +418,9 @@
                     </button>
                 </div>
 
-                <!-- INDICADORES CLAVE (KPI's) -->
+                
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full">
-                    <!-- Tarjeta: Matrículas Activas -->
+                    
                     <div
                         class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
                         <div
@@ -434,7 +434,7 @@
                         </div>
                     </div>
 
-                    <!-- Tarjeta: Pendientes -->
+                    
                     <div
                         class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
                         <div
@@ -448,7 +448,7 @@
                         </div>
                     </div>
 
-                    <!-- Tarjeta: Canceladas -->
+                    
                     <div
                         class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
                         <div
@@ -463,7 +463,7 @@
                     </div>
                 </div>
 
-                <!-- FILTROS DE BÚSQUEDA Y ESTADO -->
+                
                 <div
                     class="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm items-center justify-between w-full">
                     <div class="relative w-full sm:flex-1 flex items-center">
@@ -488,7 +488,7 @@
                     </div>
                 </div>
 
-                <!-- TABLA DE MATRÍCULAS -->
+                
                 <div
                     class="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden w-full max-w-full">
                     <div class="overflow-x-auto w-full">
@@ -559,13 +559,13 @@
                                     </td>
                                     <td class="p-4 pr-6 text-center whitespace-nowrap">
                                         <div class="flex items-center justify-center gap-2">
-                                            <!-- Botón de Aprobar (solo si está Pendiente) -->
+                                            
                                             <button *ngIf="getNormalizedStatus(m.status) === 'Pendiente'"
                                                 (click)="abrirConfirmacion(m, 'APROBADO')"
                                                 class="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 px-3 py-1.5 rounded-xl text-[10px] font-black transition active:scale-95 shadow-sm uppercase tracking-wide">
                                                 Aprobar
                                             </button>
-                                            <!-- Botón de Cancelar (solo si está Activa) -->
+                                            
                                             <button *ngIf="getNormalizedStatus(m.status) === 'Activa'"
                                                 (click)="abrirConfirmacion(m, 'CANCELADO')"
                                                 class="bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 px-3 py-1.5 rounded-xl text-[10px] font-black transition active:scale-95 shadow-sm uppercase tracking-wide">
@@ -587,7 +587,7 @@
                 </div>
             </div>
 
-            <!-- Modal para Nueva Matrícula -->
+            
             <div *ngIf="showNewEnrollmentModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div class="bg-white p-8 rounded-3xl w-full max-w-md space-y-6 shadow-2xl border border-slate-100">
@@ -641,7 +641,7 @@
                 </div>
             </div>
 
-            <!-- Modal de Confirmación Dinámico -->
+            
             <div *ngIf="showConfirmModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div class="bg-white p-8 rounded-3xl w-full max-w-sm space-y-5 shadow-2xl border border-slate-100">
@@ -668,7 +668,7 @@
                 </div>
             </div>
 
-            <!-- Modal para Nuevo Estudiante -->
+            
             <div *ngIf="showNewStudentModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div
@@ -748,7 +748,7 @@
                 </div>
             </div>
 
-            <!-- Modal para Nuevo Profesor -->
+            
             <div *ngIf="showNewTeacherModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div
@@ -810,7 +810,7 @@
                 </div>
             </div>
 
-            <!-- Modal para Editar Estudiante -->
+            
             <div *ngIf="showEditStudentModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div
@@ -898,7 +898,7 @@
                 </div>
             </div>
 
-            <!-- Modal para Editar Profesor -->
+            
             <div *ngIf="showEditTeacherModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div
@@ -968,7 +968,7 @@
                 </div>
             </div>
 
-            <!-- Modal para Nuevo Curso -->
+            
             <div *ngIf="showNewCourseModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div
@@ -1042,7 +1042,7 @@
                 </div>
             </div>
 
-            <!-- Modal para Editar Curso (Gestionar Aula) -->
+            
             <div *ngIf="showEditCourseModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div
@@ -1117,13 +1117,11 @@
                 </div>
             </div>
 
-            <!-- =========================================================================
-            VISTA E: REPORTES Y ANALÍTICAS (Fiel a image_c1efe7, image_c1efc8, image_c1ed20)
-            ========================================================================= -->
+            
             <div *ngIf="activeTab === 'reportes'"
                 class="space-y-6 animate-in fade-in duration-300 w-full min-w-0 block">
 
-                <!-- CABECERA: TÍTULO Y BOTONES DE EXPORTACIÓN (image_c1efe7.png) -->
+                
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 w-full">
                     <div>
                         <h1 class="text-2xl font-black text-slate-900 tracking-tight">Reportes y Analíticas</h1>
@@ -1148,7 +1146,7 @@
                     </div>
                 </div>
 
-                <!-- SUB-PESTAÑAS DE REPORTES -->
+                
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
                     <button *ngFor="let rep of ['Rendimiento Académico', 'Asistencia', 'Matrículas']"
                         (click)="reporteActivo = rep; calcularReportes()" [class.border-orange-500]="reporteActivo === rep"
@@ -1165,7 +1163,7 @@
                     </button>
                 </div>
 
-                <!-- FILTROS DE PERÍODO Y CURSO -->
+                
                 <div
                     class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm items-end w-full">
                     <div class="space-y-1.5">
@@ -1200,7 +1198,7 @@
                     </button>
                 </div>
 
-                <!-- INDICADORES CLAVE (KPI'S) -->
+                
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full">
                     <div
                         class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-28 hover:shadow-md transition-all">
@@ -1272,10 +1270,10 @@
                     </div>
                 </div>
 
-                <!-- GRÁFICOS: RENDIMIENTO Y DISTRIBUCIÓN (image_c1efc8.png) -->
+                
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
 
-                    <!-- Rendimiento por Materia (Gráfico de Barras con CSS) -->
+                    
                     <div
                         class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-80">
                         <span class="text-xs font-black text-slate-800 uppercase tracking-wider mb-4 block">
@@ -1283,7 +1281,7 @@
                         </span>
                         <div
                             class="flex-1 flex items-end justify-between gap-2 px-4 border-b border-l border-slate-200 pt-4 h-48 relative">
-                            <!-- Líneas de Guía de Fondo -->
+                            
                             <div
                                 class="absolute inset-x-0 top-1/4 border-t border-slate-100 border-dashed text-[9px] text-slate-300 pl-1">
                                 {{ reporteActivo === 'Rendimiento Académico' ? '4.0' : (reporteActivo === 'Asistencia' ? '80%' : '30') }}
@@ -1293,7 +1291,7 @@
                                 {{ reporteActivo === 'Rendimiento Académico' ? '2.5' : (reporteActivo === 'Asistencia' ? '50%' : '15') }}
                             </div>
 
-                            <!-- Barras Dinámicas -->
+                            
                             <div *ngFor="let bar of reporteBarras" class="flex flex-col items-center gap-2 w-12 z-10">
                                 <div class="bg-orange-500 w-full rounded-t-lg transition-all duration-500" [style.height.%]="bar.height"></div>
                                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-tight">{{ bar.label }}</span>
@@ -1301,14 +1299,14 @@
                         </div>
                     </div>
 
-                    <!-- Distribución de Calificaciones (Gráfico de Pastel Nativo CSS) -->
+                    
                     <div
                         class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-80">
                         <span class="text-xs font-black text-slate-800 uppercase tracking-wider mb-4 block">
                             {{ reporteActivo === 'Rendimiento Académico' ? 'Distribución de Calificaciones' : (reporteActivo === 'Asistencia' ? 'Rango de Asistencia' : 'Estado de Matrículas') }}
                         </span>
                         <div class="flex-1 flex items-center justify-center gap-8">
-                            <!-- Gráfico circular usando conic-gradient -->
+                            
                             <div class="w-40 h-40 rounded-full shadow-inner relative shrink-0 border border-slate-100"
                                 [style.background]="getPieChartGradient(pieChartSlices)">
                                 <div
@@ -1317,7 +1315,7 @@
                                         class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{{ pieChartCenterLabel }}</span>
                                 </div>
                             </div>
-                            <!-- Leyendas del Gráfico -->
+                            
                             <div class="grid grid-cols-2 gap-3 text-[10px] font-black text-slate-600">
                                 <div *ngFor="let slice of pieChartSlices" class="flex items-center gap-1.5">
                                     <span class="w-2.5 h-2.5 rounded block" [style.backgroundColor]="slice.color"></span>
@@ -1329,31 +1327,31 @@
 
                 </div>
 
-                <!-- ANÁLISIS DE COMPETENCIAS (image_c1efc8.png - Telaraña Simulada) -->
+                
                 <div class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm w-full">
                     <span class="text-xs font-black text-slate-800 uppercase tracking-wider mb-4 block">Análisis de Competencias</span>
                     <div class="flex flex-col md:flex-row items-center justify-around gap-6 py-4">
                         <div class="w-64 h-64 shrink-0 relative flex items-center justify-center">
                             <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible">
-                                <!-- Red Radial de Fondo -->
+                                
                                 <polygon points="50,10 85,35 85,75 50,95 15,75 15,35" fill="none" stroke="#e2e8f0"
                                     stroke-width="0.5" />
                                 <polygon points="50,25 72,43 72,67 50,81 28,67 28,43" fill="none" stroke="#e2e8f0"
                                     stroke-width="0.5" />
                                 <polygon points="50,40 60,50 60,61 50,70 40,61 40,50" fill="none" stroke="#e2e8f0"
                                     stroke-width="0.5" />
-                                <!-- Ejes -->
+                                
                                 <line x1="50" y1="50" x2="50" y2="10" stroke="#cbd5e1" stroke-width="0.5" />
                                 <line x1="50" y1="50" x2="85" y2="35" stroke="#cbd5e1" stroke-width="0.5" />
                                 <line x1="50" y1="50" x2="85" y2="75" stroke="#cbd5e1" stroke-width="0.5" />
                                 <line x1="50" y1="50" x2="50" y2="95" stroke="#cbd5e1" stroke-width="0.5" />
                                 <line x1="50" y1="50" x2="15" y2="75" stroke="#cbd5e1" stroke-width="0.5" />
                                 <line x1="50" y1="50" x2="15" y2="35" stroke="#cbd5e1" stroke-width="0.5" />
-                                <!-- Área de Competencia Alcanzada -->
+                                
                                 <polygon [attr.points]="radarPoints" fill="rgba(249, 115, 22, 0.2)"
                                     stroke="#f97316" stroke-width="1" />
                             </svg>
-                            <!-- Textos de Competencias en Posiciones Absolutas -->
+                            
                             <span
                                 class="absolute top-0 text-[9px] font-black text-slate-500 uppercase tracking-tighter">Pensamiento Crítico</span>
                             <span
@@ -1370,7 +1368,7 @@
                     </div>
                 </div>
 
-                <!-- DETALLE POR MATERIA (image_c1ed20.png) -->
+                
                 <div
                     class="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden w-full max-w-full">
                     <div class="p-4 border-b border-slate-100">
@@ -1378,7 +1376,7 @@
                     </div>
                     <div class="overflow-x-auto w-full">
                         <table class="w-full text-left border-collapse min-w-[700px]">
-                            <!-- HEADERS FOR RENDIMIENTO ACADÉMICO -->
+                            
                             <thead *ngIf="reporteActivo === 'Rendimiento Académico'">
                                 <tr class="bg-slate-50/70 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
                                     <th class="p-4 pl-6">Materia</th>
@@ -1389,7 +1387,7 @@
                                     <th class="p-4 pr-6">En Riesgo</th>
                                 </tr>
                             </thead>
-                            <!-- HEADERS FOR ASISTENCIA -->
+                            
                             <thead *ngIf="reporteActivo === 'Asistencia'">
                                 <tr class="bg-slate-50/70 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
                                     <th class="p-4 pl-6">Materia</th>
@@ -1400,7 +1398,7 @@
                                     <th class="p-4 pr-6">Asist. Crítica</th>
                                 </tr>
                             </thead>
-                            <!-- HEADERS FOR MATRÍCULAS -->
+                            
                             <thead *ngIf="reporteActivo === 'Matrículas'">
                                 <tr class="bg-slate-50/70 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
                                     <th class="p-4 pl-6">Materia</th>
@@ -1412,7 +1410,7 @@
                                 </tr>
                             </thead>
 
-                            <!-- BODY FOR RENDIMIENTO ACADÉMICO -->
+                            
                             <tbody *ngIf="reporteActivo === 'Rendimiento Académico'" class="divide-y divide-slate-100 text-xs font-bold text-slate-700">
                                 <tr *ngFor="let m of reporteMaterias" class="hover:bg-slate-50/40 transition">
                                     <td class="p-4 pl-6 text-slate-900 font-black tracking-tight">{{ m.name }}</td>
@@ -1423,7 +1421,7 @@
                                     <td class="p-4 pr-6 text-rose-600 font-black">{{ m.risk }}</td>
                                 </tr>
                             </tbody>
-                            <!-- BODY FOR ASISTENCIA -->
+                            
                             <tbody *ngIf="reporteActivo === 'Asistencia'" class="divide-y divide-slate-100 text-xs font-bold text-slate-700">
                                 <tr *ngFor="let m of reporteMaterias" class="hover:bg-slate-50/40 transition">
                                     <td class="p-4 pl-6 text-slate-900 font-black tracking-tight">{{ m.name }}</td>
@@ -1434,7 +1432,7 @@
                                     <td class="p-4 pr-6 text-rose-600 font-black">{{ m.risk }}</td>
                                 </tr>
                             </tbody>
-                            <!-- BODY FOR MATRÍCULAS -->
+                            
                             <tbody *ngIf="reporteActivo === 'Matrículas'" class="divide-y divide-slate-100 text-xs font-bold text-slate-700">
                                 <tr *ngFor="let m of reporteMaterias" class="hover:bg-slate-50/40 transition">
                                     <td class="p-4 pl-6 text-slate-900 font-black tracking-tight">{{ m.name }}</td>
@@ -1449,7 +1447,7 @@
                     </div>
                 </div>
 
-                <!-- Modal para Enviar Reporte a Profesor -->
+                
                 <div *ngIf="showSendReportModal"
                     class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200 no-print">
                     <div
@@ -1496,13 +1494,11 @@
 
             </div>
 
-            <!-- =========================================================================
-            VISTA F: CONFIGURACIÓN DEL SISTEMA (image_c1e88a hasta image_c1e4cc)
-            ========================================================================= -->
+            
             <div *ngIf="activeTab === 'configuracion'"
                 class="space-y-6 animate-in fade-in duration-300 w-full min-w-0 block">
 
-                <!-- CABECERA DE CONFIGURACIÓN -->
+                
                 <div class="flex justify-between items-center w-full">
                     <div>
                         <h1 class="text-2xl font-black text-slate-900 tracking-tight">Configuración del Sistema</h1>
@@ -1516,10 +1512,10 @@
                     </button>
                 </div>
 
-                <!-- DISEÑO DE DOBLE COLUMNA: SUB-MENÚ IZQUIERDO Y PANEL DE DETALLES DERECHO -->
+                
                 <div class="flex flex-col lg:flex-row gap-6 items-start w-full">
 
-                    <!-- Navegación de Ajustes Lateral (image_c1e88a.png) -->
+                    
                     <div
                         class="w-full lg:w-64 bg-white rounded-2xl border border-slate-200/60 shadow-sm p-3 space-y-1 shrink-0">
                         <button (click)="configTab = 'general'" [class.bg-orange-50]="configTab === 'general'"
@@ -1557,10 +1553,10 @@
                         </button>
                     </div>
 
-                    <!-- CONTENEDOR DERECHO DINÁMICO (Cambia según configTab) -->
+                    
                     <div class="flex-1 bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 w-full min-w-0">
 
-                        <!-- A. CONFIGURACIÓN GENERAL (image_c1e88a.png) -->
+                        
                         <div *ngIf="configTab === 'general'" class="space-y-6 animate-in fade-in duration-200">
                             <div>
                                 <h2 class="text-base font-black text-slate-900">Configuración General</h2>
@@ -1611,7 +1607,7 @@
                             </div>
                         </div>
 
-                        <!-- B. NOTIFICACIONES (image_c1e547.png) -->
+                        
                         <div *ngIf="configTab === 'notificaciones'" class="space-y-6 animate-in fade-in duration-200">
                             <div>
                                 <h2 class="text-base font-black text-slate-900">Notificaciones</h2>
@@ -1675,7 +1671,7 @@
                             </div>
                         </div>
 
-                        <!-- C. SEGURIDAD (image_c1e525.png) -->
+                        
                         <div *ngIf="configTab === 'seguridad'" class="space-y-6 animate-in fade-in duration-200">
                             <div>
                                 <h2 class="text-base font-black text-slate-900">Seguridad</h2>
@@ -1730,14 +1726,14 @@
                             </div>
                         </div>
 
-                        <!-- D. GESTIÓN DE USUARIOS / PERMISOS (image_c1e507.png) -->
+                        
                         <div *ngIf="configTab === 'usuarios'" class="space-y-6 animate-in fade-in duration-200">
                             <div>
                                 <h2 class="text-base font-black text-slate-900">Gestión de Usuarios</h2>
                                 <p class="text-xs text-slate-400 font-bold mt-0.5">Permisos y roles de usuario</p>
                             </div>
                             <div class="space-y-4">
-                                <!-- Rol Admin -->
+                                
                                 <div class="p-4 border border-slate-200 rounded-2xl space-y-3">
                                     <div class="flex justify-between items-center">
                                         <p class="text-xs font-black text-slate-900">Rol: Administrador</p><span
@@ -1757,7 +1753,7 @@
                                             class="flex items-center gap-1.5"><input type="checkbox" checked disabled
                                                 class="text-orange-600 rounded"><span>Configuración</span></label></div>
                                 </div>
-                                <!-- Rol Profesor -->
+                                
                                 <div class="p-4 border border-slate-200 rounded-2xl space-y-3">
                                     <div class="flex justify-between items-center">
                                         <p class="text-xs font-black text-slate-900">Rol: Profesor</p><span
@@ -1777,7 +1773,7 @@
                                                 type="checkbox" class="text-orange-600 rounded"><span>Gestionar
                                                 cursos</span></label></div>
                                 </div>
-                                <!-- Rol Estudiante -->
+                                
                                 <div class="p-4 border border-slate-200 rounded-2xl space-y-3">
                                     <div class="flex justify-between items-center">
                                         <p class="text-xs font-black text-slate-900">Rol: Estudiante</p><span
@@ -1802,7 +1798,7 @@
 
 
 
-                        <!-- F. INTEGRACIONES (image_c1e4cc.png) -->
+                        
                         <div *ngIf="configTab === 'integraciones'" class="space-y-6 animate-in fade-in duration-200">
                             <div>
                                 <h2 class="text-base font-black text-slate-900">Integraciones</h2>
@@ -1810,7 +1806,7 @@
                                     EduBridge</p>
                             </div>
                             <div class="space-y-3">
-                                <!-- Neon Database -->
+                                
                                 <div
                                     class="flex items-center justify-between p-4 border border-emerald-100 rounded-xl bg-emerald-50/20">
                                     <div class="flex gap-3"><span
@@ -1824,7 +1820,7 @@
                                     <span
                                         class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-3 py-1 rounded-xl border border-emerald-200/50 uppercase tracking-wide">Conectado</span>
                                 </div>
-                                <!-- Namecheap Domain -->
+                                
                                 <div
                                     class="flex items-center justify-between p-4 border border-amber-100 rounded-xl bg-amber-50/20">
                                     <div class="flex gap-3"><span
@@ -1838,7 +1834,7 @@
                                     <span
                                         class="bg-amber-100 text-amber-700 text-[10px] font-black px-3 py-1 rounded-xl border border-amber-200/50 uppercase tracking-wide">Conectado</span>
                                 </div>
-                                <!-- Resend Emails -->
+                                
                                 <div
                                     class="flex items-center justify-between p-4 border border-slate-200 rounded-xl bg-slate-50/50">
                                     <div class="flex gap-3"><span
@@ -1859,7 +1855,7 @@
                 </div>
             </div>
 
-            <!-- Modal para Configurar 2FA (TOTP) -->
+            
             <div *ngIf="show2faSetupModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div class="bg-white p-8 rounded-[2rem] w-full max-w-md space-y-6 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
@@ -1874,7 +1870,7 @@
                     <div class="space-y-4 text-xs text-slate-600 font-medium">
                         <p>Añade una capa adicional de seguridad a tu cuenta mediante un autenticador móvil (Google Authenticator, Authy, etc.).</p>
                         
-                        <!-- Paso 1: Escanear QR -->
+                        
                         <div class="space-y-2">
                             <p class="font-black text-[10px] text-slate-400 uppercase tracking-wider">Paso 1: Escanear Código QR</p>
                             <div class="flex justify-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
@@ -1882,7 +1878,7 @@
                             </div>
                         </div>
 
-                        <!-- Clave Secreta Manual -->
+                        
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between">
                             <div>
                                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Clave Secreta Manual</p>
@@ -1891,7 +1887,7 @@
                             <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider bg-white px-2 py-1 rounded-lg border">Copiar</span>
                         </div>
 
-                        <!-- Paso 2: Ingresar Código -->
+                        
                         <div class="space-y-1.5">
                             <p class="font-black text-[10px] text-slate-400 uppercase tracking-wider">Paso 2: Ingresar Código de 6 Dígitos</p>
                             <input type="text" maxlength="6" [(ngModel)]="totpVerificationCode" placeholder="Ej. 123456"

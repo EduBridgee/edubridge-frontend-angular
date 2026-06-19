@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar';
 import { forkJoin } from 'rxjs';
 import { TotpService } from '../../core/services/totp';
+import { API_BASE_URL } from '../../core/config/api.config';
 import {
   LucideAngularModule, Search, Bell, UserPlus, SlidersHorizontal, Download, Edit, UserCheck,
   Trash2, MoreVertical, Plus, BookOpen, User, Users, Clock, Calendar, BarChart3, AlertTriangle,
@@ -20,7 +21,7 @@ import {
   templateUrl: './admin.html'
 })
 export class AdminComponent implements OnInit {
-  private readonly API_URL = window.location.hostname === 'localhost' ? 'http://localhost:8081/api' : 'https://edubridge-backend-v2.onrender.com/api';
+  private readonly API_URL = API_BASE_URL;
 
   activeTab = 'dashboard';
   configTab = 'general';
@@ -202,7 +203,7 @@ export class AdminComponent implements OnInit {
     this.cargarDataGeneral();
     const email = this.currentUserEmail;
     if (email) {
-      const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+      const authUrl = `${API_BASE_URL}/auth`;
       this.http.get<any>(`${authUrl}/2fa/status?email=${encodeURIComponent(email)}`).subscribe({
         next: (res) => {
           this.twoFactorAuth = res.enabled;
@@ -1113,7 +1114,7 @@ export class AdminComponent implements OnInit {
     } else {
       if (confirm("¿Estás seguro de que deseas desactivar la Autenticación de Dos Factores? Esto reducirá drásticamente la seguridad de tu cuenta.")) {
         const email = this.currentUserEmail;
-        const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+        const authUrl = `${API_BASE_URL}/auth`;
         this.http.post(`${authUrl}/2fa/disable`, { email }).subscribe({
           next: () => {
             this.twoFactorAuth = false;
@@ -1139,7 +1140,7 @@ export class AdminComponent implements OnInit {
     }
 
     const email = this.currentUserEmail;
-    const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+    const authUrl = `${API_BASE_URL}/auth`;
 
     this.http.post(`${authUrl}/2fa/enable`, {
       email: email,

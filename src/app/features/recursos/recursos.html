@@ -54,7 +54,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       <div *ngFor="let item of filteredRecursos" class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-xl transition-all group relative text-left flex flex-col">
         <div class="h-40 relative flex items-center justify-center overflow-hidden shrink-0 bg-slate-100">
-          <!-- Usamos imágenes predeterminadas profesionales según el tipo de recurso -->
+          
           <img *ngIf="item.type === 'PDF'" src="https://images.unsplash.com/photo-1568667256549-094345857637?w=400" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-700" />
           <img *ngIf="item.type === 'Video'" src="https://images.unsplash.com/photo-1492724441997-5dc865305da7?w=400" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-700" />
           <img *ngIf="item.type === 'PPT'" src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-110 transition-transform duration-700" />
@@ -143,7 +143,7 @@
           <div>
             <label class="text-[9px] font-black text-slate-400 uppercase block mb-2">Materia</label>
             <select name="subject" [(ngModel)]="nuevoRecurso.subject" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-[10px] font-black uppercase outline-none">
-              <!-- Usamos [value] para pasar el nombre como string -->
+              
               <option *ngFor="let curso of cursos" [value]="curso.name">{{curso.name}}</option>
             </select>
           </div>
@@ -158,7 +158,7 @@
           </div>
         </div>
 
-        <!-- Área de Carga de Archivos (PDF, PPT, Imagen) -->
+        
         <div *ngIf="nuevoRecurso.type !== 'Video'">
           <label class="text-[9px] font-black text-slate-400 uppercase block mb-2">Archivo del Recurso</label>
           <div 
@@ -172,7 +172,7 @@
             <input type="file" (change)="onFileSelected($event)" class="absolute inset-0 opacity-0 cursor-pointer" 
                    [accept]="nuevoRecurso.type === 'PDF' ? '.pdf' : nuevoRecurso.type === 'Imagen' ? 'image/*' : '.ppt,.pptx'" />
             
-            <!-- Si no hay archivo seleccionado, o si es video o si es imagen sin cargar, mostramos el icono -->
+            
             <div *ngIf="!selectedFile || (nuevoRecurso.type === 'Imagen' && !nuevoRecurso.img)" class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
               <lucide-icon *ngIf="nuevoRecurso.type === 'PDF'" [img]="FileText" [size]="24" class="text-red-500"></lucide-icon>
               <lucide-icon *ngIf="nuevoRecurso.type === 'Video'" [img]="Video" [size]="24" class="text-blue-500"></lucide-icon>
@@ -180,12 +180,12 @@
               <lucide-icon *ngIf="nuevoRecurso.type === 'Imagen'" [img]="Image" [size]="24" class="text-emerald-500"></lucide-icon>
             </div>
 
-            <!-- Si es imagen y está seleccionada, mostramos la vista previa -->
+            
             <div *ngIf="selectedFile && nuevoRecurso.type === 'Imagen' && nuevoRecurso.img" class="w-full max-w-[200px] h-24 rounded-2xl overflow-hidden shadow-md border border-slate-100 flex items-center justify-center bg-slate-50 group-hover:scale-105 transition-transform duration-300">
               <img [src]="nuevoRecurso.img" class="w-full h-full object-cover" />
             </div>
 
-            <!-- Si es PDF y está seleccionado, mostramos una vista de documento elegante -->
+            
             <div *ngIf="selectedFile && nuevoRecurso.type === 'PDF' && nuevoRecurso.img" class="w-full max-w-[240px] p-4 bg-red-50/50 border border-red-100 rounded-2xl flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
               <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center text-white shrink-0">
                 <lucide-icon [img]="FileText" [size]="20"></lucide-icon>
@@ -196,7 +196,7 @@
               </div>
             </div>
 
-            <!-- Si es PPT y está seleccionado, mostramos una vista de presentación elegante -->
+            
             <div *ngIf="selectedFile && nuevoRecurso.type === 'PPT' && nuevoRecurso.img" class="w-full max-w-[240px] p-4 bg-orange-50/50 border border-orange-100 rounded-2xl flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
               <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white shrink-0">
                 <lucide-icon [img]="Presentation" [size]="20"></lucide-icon>
@@ -216,14 +216,14 @@
               </p>
             </div>
 
-            <!-- Barra de progreso simulada si hay archivo -->
+            
             <div *ngIf="selectedFile" class="w-full max-w-[200px] h-1.5 bg-slate-100 rounded-full overflow-hidden mt-2">
               <div class="h-full bg-blue-600 w-full animate-progress-fast"></div>
             </div>
           </div>
         </div>
 
-        <!-- Campo para Link de Video -->
+        
         <div *ngIf="nuevoRecurso.type === 'Video'" class="animate-in fade-in slide-in-from-top-2 duration-300">
           <label class="text-[9px] font-black text-slate-400 uppercase block mb-2">Enlace del Video (YouTube/Vimeo)</label>
           <div class="relative flex items-center">

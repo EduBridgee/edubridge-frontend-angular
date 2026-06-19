@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RoleService, UserRole } from '../../../core/services/role';
 import { LucideAngularModule, Bot, X, Send, Rocket } from 'lucide-angular';
+import { API_BASE_URL } from '../../../core/config/api.config';
 
 @Component({
   selector: 'app-chatbot',
@@ -70,7 +71,7 @@ export class ChatbotComponent implements OnInit {
       cursos: cursosStr
     };
 
-    this.http.post('https://edubridge-backend-v2.onrender.com/api/chat/ask', payload).subscribe({
+    this.http.post(`${API_BASE_URL}/chat/ask`, payload).subscribe({
       next: (res: any) => {
         this.loading = false;
         this.cdr.detectChanges();

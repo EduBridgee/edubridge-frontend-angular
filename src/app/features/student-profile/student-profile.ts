@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../core/services/notification';
 import { TotpService } from '../../core/services/totp';
+import { API_BASE_URL } from '../../core/config/api.config';
 import { LucideAngularModule, Settings, Mail, Phone, MapPin, Award, Calendar, X, FileText, Check, Shield } from 'lucide-angular';
 
 @Component({
@@ -40,7 +41,7 @@ export class StudentProfileComponent implements OnInit {
   }
 
   get apiBaseUrl(): string {
-    return window.location.hostname === 'localhost' ? 'http://localhost:8081/api' : 'https://edubridge-backend-v2.onrender.com/api';
+    return API_BASE_URL;
   }
 
   user: any = {
@@ -67,7 +68,6 @@ export class StudentProfileComponent implements OnInit {
   promedioGeneralReal: number = 0;
   faltasTotalesReales: number = 0;
 
-  // 2FA TOTP state
   twoFactorAuth: boolean = false;
   show2faSetupModal: boolean = false;
   totpVerificationCode: string = '';
@@ -126,7 +126,7 @@ export class StudentProfileComponent implements OnInit {
     this.cargarCursosDesdeBD();
     const email = this.userEmail;
     if (email) {
-      const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+      const authUrl = `${API_BASE_URL}/auth`;
       this.http.get<any>(`${authUrl}/2fa/status?email=${encodeURIComponent(email)}`).subscribe({
         next: (res) => {
           this.twoFactorAuth = res.enabled;
@@ -361,7 +361,7 @@ export class StudentProfileComponent implements OnInit {
     } else {
       if (confirm("¿Estás seguro de que deseas desactivar la Autenticación de Dos Factores? Esto reducirá drásticamente la seguridad de tu cuenta.")) {
         const email = this.userEmail;
-        const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+        const authUrl = `${API_BASE_URL}/auth`;
         this.http.post(`${authUrl}/2fa/disable`, { email }).subscribe({
           next: () => {
             this.twoFactorAuth = false;
@@ -387,7 +387,7 @@ export class StudentProfileComponent implements OnInit {
     }
 
     const email = this.userEmail;
-    const authUrl = window.location.hostname === 'localhost' ? 'http://localhost:8081/api/auth' : 'https://edubridge-backend-v2.onrender.com/api/auth';
+    const authUrl = `${API_BASE_URL}/auth`;
 
     this.http.post(`${authUrl}/2fa/enable`, {
       email: email,
