@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar';
 import { forkJoin } from 'rxjs';
 import { TotpService } from '../../core/services/totp';
+import { NotificationService } from '../../core/services/notification';
 import { API_BASE_URL } from '../../core/config/api.config';
 import {
   LucideAngularModule, Search, Bell, UserPlus, SlidersHorizontal, Download, Edit, UserCheck,
@@ -18,7 +19,8 @@ import {
   selector: 'app-admin',
   standalone: true,
   imports: [CommonModule, DecimalPipe, LucideAngularModule, SidebarComponent, FormsModule],
-  templateUrl: './admin.html'
+  templateUrl: './admin.html',
+  styleUrl: './admin.css'
 })
 export class AdminComponent implements OnInit {
   private readonly API_URL = API_BASE_URL;
@@ -197,7 +199,8 @@ export class AdminComponent implements OnInit {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private totpService: TotpService
-  ) { }
+  ,
+    private notificationService: NotificationService) { }
 
   ngOnInit(): void {
     this.cargarDataGeneral();
@@ -608,7 +611,7 @@ export class AdminComponent implements OnInit {
 
   enviarReporteADocente(): void {
     if (!this.selectedTeacherForReport) {
-      alert("Por favor, selecciona un profesor.");
+      this.notificationService.showInfo("Por favor, selecciona un profesor.");
       return;
     }
 
@@ -651,13 +654,13 @@ export class AdminComponent implements OnInit {
 
     this.http.post(`${this.API_URL}/notifications`, payload, { headers }).subscribe({
       next: () => {
-        alert(`Reporte enviado con éxito al Prof. ${teacher.name}`);
+        this.notificationService.showSuccess(`Reporte enviado con éxito al Prof. ${teacher.name}`);
         this.showSendReportModal = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error("Error al enviar notificación:", err);
-        alert("Error al enviar el reporte: " + (err.error?.message || "Servicio no disponible"));
+        this.notificationService.showError("Error al enviar el reporte: " + (err.error?.message || "Servicio no disponible"));
       }
     });
   }
@@ -756,7 +759,7 @@ export class AdminComponent implements OnInit {
     this.http.patch(`${this.API_URL}/enrollments/${this.selectedEnrollment.id}/status`, { status: this.confirmActionType }, { headers })
       .subscribe({
         next: () => { this.showConfirmModal = false; this.cargarDataGeneral(); },
-        error: (err) => alert("Error: " + (err.error?.message || "No se pudo actualizar"))
+        error: (err) => this.notificationService.showError("Error: " + (err.error?.message || "No se pudo actualizar"))
       });
   }
 
@@ -769,7 +772,7 @@ export class AdminComponent implements OnInit {
         this.cargarDataGeneral();
       },
 
-      error: (err) => alert("Error: " + (err.error?.message || err.error || "No se pudo procesar"))
+      error: (err) => this.notificationService.showError("Error: " + (err.error?.message || err.error || "No se pudo procesar"))
     });
   }
 
@@ -781,7 +784,7 @@ export class AdminComponent implements OnInit {
 
     this.http.post(`${this.API_URL}/students`, this.studentRequest, { headers }).subscribe({
       next: () => {
-        alert("Estudiante registrado con éxito");
+        this.notificationService.showSuccess("Estudiante registrado con éxito");
         this.showNewStudentModal = false;
         this.studentRequest = {
           name: '',
@@ -804,7 +807,7 @@ export class AdminComponent implements OnInit {
         };
         this.cargarDataGeneral();
       },
-      error: (err) => alert("Error: " + (err.error?.message || err.error || "No se pudo registrar"))
+      error: (err) => this.notificationService.showError("Error: " + (err.error?.message || err.error || "No se pudo registrar"))
     });
   }
 
@@ -825,7 +828,7 @@ export class AdminComponent implements OnInit {
 
     this.http.post(`${this.API_URL}/teachers`, body, { headers }).subscribe({
       next: () => {
-        alert("Profesor registrado con éxito");
+        this.notificationService.showSuccess("Profesor registrado con éxito");
         this.showNewTeacherModal = false;
         this.teacherRequest = {
           name: '',
@@ -836,7 +839,7 @@ export class AdminComponent implements OnInit {
         };
         this.cargarDataGeneral();
       },
-      error: (err) => alert("Error: " + (err.error?.message || err.error || "No se pudo registrar al profesor"))
+      error: (err) => this.notificationService.showError("Error: " + (err.error?.message || err.error || "No se pudo registrar al profesor"))
     });
   }
 
@@ -897,12 +900,12 @@ export class AdminComponent implements OnInit {
 
     this.http.put(`${this.API_URL}/students/${this.selectedStudentId}`, body, { headers }).subscribe({
       next: () => {
-        alert("Estudiante actualizado con éxito");
+        this.notificationService.showSuccess("Estudiante actualizado con éxito");
         this.showEditStudentModal = false;
         this.selectedStudentId = null;
         this.cargarDataGeneral();
       },
-      error: (err) => alert("Error: " + (err.error?.message || err.error || "No se pudo actualizar"))
+      error: (err) => this.notificationService.showError("Error: " + (err.error?.message || err.error || "No se pudo actualizar"))
     });
   }
 
@@ -925,7 +928,7 @@ export class AdminComponent implements OnInit {
 
     this.http.put(url, body, { headers }).subscribe({
       next: () => {
-        alert("Profesor actualizado con éxito");
+        this.notificationService.showSuccess("Profesor actualizado con éxito");
         this.showEditTeacherModal = false;
         this.selectedTeacherId = null;
         this.teacherRequest = {
@@ -937,7 +940,7 @@ export class AdminComponent implements OnInit {
         };
         this.cargarDataGeneral();
       },
-      error: (err) => alert("Error: " + (err.error?.message || err.error || "No se pudo actualizar"))
+      error: (err) => this.notificationService.showError("Error: " + (err.error?.message || err.error || "No se pudo actualizar"))
     });
   }
 
@@ -950,10 +953,10 @@ export class AdminComponent implements OnInit {
 
     this.http.delete(`${this.API_URL}/${endpoint}/${account.id}`, { headers }).subscribe({
       next: () => {
-        alert("Cuenta eliminada con éxito");
+        this.notificationService.showSuccess("Cuenta eliminada con éxito");
         this.cargarDataGeneral();
       },
-      error: (err) => alert("Error: " + (err.error?.message || err.error || "No se pudo eliminar la cuenta"))
+      error: (err) => this.notificationService.showError("Error: " + (err.error?.message || err.error || "No se pudo eliminar la cuenta"))
     });
   }
 
@@ -975,10 +978,10 @@ export class AdminComponent implements OnInit {
 
     this.http.put(`${this.API_URL}/students/${student.id}`, body, { headers }).subscribe({
       next: () => {
-        alert(`Estado del estudiante actualizado a: ${nuevoEstado}`);
+        this.notificationService.showInfo(`Estado del estudiante actualizado a: ${nuevoEstado}`);
         this.cargarDataGeneral();
       },
-      error: (err) => alert("Error: " + (err.error?.message || err.error || "No se pudo actualizar el estado"))
+      error: (err) => this.notificationService.showError("Error: " + (err.error?.message || err.error || "No se pudo actualizar el estado"))
     });
   }
 
@@ -999,7 +1002,7 @@ export class AdminComponent implements OnInit {
 
     this.http.post(url, body, { headers }).subscribe({
       next: () => {
-        alert("Curso creado y asignado con éxito");
+        this.notificationService.showSuccess("Curso creado y asignado con éxito");
         this.showNewCourseModal = false;
         this.courseRequest = {
           name: '',
@@ -1011,7 +1014,7 @@ export class AdminComponent implements OnInit {
         };
         this.cargarDataGeneral();
       },
-      error: (err) => alert("Error: " + (err.error?.message || err.error || "No se pudo crear el curso"))
+      error: (err) => this.notificationService.showError("Error: " + (err.error?.message || err.error || "No se pudo crear el curso"))
     });
   }
 
@@ -1057,12 +1060,12 @@ export class AdminComponent implements OnInit {
 
     this.http.put(url, body, { headers }).subscribe({
       next: () => {
-        alert("Curso actualizado con éxito");
+        this.notificationService.showSuccess("Curso actualizado con éxito");
         this.showEditCourseModal = false;
         this.selectedCourseId = null;
         this.cargarDataGeneral();
       },
-      error: (err) => alert("Error: " + (err.error?.message || err.error || "No se pudo actualizar el curso"))
+      error: (err) => this.notificationService.showError("Error: " + (err.error?.message || err.error || "No se pudo actualizar el curso"))
     });
   }
 
@@ -1088,19 +1091,19 @@ export class AdminComponent implements OnInit {
   }
 
   guardarConfiguracion(): void {
-    alert("¡Configuración guardada exitosamente!");
+    this.notificationService.showSuccess("¡Configuración guardada exitosamente!");
   }
 
   actualizarPasswordConfig(): void {
     if (!this.newPasswordConfig || !this.confirmPasswordConfig) {
-      alert("Por favor, completa ambos campos de contraseña.");
+      this.notificationService.showInfo("Por favor, completa ambos campos de contraseña.");
       return;
     }
     if (this.newPasswordConfig !== this.confirmPasswordConfig) {
-      alert("Las contraseñas no coinciden.");
+      this.notificationService.showInfo("Las contraseñas no coinciden.");
       return;
     }
-    alert("Contraseña de administrador actualizada con éxito.");
+    this.notificationService.showSuccess("Contraseña de administrador actualizada con éxito.");
     this.newPasswordConfig = '';
     this.confirmPasswordConfig = '';
   }
@@ -1120,12 +1123,12 @@ export class AdminComponent implements OnInit {
             this.twoFactorAuth = false;
             localStorage.removeItem('twoFactorAuth_enabled_' + email);
             localStorage.removeItem('twoFactorAuth_secret_' + email);
-            alert("Autenticación de Dos Factores desactivada con éxito.");
+            this.notificationService.showSuccess("Autenticación de Dos Factores desactivada con éxito.");
             this.cdr.detectChanges();
           },
           error: (err) => {
             console.error("Error al desactivar 2FA del admin en el servidor", err);
-            alert("No se pudo desactivar la Autenticación de Dos Factores en el servidor.");
+            this.notificationService.showError("No se pudo desactivar la Autenticación de Dos Factores en el servidor.");
           }
         });
       }
@@ -1135,7 +1138,7 @@ export class AdminComponent implements OnInit {
 
   confirmarActivacion2fa() {
     if (!this.totpVerificationCode || this.totpVerificationCode.length !== 6 || isNaN(Number(this.totpVerificationCode))) {
-      alert("Por favor, ingresa el código de 6 dígitos que se muestra en tu aplicación autenticadora.");
+      this.notificationService.showInfo("Por favor, ingresa el código de 6 dígitos que se muestra en tu aplicación autenticadora.");
       return;
     }
 
@@ -1152,12 +1155,12 @@ export class AdminComponent implements OnInit {
         localStorage.setItem('twoFactorAuth_enabled_' + email, 'true');
         localStorage.setItem('twoFactorAuth_secret_' + email, this.totpSecretKey);
         this.show2faSetupModal = false;
-        alert("¡Autenticación de Dos Factores (TOTP) configurada y activada con éxito!");
+        this.notificationService.showSuccess("¡Autenticación de Dos Factores (TOTP) configurada y activada con éxito!");
         this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error("Error al activar 2FA del admin en el servidor", err);
-        alert(err.error?.message || "El código ingresado es incorrecto o ha expirado. Por favor, verifica tu aplicación autenticadora.");
+        this.notificationService.showError(err.error?.message || "El código ingresado es incorrecto o ha expirado. Por favor, verifica tu aplicación autenticadora.");
       }
     });
   }

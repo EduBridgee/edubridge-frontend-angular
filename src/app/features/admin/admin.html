@@ -1,149 +1,149 @@
-<div class="flex w-screen h-screen overflow-hidden bg-slate-100 font-sans text-slate-800">
+<div class="admin-main">
 
     <app-sidebar [userName]="user.name" [userRole]="user.role"
         [currentPage]="activeTab === 'dashboard' ? 'admin' : 'admin/' + activeTab" (setPage)="handlePageChange($event)"
         (onLogout)="logout()">
     </app-sidebar>
 
-    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative md:pl-64">
+    <div class="admin-sidebar-layout">
 
-        <main class="p-8 flex-1 overflow-y-auto space-y-6 min-w-0 w-full block">
+        <main class="admin-body">
 
             <div *ngIf="activeTab === 'dashboard'"
-                class="space-y-6 animate-in fade-in duration-300 w-full min-w-0 block">
+                class="admin-tab-view animate-in fade-in duration-300">
                 <div>
-                    <h1 class="text-2xl font-black text-slate-900 tracking-tight">Dashboard Administrativo</h1>
-                    <p class="text-xs font-bold text-slate-400 mt-0.5">Resumen general del sistema educativo</p>
+                    <h1 class="admin-tab-title">Dashboard Administrativo</h1>
+                    <p class="admin-tab-subtitle">Resumen general del sistema educativo</p>
                 </div>
 
-                <div class="bg-orange-600 p-5 rounded-2xl shadow-sm text-white space-y-3 w-full">
-                    <p class="text-xs font-black uppercase tracking-wider text-orange-100">Acciones Rápidas</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
+                <div class="quick-actions-banner">
+                    <p class="quick-actions-title">Acciones Rápidas</p>
+                    <div class="quick-actions-grid">
                         <button (click)="activeTab = 'estudiantes'"
-                            class="bg-white/10 hover:bg-white/20 transition-all p-3.5 rounded-xl flex flex-col items-center justify-center gap-2 border border-white/5 group text-center active:scale-95">
+                            class="quick-action-btn group">
                             <lucide-icon [img]="UserPlus"
-                                class="w-5 h-5 group-hover:scale-110 transition-transform"></lucide-icon>
-                            <span class="text-[11px] font-black tracking-tight">Nuevo Estudiante</span>
+                                class="quick-action-icon"></lucide-icon>
+                            <span class="quick-action-text">Nuevo Estudiante</span>
                         </button>
                         <button (click)="activeTab = 'cursos'"
-                            class="bg-white/10 hover:bg-white/20 transition-all p-3.5 rounded-xl flex flex-col items-center justify-center gap-2 border border-white/5 group text-center active:scale-95">
+                            class="quick-action-btn group">
                             <lucide-icon [img]="Plus"
-                                class="w-5 h-5 group-hover:scale-110 transition-transform"></lucide-icon>
-                            <span class="text-[11px] font-black tracking-tight">Crear Curso</span>
+                                class="quick-action-icon"></lucide-icon>
+                            <span class="quick-action-text">Crear Curso</span>
                         </button>
                         <button (click)="activeTab = 'matriculas'"
-                            class="bg-white/10 hover:bg-white/20 transition-all p-3.5 rounded-xl flex flex-col items-center justify-center gap-2 border border-white/5 group text-center active:scale-95">
+                            class="quick-action-btn group">
                             <lucide-icon [img]="GraduationCap"
-                                class="w-5 h-5 group-hover:scale-110 transition-transform"></lucide-icon>
-                            <span class="text-[11px] font-black tracking-tight">Matricular</span>
+                                class="quick-action-icon"></lucide-icon>
+                            <span class="quick-action-text">Matricular</span>
                         </button>
                         <button (click)="activeTab = 'reportes'"
-                            class="bg-white/10 hover:bg-white/20 transition-all p-3.5 rounded-xl flex flex-col items-center justify-center gap-2 border border-white/5 group text-center active:scale-95">
+                            class="quick-action-btn group">
                             <lucide-icon [img]="BarChart3"
-                                class="w-5 h-5 group-hover:scale-110 transition-transform"></lucide-icon>
-                            <span class="text-[11px] font-black tracking-tight">Ver Reportes</span>
+                                class="quick-action-icon"></lucide-icon>
+                            <span class="quick-action-text">Ver Reportes</span>
                         </button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full">
+                <div class="stats-grid">
 
                     <div
-                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-28 hover:shadow-md transition-all">
-                        <div class="flex justify-between items-start">
-                            <span class="bg-blue-50 text-blue-600 p-2 rounded-xl flex items-center justify-center">
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-icon-wrapper-blue">
                                 <lucide-icon [img]="Users" class="w-4 h-4"></lucide-icon>
                             </span>
                             <span
-                                class="text-xs font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-lg">+12%</span>
+                                class="stat-trend-badge-green">+12%</span>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Total Estudiantes
+                            <p class="stat-label">Total Estudiantes
                             </p>
-                            <h3 class="text-xl font-black text-slate-900 mt-0.5">{{ stats.totalStudents || 0 }}</h3>
+                            <h3 class="stat-value">{{ stats.totalStudents || 0 }}</h3>
                         </div>
                     </div>
 
                     <div
-                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-28 hover:shadow-md transition-all">
-                        <div class="flex justify-between items-start">
+                        class="stat-card">
+                        <div class="stat-card-header">
                             <span
-                                class="bg-emerald-50 text-emerald-600 p-2 rounded-xl flex items-center justify-center">
+                                class="stat-icon-wrapper-emerald">
                                 <lucide-icon [img]="BookOpen" class="w-4 h-4"></lucide-icon>
                             </span>
                             <span
-                                class="text-xs font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-lg">+3</span>
+                                class="stat-trend-badge-green">+3</span>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Cursos Activos</p>
-                            <h3 class="text-xl font-black text-slate-900 mt-0.5">{{ stats.activeCourses || 0 }}</h3>
+                            <p class="stat-label">Cursos Activos</p>
+                            <h3 class="stat-value">{{ stats.activeCourses || 0 }}</h3>
                         </div>
                     </div>
 
                     <div
-                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-28 hover:shadow-md transition-all">
-                        <div class="flex justify-between items-start">
-                            <span class="bg-purple-50 text-purple-600 p-2 rounded-xl flex items-center justify-center">
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-icon-wrapper-purple">
                                 <lucide-icon [img]="GraduationCap" class="w-4 h-4"></lucide-icon>
                             </span>
                             <span
-                                class="text-xs font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-lg">+8%</span>
+                                class="stat-trend-badge-green">+8%</span>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Matrículas Mes</p>
-                            <h3 class="text-xl font-black text-slate-900 mt-0.5">{{ stats.monthlyEnrollments || 0 }}
+                            <p class="stat-label">Matrículas Mes</p>
+                            <h3 class="stat-value">{{ stats.monthlyEnrollments || 0 }}
                             </h3>
                         </div>
                     </div>
 
                     <div
-                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-28 hover:shadow-md transition-all">
-                        <div class="flex justify-between items-start">
-                            <span class="bg-orange-50 text-orange-600 p-2 rounded-xl flex items-center justify-center">
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-icon-wrapper-orange">
                                 <lucide-icon [img]="TrendingUp" class="w-4 h-4"></lucide-icon>
                             </span>
                             <span
-                                class="text-xs font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-lg">+5%</span>
+                                class="stat-trend-badge-green">+5%</span>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Tasa Aprobación
+                            <p class="stat-label">Tasa Aprobación
                             </p>
-                            <h3 class="text-xl font-black text-slate-900 mt-0.5">{{ stats.approvalRate || 0 }}%</h3>
+                            <h3 class="stat-value">{{ stats.approvalRate || 0 }}%</h3>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm">
-                        <p class="text-xs font-black text-slate-800 uppercase tracking-wide mb-4">Actividad Reciente</p>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl"
+                <div class="panels-grid">
+                    <div class="activity-panel">
+                        <p class="panel-title">Actividad Reciente</p>
+                        <div class="panel-list">
+                            <div class="activity-item"
                                 *ngFor="let s of estudiantes.slice(0,2)">
-                                <div class="flex items-center gap-3">
+                                <div class="activity-item-info">
                                     <span
-                                        class="bg-blue-100 text-blue-600 p-2 rounded-lg flex items-center justify-center"><lucide-icon
+                                        class="activity-icon-wrapper"><lucide-icon
                                             [img]="GraduationCap" class="w-4 h-4"></lucide-icon></span>
                                     <div>
-                                        <p class="text-xs font-black text-slate-900">{{s.name}}</p>
-                                        <p class="text-[10px] text-slate-400 font-bold">Matrícula Procesada con Éxito
+                                        <p class="activity-text-title">{{s.name}}</p>
+                                        <p class="activity-text-desc">Matrícula Procesada con Éxito
                                         </p>
                                     </div>
                                 </div>
-                                <span class="text-[10px] font-bold text-slate-400">Hace 5 min</span>
+                                <span class="activity-time">Hace 5 min</span>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm">
-                        <p class="text-xs font-black text-slate-800 uppercase tracking-wide mb-4">Tareas Pendientes</p>
+                    <div class="activity-panel">
+                        <p class="panel-title">Tareas Pendientes</p>
                         <div class="space-y-3">
                             <div
-                                class="flex items-center justify-between p-3 border-l-4 border-rose-500 bg-rose-50/30 rounded-xl">
+                                class="task-item-high">
                                 <div>
-                                    <p class="text-xs font-black text-slate-900">Revisar solicitudes de matrícula</p>
-                                    <p class="text-[10px] text-slate-400 font-bold">Hoy, 5:00 PM</p>
+                                    <p class="activity-text-title">Revisar solicitudes de matrícula</p>
+                                    <p class="activity-text-desc">Hoy, 5:00 PM</p>
                                 </div>
                                 <span
-                                    class="bg-rose-100 text-rose-700 text-[9px] font-black px-2 py-0.5 rounded uppercase">Alta</span>
+                                    class="task-item-priority-high">Alta</span>
                             </div>
                         </div>
                     </div>
@@ -151,14 +151,14 @@
             </div>
 
             <div *ngIf="activeTab === 'estudiantes'"
-                class="space-y-6 animate-in fade-in duration-300 w-full min-w-0 block">
+                class="admin-tab-view animate-in fade-in duration-300">
                 <div class="flex justify-between items-center w-full">
                     <div>
-                        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Gestión de Cuentas</h1>
-                        <p class="text-xs font-bold text-slate-400 mt-0.5">{{estudiantes.length}} estudiantes y
+                        <h1 class="admin-tab-title">Gestión de Cuentas</h1>
+                        <p class="admin-tab-subtitle">{{estudiantes.length}} estudiantes y
                             {{profesores.length}} profesores registrados</p>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="activity-item-info">
                         <button (click)="showNewStudentModal = true"
                             class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 active:scale-95 shrink-0">
                             <lucide-icon [img]="UserPlus" class="w-4 h-4"></lucide-icon>
@@ -223,7 +223,7 @@
                                         <div class="truncate">
                                             <p class="text-slate-900 font-black tracking-tight truncate">{{ account.name
                                                 }}</p>
-                                            <p class="text-[10px] text-slate-400 font-bold">ID: {{ account.id }}</p>
+                                            <p class="activity-text-desc">ID: {{ account.id }}</p>
                                         </div>
                                     </td>
                                     <td class="p-4">
@@ -302,12 +302,12 @@
                 </div>
             </div>
 
-            <div *ngIf="activeTab === 'cursos'" class="space-y-6 animate-in fade-in duration-300 w-full min-w-0 block">
+            <div *ngIf="activeTab === 'cursos'" class="admin-tab-view animate-in fade-in duration-300">
 
                 <div class="flex justify-between items-center w-full">
                     <div>
-                        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Gestión de Cursos</h1>
-                        <p class="text-xs font-bold text-slate-400 mt-0.5">{{cursos.length}} cursos activos en el
+                        <h1 class="admin-tab-title">Gestión de Cursos</h1>
+                        <p class="admin-tab-subtitle">{{cursos.length}} cursos activos en el
                             sistema</p>
                     </div>
                     <button (click)="showNewCourseModal = true"
@@ -342,7 +342,7 @@
 
                         <div
                             class="bg-gradient-to-br from-orange-600 to-orange-500 p-6 text-white relative h-32 flex flex-col justify-between">
-                            <div class="flex justify-between items-start">
+                            <div class="stat-card-header">
                                 <span
                                     class="text-[10px] font-black bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full uppercase tracking-widest">
                                     {{ curso.code }}
@@ -402,13 +402,13 @@
             </div>
 
             <div *ngIf="activeTab === 'matriculas'"
-                class="space-y-6 animate-in fade-in duration-300 w-full min-w-0 block">
+                class="admin-tab-view animate-in fade-in duration-300">
 
                 
                 <div class="flex justify-between items-center w-full">
                     <div>
-                        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Gestión de Matrículas</h1>
-                        <p class="text-xs font-bold text-slate-400 mt-0.5">{{ filteredEnrollments.length }} matrículas
+                        <h1 class="admin-tab-title">Gestión de Matrículas</h1>
+                        <p class="admin-tab-subtitle">{{ filteredEnrollments.length }} matrículas
                             registradas</p>
                     </div>
                     <button (click)="showNewEnrollmentModal = true"
@@ -428,9 +428,9 @@
                             <lucide-icon [img]="Check" class="w-5 h-5"></lucide-icon>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Matrículas Activas
+                            <p class="stat-label">Matrículas Activas
                             </p>
-                            <h3 class="text-xl font-black text-slate-900 mt-0.5">{{ getMatriculasCount('Activa') }}</h3>
+                            <h3 class="stat-value">{{ getMatriculasCount('Activa') }}</h3>
                         </div>
                     </div>
 
@@ -442,8 +442,8 @@
                             <lucide-icon [img]="AlertTriangle" class="w-5 h-5"></lucide-icon>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Pendientes</p>
-                            <h3 class="text-xl font-black text-slate-900 mt-0.5">{{ getMatriculasCount('Pendiente') }}
+                            <p class="stat-label">Pendientes</p>
+                            <h3 class="stat-value">{{ getMatriculasCount('Pendiente') }}
                             </h3>
                         </div>
                     </div>
@@ -456,8 +456,8 @@
                             <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Canceladas</p>
-                            <h3 class="text-xl font-black text-slate-900 mt-0.5">{{ getMatriculasCount('Cancelada') }}
+                            <p class="stat-label">Canceladas</p>
+                            <h3 class="stat-value">{{ getMatriculasCount('Cancelada') }}
                             </h3>
                         </div>
                     </div>
@@ -517,7 +517,7 @@
                                         <div class="truncate">
                                             <p class="text-slate-900 font-black tracking-tight truncate">{{
                                                 m.student?.name }}</p>
-                                            <p class="text-[10px] text-slate-400 font-bold">ID: {{ m.student?.id }}</p>
+                                            <p class="activity-text-desc">ID: {{ m.student?.id }}</p>
                                         </div>
                                     </td>
                                     <td class="p-4">
@@ -590,16 +590,16 @@
             
             <div *ngIf="showNewEnrollmentModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
-                <div class="bg-white p-8 rounded-3xl w-full max-w-md space-y-6 shadow-2xl border border-slate-100">
+                <div class="modal-container-sm">
                     <div class="flex justify-between items-center">
                         <h2 class="font-black text-xl text-slate-900 tracking-tight">Nueva Matrícula</h2>
                         <button (click)="showNewEnrollmentModal = false"
-                            class="text-slate-400 hover:text-slate-600 transition">
+                            class="modal-close-btn">
                             <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
                         </button>
                     </div>
 
-                    <div class="space-y-4">
+                    <div class="panel-list">
                         <div class="space-y-1.5">
                             <label
                                 class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Estudiante</label>
@@ -672,16 +672,16 @@
             <div *ngIf="showNewStudentModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div
-                    class="bg-white p-8 rounded-3xl w-full max-w-lg space-y-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+                    class="modal-container">
                     <div class="flex justify-between items-center">
                         <h2 class="font-black text-xl text-slate-900 tracking-tight">Nuevo Estudiante</h2>
                         <button (click)="showNewStudentModal = false"
-                            class="text-slate-400 hover:text-slate-600 transition">
+                            class="modal-close-btn">
                             <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="form-row">
                         <div class="space-y-1.5 col-span-1 sm:col-span-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre
                                 Completo</label>
@@ -752,16 +752,16 @@
             <div *ngIf="showNewTeacherModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div
-                    class="bg-white p-8 rounded-3xl w-full max-w-lg space-y-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+                    class="modal-container">
                     <div class="flex justify-between items-center">
                         <h2 class="font-black text-xl text-slate-900 tracking-tight">Nuevo Profesor</h2>
                         <button (click)="showNewTeacherModal = false"
-                            class="text-slate-400 hover:text-slate-600 transition">
+                            class="modal-close-btn">
                             <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="form-row">
                         <div class="space-y-1.5 col-span-1 sm:col-span-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre
                                 Completo</label>
@@ -814,16 +814,16 @@
             <div *ngIf="showEditStudentModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div
-                    class="bg-white p-8 rounded-3xl w-full max-w-lg space-y-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+                    class="modal-container">
                     <div class="flex justify-between items-center">
                         <h2 class="font-black text-xl text-slate-900 tracking-tight">Editar Estudiante</h2>
                         <button (click)="showEditStudentModal = false"
-                            class="text-slate-400 hover:text-slate-600 transition">
+                            class="modal-close-btn">
                             <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="form-row">
                         <div class="space-y-1.5 col-span-1 sm:col-span-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre
                                 Completo</label>
@@ -902,16 +902,16 @@
             <div *ngIf="showEditTeacherModal"
                 class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
                 <div
-                    class="bg-white p-8 rounded-3xl w-full max-w-lg space-y-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+                    class="modal-container">
                     <div class="flex justify-between items-center">
                         <h2 class="font-black text-xl text-slate-900 tracking-tight">Editar Profesor</h2>
                         <button (click)="showEditTeacherModal = false"
-                            class="text-slate-400 hover:text-slate-600 transition">
+                            class="modal-close-btn">
                             <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="form-row">
                         <div class="space-y-1.5 col-span-1 sm:col-span-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre
                                 Completo</label>
@@ -976,12 +976,12 @@
                     <div class="flex justify-between items-center">
                         <h2 class="font-black text-xl text-slate-900 tracking-tight">Nuevo Curso</h2>
                         <button (click)="showNewCourseModal = false"
-                            class="text-slate-400 hover:text-slate-600 transition">
+                            class="modal-close-btn">
                             <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="form-row">
                         <div class="space-y-1.5 col-span-1 sm:col-span-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre del
                                 Curso</label>
@@ -1050,12 +1050,12 @@
                     <div class="flex justify-between items-center">
                         <h2 class="font-black text-xl text-slate-900 tracking-tight">Gestionar Aula (Editar Curso)</h2>
                         <button (click)="showEditCourseModal = false"
-                            class="text-slate-400 hover:text-slate-600 transition">
+                            class="modal-close-btn">
                             <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="form-row">
                         <div class="space-y-1.5 col-span-1 sm:col-span-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre del
                                 Curso</label>
@@ -1119,13 +1119,13 @@
 
             
             <div *ngIf="activeTab === 'reportes'"
-                class="space-y-6 animate-in fade-in duration-300 w-full min-w-0 block">
+                class="admin-tab-view animate-in fade-in duration-300">
 
                 
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 w-full">
                     <div>
-                        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Reportes y Analíticas</h1>
-                        <p class="text-xs font-bold text-slate-400 mt-0.5">Informes detallados del desempeño institucional</p>
+                        <h1 class="admin-tab-title">Reportes y Analíticas</h1>
+                        <p class="admin-tab-subtitle">Informes detallados del desempeño institucional</p>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
                         <button (click)="imprimirReporte()"
@@ -1199,11 +1199,11 @@
                 </div>
 
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full">
+                <div class="stats-grid">
                     <div
-                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-28 hover:shadow-md transition-all">
-                        <div class="flex justify-between items-start">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <p class="stat-label">
                                 {{ reporteActivo === 'Rendimiento Académico' ? 'Promedio General' : (reporteActivo === 'Asistencia' ? 'Asistencia Promedio' : 'Total Matrículas') }}
                             </p>
                             <lucide-icon [img]="TrendingUp" class="w-4 h-4 text-emerald-500"></lucide-icon>
@@ -1218,9 +1218,9 @@
                         </div>
                     </div>
                     <div
-                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-28 hover:shadow-md transition-all">
-                        <div class="flex justify-between items-start">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <p class="stat-label">
                                 {{ reporteActivo === 'Rendimiento Académico' ? 'Tasa de Aprobación' : (reporteActivo === 'Asistencia' ? 'Asistencia Perfecta' : 'Matrículas Activas') }}
                             </p>
                             <lucide-icon [img]="TrendingUp" class="w-4 h-4 text-emerald-500"></lucide-icon>
@@ -1235,9 +1235,9 @@
                         </div>
                     </div>
                     <div
-                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-28 hover:shadow-md transition-all">
-                        <div class="flex justify-between items-start">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <p class="stat-label">
                                 {{ reporteActivo === 'Rendimiento Académico' ? 'Estudiantes Destacados' : (reporteActivo === 'Asistencia' ? 'Clases Totales' : 'Solicitudes Pendientes') }}
                             </p>
                             <lucide-icon [img]="reporteActivo === 'Rendimiento Académico' ? User : (reporteActivo === 'Asistencia' ? Calendar : Clock)" class="w-4 h-4 text-orange-500"></lucide-icon>
@@ -1252,9 +1252,9 @@
                         </div>
                     </div>
                     <div
-                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-28 hover:shadow-md transition-all">
-                        <div class="flex justify-between items-start">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <p class="stat-label">
                                 {{ reporteActivo === 'Rendimiento Académico' ? 'En Riesgo' : (reporteActivo === 'Asistencia' ? 'Riesgo de Inasistencia' : 'Matrículas Canceladas') }}
                             </p>
                             <lucide-icon [img]="AlertTriangle" class="w-4 h-4 text-rose-500"></lucide-icon>
@@ -1271,7 +1271,7 @@
                 </div>
 
                 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+                <div class="panels-grid">
 
                     
                     <div
@@ -1455,12 +1455,12 @@
                         <div class="flex justify-between items-center">
                             <h2 class="font-black text-xl text-slate-900 tracking-tight">Enviar Reporte a Docente</h2>
                             <button (click)="showSendReportModal = false"
-                                class="text-slate-400 hover:text-slate-600 transition">
+                                class="modal-close-btn">
                                 <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
                             </button>
                         </div>
 
-                        <div class="space-y-4">
+                        <div class="panel-list">
                             <div class="space-y-1.5">
                                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Seleccionar Profesor</label>
                                 <select [(ngModel)]="selectedTeacherForReport"
@@ -1496,13 +1496,13 @@
 
             
             <div *ngIf="activeTab === 'configuracion'"
-                class="space-y-6 animate-in fade-in duration-300 w-full min-w-0 block">
+                class="admin-tab-view animate-in fade-in duration-300">
 
                 
                 <div class="flex justify-between items-center w-full">
                     <div>
-                        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Configuración del Sistema</h1>
-                        <p class="text-xs font-bold text-slate-400 mt-0.5">Gestiona las preferencias y configuración de
+                        <h1 class="admin-tab-title">Configuración del Sistema</h1>
+                        <p class="admin-tab-subtitle">Gestiona las preferencias y configuración de
                             la plataforma</p>
                     </div>
                     <button (click)="guardarConfiguracion()"
@@ -1618,10 +1618,10 @@
                                 <div
                                     class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-xl">
                                     <div class="flex gap-3"><span
-                                            class="bg-blue-50 text-blue-600 p-2 rounded-xl flex items-center justify-center"><lucide-icon
+                                            class="stat-icon-wrapper-blue"><lucide-icon
                                                 [img]="Bell" class="w-4 h-4"></lucide-icon></span>
                                         <div>
-                                            <p class="text-xs font-black text-slate-900">Notificaciones por Email</p>
+                                            <p class="activity-text-title">Notificaciones por Email</p>
                                             <p class="text-[10px] text-slate-400 font-bold mt-0.5">Recibe alertas
                                                 importantes por correo</p>
                                         </div>
@@ -1637,10 +1637,10 @@
                                 <div
                                     class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-xl">
                                     <div class="flex gap-3"><span
-                                            class="bg-emerald-50 text-emerald-600 p-2 rounded-xl flex items-center justify-center"><lucide-icon
+                                            class="stat-icon-wrapper-emerald"><lucide-icon
                                                 [img]="MessageSquare" class="w-4 h-4"></lucide-icon></span>
                                         <div>
-                                            <p class="text-xs font-black text-slate-900">Notificaciones SMS</p>
+                                            <p class="activity-text-title">Notificaciones SMS</p>
                                             <p class="text-[10px] text-slate-400 font-bold mt-0.5">Alertas urgentes vía
                                                 mensaje de texto</p>
                                         </div>
@@ -1681,10 +1681,10 @@
                             <div
                                 class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-xl">
                                 <div class="flex gap-3"><span
-                                        class="bg-purple-50 text-purple-600 p-2 rounded-xl flex items-center justify-center"><lucide-icon
+                                        class="stat-icon-wrapper-purple"><lucide-icon
                                             [img]="Shield" class="w-4 h-4"></lucide-icon></span>
                                     <div>
-                                        <p class="text-xs font-black text-slate-900">Autenticación de Dos Factores</p>
+                                        <p class="activity-text-title">Autenticación de Dos Factores</p>
                                         <p class="text-[10px] text-slate-400 font-bold mt-0.5">Capa extra de seguridad
                                             para tu cuenta</p>
                                     </div>
@@ -1732,15 +1732,15 @@
                                 <h2 class="text-base font-black text-slate-900">Gestión de Usuarios</h2>
                                 <p class="text-xs text-slate-400 font-bold mt-0.5">Permisos y roles de usuario</p>
                             </div>
-                            <div class="space-y-4">
+                            <div class="panel-list">
                                 
                                 <div class="p-4 border border-slate-200 rounded-2xl space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <p class="text-xs font-black text-slate-900">Rol: Administrador</p><span
+                                        <p class="activity-text-title">Rol: Administrador</p><span
                                             class="bg-purple-50 text-purple-600 font-black text-[9px] px-2 py-0.5 rounded-lg border border-purple-100/50">{{ getRoleCount('admin') }}
                                             usuario{{ getRoleCount('admin') === 1 ? '' : 's' }}</span>
                                     </div>
-                                    <p class="text-[10px] text-slate-400 font-bold">Acceso completo al sistema</p>
+                                    <p class="activity-text-desc">Acceso completo al sistema</p>
                                     <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-600 pt-1"><label
                                             class="flex items-center gap-1.5"><input type="checkbox" checked disabled
                                                 class="text-orange-600 rounded"><span>Gestionar
@@ -1756,11 +1756,11 @@
                                 
                                 <div class="p-4 border border-slate-200 rounded-2xl space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <p class="text-xs font-black text-slate-900">Rol: Profesor</p><span
+                                        <p class="activity-text-title">Rol: Profesor</p><span
                                             class="bg-blue-50 text-blue-600 font-black text-[9px] px-2 py-0.5 rounded-lg border border-blue-100/50">{{ getRoleCount('docente') }}
                                             usuario{{ getRoleCount('docente') === 1 ? '' : 's' }}</span>
                                     </div>
-                                    <p class="text-[10px] text-slate-400 font-bold">Gestión de clases y estudiantes</p>
+                                    <p class="activity-text-desc">Gestión de clases y estudiantes</p>
                                     <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-600 pt-1"><label
                                             class="flex items-center gap-1.5"><input type="checkbox" checked
                                                 class="text-orange-600 rounded"><span>Ver
@@ -1776,11 +1776,11 @@
                                 
                                 <div class="p-4 border border-slate-200 rounded-2xl space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <p class="text-xs font-black text-slate-900">Rol: Estudiante</p><span
+                                        <p class="activity-text-title">Rol: Estudiante</p><span
                                             class="bg-emerald-50 text-emerald-600 font-black text-[9px] px-2 py-0.5 rounded-lg border border-emerald-100/50">{{ getRoleCount('estudiante') }}
                                             usuario{{ getRoleCount('estudiante') === 1 ? '' : 's' }}</span>
                                     </div>
-                                    <p class="text-[10px] text-slate-400 font-bold">Acceso básico a cursos</p>
+                                    <p class="activity-text-desc">Acceso básico a cursos</p>
                                     <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-600 pt-1"><label
                                             class="flex items-center gap-1.5"><input type="checkbox" checked
                                                 class="text-orange-600 rounded"><span>Ver cursos</span></label><label
@@ -1813,7 +1813,7 @@
                                             class="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl flex items-center justify-center shrink-0"><lucide-icon
                                                 [img]="Database" class="w-4 h-4"></lucide-icon></span>
                                         <div>
-                                            <p class="text-xs font-black text-slate-900">Neon</p>
+                                            <p class="activity-text-title">Neon</p>
                                             <p class="text-[10px] text-slate-400 font-bold mt-0.5">Base de datos principal (PostgreSQL)</p>
                                         </div>
                                     </div>
@@ -1827,7 +1827,7 @@
                                             class="bg-amber-50 text-amber-600 p-2.5 rounded-xl flex items-center justify-center shrink-0"><lucide-icon
                                                 [img]="Globe" class="w-4 h-4"></lucide-icon></span>
                                         <div>
-                                            <p class="text-xs font-black text-slate-900">Namecheap</p>
+                                            <p class="activity-text-title">Namecheap</p>
                                             <p class="text-[10px] text-slate-400 font-bold mt-0.5">Gestión de dominio y DNS</p>
                                         </div>
                                     </div>
@@ -1841,7 +1841,7 @@
                                             class="bg-slate-100 text-slate-700 p-2.5 rounded-xl flex items-center justify-center shrink-0"><lucide-icon
                                                 [img]="Mail" class="w-4 h-4"></lucide-icon></span>
                                         <div>
-                                            <p class="text-xs font-black text-slate-900">Resend</p>
+                                            <p class="activity-text-title">Resend</p>
                                             <p class="text-[10px] text-slate-400 font-bold mt-0.5">Envío de correos y recuperación de contraseñas</p>
                                         </div>
                                     </div>
@@ -1862,7 +1862,7 @@
                     <div class="flex justify-between items-center">
                         <h2 class="font-black text-xl text-slate-900 tracking-tight">Activar Autenticación 2FA</h2>
                         <button (click)="cancelarActivacion2fa()"
-                            class="text-slate-400 hover:text-slate-600 transition">
+                            class="modal-close-btn">
                             <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
                         </button>
                     </div>
