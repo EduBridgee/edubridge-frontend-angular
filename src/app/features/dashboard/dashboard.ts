@@ -55,8 +55,8 @@ export class DashboardComponent implements OnInit {
   studentAttendancePct: number = 0;
   studentAttendedClasses: number = 0;
   studentTotalClasses: number = 0;
+  studentTasks: any[] = [];
 
-  
   tendenciaMensual: string = '+0.0';
   esTendenciaPositiva: boolean = true;
 
@@ -75,7 +75,6 @@ export class DashboardComponent implements OnInit {
     const normalizedRole = this.roleService.normalizeRole(this.user.role);
     const userId = Number(this.user.id);
 
-    
     if (normalizedRole === UserRole.ADMIN) {
       this.processAdminDashboard();
       return;
@@ -103,34 +102,30 @@ export class DashboardComponent implements OnInit {
       : this.http.get<any[]>(`${API_BASE_URL}/grades/student/${userId}`)
         .pipe(catchError(() => of([])));
 
+    const studentTasksReq = isDocente
+      ? of([])
+      : this.http.get<any[]>(`${API_BASE_URL}/student-tasks/student/${userId}`).pipe(catchError(() => of([])));
+
     forkJoin({
       allStudents: studentsReq,
       allCourses: coursesReq,
       allTeachers: teachersReq,
       allEnrollments: enrollmentsReq,
-      myGrades: gradesReq
+      myGrades: gradesReq,
+      myTasks: studentTasksReq
     }).subscribe({
       next: (res) => {
         if (isDocente) {
           const teacherId = Number(this.user.id);
-
-          
           const nuevosCursos = res.allCourses.filter(c => c.teacher && Number(c.teacher.id) === teacherId);
-
-          
           const viejosCursos = res.allTeachers.filter(p => Number(p.id) === teacherId && p.course).map(p => p.course);
-
-          
           const combinados = [...nuevosCursos];
           viejosCursos.forEach(vc => {
             if (vc && !combinados.some(c => c.id === vc.id)) {
               combinados.push(vc);
             }
           });
-
           const teacherCourseIds = combinados.map(c => Number(c.id));
-
-          
           const myStudentIds = new Set<number>();
           res.allEnrollments.forEach(m => {
             const status = (m.status || '').toUpperCase();
@@ -142,20 +137,15 @@ export class DashboardComponent implements OnInit {
               myStudentIds.add(sId);
             }
           });
-
-          
           const myStudents = res.allStudents.filter(alumno => myStudentIds.has(Number(alumno.id)));
           this.students = myStudents;
-
-          
           const myGrades = res.myGrades.filter(g => g.course && teacherCourseIds.includes(Number(g.course.id)));
-
           this.processDocenteData(myStudents, myGrades, combinados, res.allEnrollments);
         } else {
           this.students = res.allStudents;
+          this.studentTasks = res.myTasks;
           this.processEstudianteData(res.allStudents, res.myGrades, userId, res.allEnrollments);
         }
-
         this.loading = false;
         this.cdr.detectChanges();
       },

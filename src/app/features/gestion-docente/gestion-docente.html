@@ -68,6 +68,10 @@
           <lucide-icon [img]="Edit" [size]="24" class="action-box-icon"></lucide-icon>
           <span class="action-box-label">Participación</span>
         </div>
+        <div (click)="abrirModalTarea()" class="action-box-rose group">
+          <lucide-icon [img]="Calendar" [size]="24" class="action-box-icon"></lucide-icon>
+          <span class="action-box-label">Asignar Tarea</span>
+        </div>
         <div (click)="toggleTwoFactorSwitch()" class="action-box-indigo group">
           <lucide-icon [img]="Shield" [size]="24" class="action-box-icon"></lucide-icon>
           <span class="action-box-label">{{ twoFactorAuth ? '2FA Activo' : 'Activar 2FA' }}</span>
@@ -410,6 +414,39 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div *ngIf="showAsignarTareaModal" class="modal-overlay">
+    <div class="modal-container animate-in fade-in slide-in-from-bottom-10 duration-300">
+      <div class="modal-header-indigo">
+        <h3 class="modal-title">
+          <lucide-icon [img]="Calendar" [size]="18"></lucide-icon> Asignar Tarea
+        </h3>
+        <button (click)="showAsignarTareaModal = false" class="modal-close-btn">
+          <lucide-icon [img]="X" [size]="20"></lucide-icon>
+        </button>
+      </div>
+      <form (ngSubmit)="manejarCrearTareaEstudiante()" class="modal-form">
+        <div class="form-field">
+          <label class="form-label">Estudiante</label>
+          <select required name="tStudentId" [(ngModel)]="nuevaTareaEstudiante.studentId" class="form-select">
+            <option [ngValue]="null" disabled>Elegir estudiante...</option>
+            <option *ngFor="let s of estudiantesCurso" [value]="s.id">{{s.name}} ({{s.code}})</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Título de la Tarea</label>
+          <input type="text" required name="tTitle" [(ngModel)]="nuevaTareaEstudiante.title" placeholder="Ej: Ejercicios de Integrales" class="form-input" />
+        </div>
+        <div class="form-field">
+          <label class="form-label">Fecha de Entrega / Vencimiento</label>
+          <input type="text" required name="tDueDate" [(ngModel)]="nuevaTareaEstudiante.dueDate" placeholder="Ej: 17 abr, 30 jun..." class="form-input" />
+        </div>
+        <button type="submit" class="btn-submit-modal-blue">
+          Asignar Tarea
+        </button>
+      </form>
     </div>
   </div>
 

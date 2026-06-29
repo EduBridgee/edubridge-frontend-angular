@@ -303,25 +303,18 @@
                         <lucide-icon [img]="Clock" [size]="16" class="text-orange-500"></lucide-icon> Tareas Pendientes
                     </h3>
                     <div class="tasks-list">
-                        <div class="task-item">
+                        <div *ngFor="let task of studentTasks" class="task-item">
                             <div class="task-info-wrapper">
                                 <div class="task-dot-rose"></div>
                                 <div class="task-details">
-                                    <p class="task-title">Ensayo sobre la Revolución Industrial</p>
-                                    <p class="task-meta">Historia • <lucide-icon [img]="Calendar" [size]="10" class="inline"></lucide-icon> 17 abr</p>
+                                    <p class="task-title">{{task.title}}</p>
+                                    <p class="task-meta">{{task.courseName}} • <lucide-icon [img]="Calendar" [size]="10" class="inline"></lucide-icon> {{task.dueDate}}</p>
                                 </div>
                             </div>
-                            <span class="task-status-badge">Pendiente</span>
+                            <span class="task-status-badge">{{task.status}}</span>
                         </div>
-                        <div class="task-item">
-                            <div class="task-info-wrapper">
-                                <div class="task-dot-rose"></div>
-                                <div class="task-details">
-                                    <p class="task-title">Resolver ejercicios de Cálculo Integral</p>
-                                    <p class="task-meta">Matemáticas • <lucide-icon [img]="Calendar" [size]="10" class="inline"></lucide-icon> 18 abr</p>
-                                </div>
-                            </div>
-                            <span class="task-status-badge">Pendiente</span>
+                        <div *ngIf="studentTasks.length === 0" class="py-6 text-center text-slate-400 text-sm">
+                            No tienes tareas pendientes
                         </div>
                     </div>
                 </div>

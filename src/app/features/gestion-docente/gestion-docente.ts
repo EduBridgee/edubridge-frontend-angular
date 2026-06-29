@@ -74,6 +74,8 @@ export class GestionDocenteComponent implements OnInit {
   courses: any[] = [];             
   matriculasCurso: any[] = [];
   tasks: any[] = [];
+  showAsignarTareaModal: boolean = false;
+  nuevaTareaEstudiante = { studentId: null, title: '', dueDate: '' };
 
   cursoSeleccionadoId: number | null = null;
 
@@ -576,5 +578,42 @@ export class GestionDocenteComponent implements OnInit {
     this.show2faSetupModal = false;
     this.twoFactorAuth = false;
     this.cdr.detectChanges();
+  }
+
+  abrirModalTarea() {
+    this.nuevaTareaEstudiante = {
+      studentId: null,
+      title: '',
+      dueDate: ''
+    };
+    this.showAsignarTareaModal = true;
+    this.cdr.detectChanges();
+  }
+
+  manejarCrearTareaEstudiante() {
+    if (!this.nuevaTareaEstudiante.studentId || !this.nuevaTareaEstudiante.title || !this.nuevaTareaEstudiante.dueDate) {
+      this.notificationService.showError("Por favor completa todos los campos.");
+      return;
+    }
+    const cursoActivo = this.courses.find(c => Number(c.id) === Number(this.cursoSeleccionadoId));
+    const courseName = cursoActivo ? cursoActivo.name : "General";
+    const payload = {
+      studentId: Number(this.nuevaTareaEstudiante.studentId),
+      title: this.nuevaTareaEstudiante.title,
+      courseName: courseName,
+      dueDate: this.nuevaTareaEstudiante.dueDate,
+      teacherName: this.user.name || "Docente"
+    };
+    this.http.post(`${API_BASE_URL}/student-tasks`, payload).subscribe({
+      next: () => {
+        this.notificationService.showSuccess("Tarea asignada correctamente al estudiante.");
+        this.showAsignarTareaModal = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Error al asignar tarea:", err);
+        this.notificationService.showError("Error al asignar tarea en el servidor.");
+      }
+    });
   }
 }
