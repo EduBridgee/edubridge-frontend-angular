@@ -209,7 +209,10 @@
                 </div>
 
                 <div *ngIf="session.status?.toLowerCase() !== 'finalizada' && session.status?.toLowerCase() !== 'cancelada'" class="session-actions-row pt-2">
-                  <button (click)="unirseASesion(session)" class="btn-join-session">
+                  <button (click)="unirseASesion(session)" 
+                          [style.opacity]="session.status?.toLowerCase() === 'pendiente' ? 0.6 : 1"
+                          [style.cursor]="session.status?.toLowerCase() === 'pendiente' ? 'not-allowed' : 'pointer'"
+                          class="btn-join-session">
                     Unirse a la Sesión
                   </button>
                   <button (click)="reprogramarTutoria(session.id)" class="btn-reschedule-session">

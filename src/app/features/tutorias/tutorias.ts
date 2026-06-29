@@ -174,7 +174,13 @@ export class TutoriasComponent implements OnInit {
   }
 
   unirseASesion(session: any) {
-    const sessionObj = typeof session === 'string' ? { courseName: session, id: 0 } : session;
+    const sessionObj = typeof session === 'string' ? { courseName: session, id: 0, status: '' } : session;
+    
+    if (sessionObj.status && sessionObj.status.toLowerCase() === 'pendiente') {
+      this.notificationService.showInfo('Espera que el profesor confirme esta reunion', 'Tutoría Pendiente');
+      return;
+    }
+
     this.activeMeetingCourse = sessionObj.courseName;
     this.showVideoModal = true;
     this.cdr.detectChanges();
