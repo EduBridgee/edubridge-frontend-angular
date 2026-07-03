@@ -235,8 +235,8 @@
                 <div class="estudiante-kpi-card">
                     <div class="estudiante-kpi-text-block">
                         <p class="estudiante-kpi-label">Tareas Pendientes</p>
-                        <h4 class="estudiante-kpi-value">4</h4>
-                        <p class="estudiante-kpi-trend text-orange-600">2 urgentes</p>
+                        <h4 class="estudiante-kpi-value">{{studentPendingTasksCount}}</h4>
+                        <p class="estudiante-kpi-subtext-orange">Por entregar</p>
                     </div>
                     <div class="estudiante-kpi-icon-wrapper-orange">
                         <lucide-icon [img]="Clock" [size]="24"></lucide-icon>
@@ -245,12 +245,97 @@
 
                 <div class="estudiante-kpi-card">
                     <div class="estudiante-kpi-text-block">
-                        <p class="estudiante-kpi-label">Cursos Matriculados</p>
-                        <h4 class="estudiante-kpi-value">{{studentEnrolledCoursesCount}}</h4>
-                        <p class="estudiante-kpi-subtext-purple">Ciclo 2026-I</p>
+                        <p class="estudiante-kpi-label">Tasa de Entrega</p>
+                        <h4 class="estudiante-kpi-value">{{studentSubmissionRate}}%</h4>
+                        <p class="estudiante-kpi-subtext-indigo">{{studentSubmittedTasksCount}} entregadas</p>
                     </div>
-                    <div class="estudiante-kpi-icon-wrapper-purple">
-                        <lucide-icon [img]="BookOpen" [size]="24"></lucide-icon>
+                    <div class="estudiante-kpi-icon-wrapper-indigo">
+                        <lucide-icon [img]="Target" [size]="24"></lucide-icon>
+                    </div>
+                </div>
+
+                <div class="estudiante-kpi-card">
+                    <div class="estudiante-kpi-text-block">
+                        <p class="estudiante-kpi-label">Puntualidad</p>
+                        <h4 class="estudiante-kpi-value">{{studentPunctualityRate}}%</h4>
+                        <p class="estudiante-kpi-subtext-rose">{{studentOnTimeTasksCount}} a tiempo</p>
+                    </div>
+                    <div class="estudiante-kpi-icon-wrapper-rose">
+                        <lucide-icon [img]="TrendingUp" [size]="24"></lucide-icon>
+                    </div>
+                </div>
+            </section>
+
+            <section *ngIf="coursesInRisk.length > 0" class="refuerzo-section alert-active animate-in fade-in duration-500">
+                <div class="refuerzo-header">
+                    <div class="refuerzo-title-area">
+                        <div class="refuerzo-icon-wrapper pulse-animation">
+                            <lucide-icon [img]="Sparkles" [size]="20" class="text-amber-600"></lucide-icon>
+                        </div>
+                        <div>
+                            <h3 class="refuerzo-title">Plan de Refuerzo Académico Sugerido</h3>
+                            <p class="refuerzo-subtitle">
+                                Basado en tu rendimiento actual, te recomendamos repasar material de apoyo para las siguientes asignaturas:
+                                <span class="badge-risk-course" *ngFor="let course of coursesInRisk">{{course}}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="refuerzo-grid" *ngIf="recommendedResources.length > 0; else noResourcesFound">
+                    <div *ngFor="let recurso of recommendedResources" class="recurso-card-mini group">
+                        <div class="recurso-card-mini-body">
+                            <div class="recurso-icon-box" [ngClass]="{
+                                'pdf-bg': recurso.type === 'PDF',
+                                'video-bg': recurso.type === 'Video',
+                                'ppt-bg': recurso.type === 'PPT' || recurso.type === 'Presentacion',
+                                'default-bg': recurso.type !== 'PDF' && recurso.type !== 'Video' && recurso.type !== 'PPT' && recurso.type !== 'Presentacion'
+                            }">
+                                <lucide-icon *ngIf="recurso.type === 'PDF'" [img]="FileText" [size]="20" class="text-rose-500"></lucide-icon>
+                                <lucide-icon *ngIf="recurso.type === 'Video'" [img]="Video" [size]="20" class="text-blue-500"></lucide-icon>
+                                <lucide-icon *ngIf="recurso.type !== 'PDF' && recurso.type !== 'Video'" [img]="Presentation" [size]="20" class="text-orange-500"></lucide-icon>
+                            </div>
+                            <div class="recurso-card-mini-info">
+                                <h4 class="recurso-card-mini-title">{{recurso.title}}</h4>
+                                <div class="recurso-card-mini-meta">
+                                    <span class="meta-subject">{{recurso.subject}}</span>
+                                    <span class="meta-divider">•</span>
+                                    <span class="meta-type">{{recurso.type}}</span>
+                                    <span class="meta-divider" *ngIf="recurso.stats">•</span>
+                                    <span class="meta-stats" *ngIf="recurso.stats">{{recurso.stats}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="recurso-card-mini-actions">
+                            <button (click)="viewResource(recurso)" class="btn-action-mini" title="Visualizar">
+                                <lucide-icon [img]="BookOpen" [size]="16"></lucide-icon>
+                                <span>Ver</span>
+                            </button>
+                            <button (click)="downloadResource(recurso)" class="btn-action-mini secondary" title="Descargar" *ngIf="recurso.img">
+                                <lucide-icon [img]="Download" [size]="16"></lucide-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <ng-template #noResourcesFound>
+                    <div class="refuerzo-empty-resources">
+                        <p>No se encontraron materiales de estudio cargados en el sistema específicamente para estas asignaturas. Te recomendamos consultar directamente con tu tutor.</p>
+                    </div>
+                </ng-template>
+            </section>
+
+            <section *ngIf="coursesInRisk.length === 0" class="refuerzo-section no-risk animate-in fade-in duration-500">
+                <div class="refuerzo-header">
+                    <div class="refuerzo-title-area">
+                        <div class="refuerzo-icon-wrapper-success">
+                            <lucide-icon [img]="ThumbsUp" [size]="20" class="text-emerald-600"></lucide-icon>
+                        </div>
+                        <div>
+                            <h3 class="refuerzo-title">¡Excelente rendimiento académico!</h3>
+                            <p class="refuerzo-subtitle-success">
+                                Mantienes un promedio saludable superior a 13.0 en todas tus asignaturas matriculadas. ¡Sigue esforzándote de la misma manera!
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -305,13 +390,20 @@
                     <div class="tasks-list">
                         <div *ngFor="let task of studentTasks" class="task-item">
                             <div class="task-info-wrapper">
-                                <div class="task-dot-rose"></div>
+                                <div [ngClass]="task.status === 'Pendiente' ? 'task-dot-rose' : 'task-dot-emerald'"></div>
                                 <div class="task-details">
-                                    <p class="task-title">{{task.title}}</p>
+                                    <p class="task-title" [ngStyle]="{'text-decoration': task.status !== 'Pendiente' ? 'line-through' : 'none'}">{{task.title}}</p>
                                     <p class="task-meta">{{task.courseName}} • <lucide-icon [img]="Calendar" [size]="10" class="inline"></lucide-icon> {{task.dueDate}}</p>
                                 </div>
                             </div>
-                            <span class="task-status-badge">{{task.status}}</span>
+                            <div class="flex items-center gap-2">
+                                <button *ngIf="task.status === 'Pendiente'" (click)="abrirModalEntregar(task)" class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1 shadow-sm">
+                                    <lucide-icon [img]="Check" [size]="12"></lucide-icon> Entregar
+                                </button>
+                                <span class="task-status-badge" [ngClass]="task.status === 'Pendiente' ? 'bg-amber-100 text-amber-800' : (task.status === 'Atrasado' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800')">
+                                    {{task.status}}
+                                </span>
+                            </div>
                         </div>
                         <div *ngIf="studentTasks.length === 0" class="py-6 text-center text-slate-400 text-sm">
                             No tienes tareas pendientes
@@ -340,6 +432,79 @@
                     </div>
                 </div>
             </section>
+        </div>
+    </div>
+
+    <div *ngIf="showSubmitTaskModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 flex flex-col animate-in zoom-in-95 duration-300">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                <div>
+                    <h3 class="text-base font-black text-slate-800 uppercase tracking-wider">Entregar Asignación</h3>
+                    <p class="text-xs text-slate-500 font-bold mt-0.5">{{ selectedSubmitTask?.title }}</p>
+                </div>
+                <button (click)="cerrarModalEntregar()" class="p-2 hover:bg-slate-200/60 text-slate-400 hover:text-slate-600 rounded-full transition-colors">
+                    <lucide-icon [img]="X" [size]="18"></lucide-icon>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Formato de Entrega</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button (click)="submissionType = 'FILE'" [ngClass]="submissionType === 'FILE' ? 'border-emerald-500 bg-emerald-50/40 text-emerald-800' : 'border-slate-200 hover:border-slate-300 text-slate-600'" class="py-3 px-4 rounded-2xl border-2 font-bold text-xs flex flex-col items-center justify-center gap-1.5 transition-all">
+                            <lucide-icon [img]="Upload" [size]="20" [class.text-emerald-600]="submissionType === 'FILE'"></lucide-icon>
+                            Subir Archivo
+                            <span class="text-[9px] font-medium text-slate-400 mt-0.5">(Word, PPT, Imagen, PDF)</span>
+                        </button>
+                        <button (click)="submissionType = 'LINK'" [ngClass]="submissionType === 'LINK' ? 'border-emerald-500 bg-emerald-50/40 text-emerald-800' : 'border-slate-200 hover:border-slate-300 text-slate-600'" class="py-3 px-4 rounded-2xl border-2 font-bold text-xs flex flex-col items-center justify-center gap-1.5 transition-all">
+                            <lucide-icon [img]="Link" [size]="20" [class.text-emerald-600]="submissionType === 'LINK'"></lucide-icon>
+                            Compartir Enlace
+                            <span class="text-[9px] font-medium text-slate-400 mt-0.5">(Video URL, Google Drive)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="submissionType === 'FILE'" class="space-y-2">
+                    <label class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Seleccionar Documento</label>
+                    <div class="relative border-2 border-dashed border-slate-200 rounded-2xl p-6 hover:border-emerald-400 hover:bg-emerald-50/10 transition-colors flex flex-col items-center justify-center text-center">
+                        <input type="file" (change)="onFileSelected($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" />
+                        <lucide-icon [img]="Upload" [size]="28" class="text-slate-300 mb-2"></lucide-icon>
+                        <p class="text-xs font-bold text-slate-700">Arrastra tu archivo aquí o haz clic para buscar</p>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-1">Formatos permitidos: Word, PPT, PDF, PNG, JPG (máx. 10MB)</p>
+                    </div>
+                    <div *ngIf="submissionFileName" class="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between animate-in slide-in-from-top-2 duration-200">
+                        <div class="flex items-center gap-2">
+                            <lucide-icon [img]="FileText" [size]="16" class="text-emerald-500"></lucide-icon>
+                            <span class="text-xs font-bold text-slate-700 max-w-[280px] truncate">{{ submissionFileName }}</span>
+                        </div>
+                        <button (click)="submissionFileName = ''; submissionContent = ''" class="text-slate-400 hover:text-rose-500 p-1 rounded-lg hover:bg-slate-200/50 transition-colors">
+                            <lucide-icon [img]="X" [size]="14"></lucide-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="submissionType === 'LINK'" class="space-y-2">
+                    <label class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Enlace o URL de la Tarea</label>
+                    <div class="flex items-center gap-2 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus-within:border-emerald-500 transition-colors">
+                        <lucide-icon [img]="Link" [size]="16" class="text-slate-400"></lucide-icon>
+                        <input type="url" [(ngModel)]="submissionContent" placeholder="https://youtube.com/watch?v=... o https://drive.google.com/..." class="w-full bg-transparent border-none text-xs font-bold text-slate-700 placeholder:text-slate-400 outline-none" />
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Comentario para el Profesor (Opcional)</label>
+                    <textarea [(ngModel)]="studentComment" placeholder="Escribe un mensaje o indicación adicional para el docente..." rows="3" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:border-emerald-500 outline-none text-xs font-bold text-slate-700 placeholder:text-slate-400 resize-none transition-colors"></textarea>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                <button (click)="cerrarModalEntregar()" class="px-4 py-2 border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-bold rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button (click)="confirmarEntregarTarea()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-500/10 transition-colors">
+                    Enviar Tarea
+                </button>
+            </div>
         </div>
     </div>
 </main>

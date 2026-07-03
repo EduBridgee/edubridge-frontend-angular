@@ -1,17 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RoleService, UserRole } from '../../core/services/role';
 import { API_BASE_URL } from '../../core/config/api.config';
-import { LucideAngularModule, Search, Users, Award, Target, AlertTriangle, TrendingUp, BarChart3, Check, Clock, BookOpen, Calendar } from 'lucide-angular';
+import { LucideAngularModule, Search, Users, Award, Target, AlertTriangle, TrendingUp, BarChart3, Check, Clock, BookOpen, Calendar, FileText, Video, Presentation, Download, Sparkles, ThumbsUp, Upload, Link, X } from 'lucide-angular';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, NotificationBellComponent, DecimalPipe, LucideAngularModule],
+  imports: [CommonModule, FormsModule, NotificationBellComponent, DecimalPipe, LucideAngularModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
@@ -34,6 +35,15 @@ export class DashboardComponent implements OnInit {
   readonly Clock = Clock;
   readonly BookOpen = BookOpen;
   readonly Calendar = Calendar;
+  readonly FileText = FileText;
+  readonly Video = Video;
+  readonly Presentation = Presentation;
+  readonly Download = Download;
+  readonly Sparkles = Sparkles;
+  readonly ThumbsUp = ThumbsUp;
+  readonly Upload = Upload;
+  readonly Link = Link;
+  readonly X = X;
 
   students: any[] = [];
   loading: boolean = true;
@@ -56,6 +66,22 @@ export class DashboardComponent implements OnInit {
   studentAttendedClasses: number = 0;
   studentTotalClasses: number = 0;
   studentTasks: any[] = [];
+  studentPendingTasksCount: number = 0;
+  studentSubmittedTasksCount: number = 0;
+  studentOnTimeTasksCount: number = 0;
+  studentLateTasksCount: number = 0;
+  studentSubmissionRate: number = 0;
+  studentPunctualityRate: number = 0;
+
+  showSubmitTaskModal: boolean = false;
+  selectedSubmitTask: any = null;
+  submissionType: 'FILE' | 'LINK' = 'FILE';
+  submissionFileName: string = '';
+  submissionContent: string = '';
+  studentComment: string = '';
+
+  recommendedResources: any[] = [];
+  coursesInRisk: string[] = [];
 
   tendenciaMensual: string = '+0.0';
   esTendenciaPositiva: boolean = true;
@@ -106,13 +132,18 @@ export class DashboardComponent implements OnInit {
       ? of([])
       : this.http.get<any[]>(`${API_BASE_URL}/student-tasks/student/${userId}`).pipe(catchError(() => of([])));
 
+    const resourcesReq = isDocente
+      ? of([])
+      : this.http.get<any[]>(`${API_BASE_URL}/resources`).pipe(catchError(() => of([])));
+
     forkJoin({
       allStudents: studentsReq,
       allCourses: coursesReq,
       allTeachers: teachersReq,
       allEnrollments: enrollmentsReq,
       myGrades: gradesReq,
-      myTasks: studentTasksReq
+      myTasks: studentTasksReq,
+      allResources: resourcesReq
     }).subscribe({
       next: (res) => {
         if (isDocente) {
@@ -144,7 +175,22 @@ export class DashboardComponent implements OnInit {
         } else {
           this.students = res.allStudents;
           this.studentTasks = res.myTasks;
-          this.processEstudianteData(res.allStudents, res.myGrades, userId, res.allEnrollments);
+
+          const totalTasks = this.studentTasks.length;
+          const pending = this.studentTasks.filter(t => t.status === 'Pendiente' || !t.status).length;
+          const onTime = this.studentTasks.filter(t => t.status === 'Entregado').length;
+          const late = this.studentTasks.filter(t => t.status === 'Atrasado').length;
+          const submitted = onTime + late;
+
+          this.studentPendingTasksCount = pending;
+          this.studentSubmittedTasksCount = submitted;
+          this.studentOnTimeTasksCount = onTime;
+          this.studentLateTasksCount = late;
+
+          this.studentSubmissionRate = totalTasks > 0 ? Math.round((submitted / totalTasks) * 100) : 0;
+          this.studentPunctualityRate = submitted > 0 ? Math.round((onTime / submitted) * 100) : 100;
+
+          this.processEstudianteData(res.allStudents, res.myGrades, userId, res.allEnrollments, res.allResources);
         }
         this.loading = false;
         this.cdr.detectChanges();
@@ -314,7 +360,7 @@ export class DashboardComponent implements OnInit {
     return `conic-gradient(#10b981 0% ${limit1}%, #f59e0b ${limit1}% ${limit2}%, #ef4444 ${limit2}% 100%)`;
   }
 
-  private processEstudianteData(allStudents: any[], myGrades: any[], userId: number, myEnrollments: any[] = []) {
+  private processEstudianteData(allStudents: any[], myGrades: any[], userId: number, myEnrollments: any[] = [], allResources: any[] = []) {
     this.studentSummary = allStudents.find(s => s.id === userId);
 
     
@@ -333,6 +379,9 @@ export class DashboardComponent implements OnInit {
     this.studentAttendedClasses = sumAttended;
     this.studentTotalClasses = sumTotal;
     this.studentAttendancePct = sumTotal > 0 ? Math.round((sumAttended / sumTotal) * 100) : 0;
+
+    this.coursesInRisk = [];
+    const lowPerformanceCourses: string[] = [];
 
     if (myGrades && myGrades.length > 0) {
       const cursosMap: { [key: number]: { nombre: string, suma: number, cantidad: number } } = {};
@@ -366,12 +415,18 @@ export class DashboardComponent implements OnInit {
         const promedioCurso = c.suma / c.cantidad;
         sumaPromediosCursos += promedioCurso;
 
+        if (promedioCurso < 13.0) {
+          lowPerformanceCourses.push(c.nombre);
+        }
+
         return {
           label: c.nombre.substring(0, 3).toUpperCase(),
           value: Math.round(promedioCurso * 10) / 10,
           percentage: (promedioCurso / 20 * 100) + '%'
         };
       });
+
+      this.coursesInRisk = lowPerformanceCourses;
 
       const finalProm = sumaPromediosCursos / keys.length;
       this.promedioCalculadoEstudiante = Math.round(finalProm * 10) / 10;
@@ -392,7 +447,97 @@ export class DashboardComponent implements OnInit {
       this.tendenciaMensual = 'Estable';
     }
 
+    if (this.coursesInRisk.length > 0 && allResources && allResources.length > 0) {
+      const lowerRiskCourses = this.coursesInRisk.map(c => c.toLowerCase().trim());
+      this.recommendedResources = allResources.filter(r => {
+        const subjectLower = r.subject ? r.subject.toLowerCase().trim() : '';
+        return lowerRiskCourses.some(lc => subjectLower.includes(lc) || lc.includes(subjectLower));
+      });
+    } else {
+      this.recommendedResources = [];
+    }
+
     this.generateEvolutionChart(this.promedioCalculadoEstudiante);
+  }
+
+  viewResource(recurso: any) {
+    let content = recurso.img;
+    if (!content) {
+      if (recurso.type === 'Video') {
+        content = `https://www.youtube.com/results?search_query=${recurso.title}`;
+      } else {
+        return;
+      }
+    }
+
+    if (content.startsWith('data:')) {
+      try {
+        const byteString = atob(content.split(',')[1]);
+        const mimeString = content.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([ab], {type: mimeString});
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      } catch (e) {
+        console.error("Error al procesar Base64:", e);
+        window.open(content, '_blank');
+      }
+    } else {
+      window.open(content, '_blank');
+    }
+  }
+
+  downloadResource(recurso: any) {
+    const content = recurso.img;
+    if (!content) return;
+    if (recurso.type === 'Video' && !content.startsWith('data:')) {
+      window.open(content, '_blank');
+      return;
+    }
+
+    const processBlob = (blob: Blob, fileName: string) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
+    };
+
+    if (content.startsWith('data:')) {
+      try {
+        const mimeType = content.split(',')[0].split(':')[1].split(';')[0];
+        const extension = mimeType.split('/')[1] || 'file';
+        const byteString = atob(content.split(',')[1]);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([ab], {type: mimeType});
+        processBlob(blob, `${recurso.title}.${extension}`);
+      } catch (e) {
+        console.error("Error al descargar Base64:", e);
+        window.open(content, '_blank');
+      }
+    } else {
+      fetch(content)
+        .then(response => response.blob())
+        .then(blob => {
+          const extension = content.split('.').pop()?.split('?')[0] || 'file';
+          processBlob(blob, `${recurso.title}.${extension}`);
+        })
+        .catch(() => window.open(content, '_blank'));
+    }
   }
 
   generateEvolutionChart(baseValue: number) {
@@ -405,5 +550,64 @@ export class DashboardComponent implements OnInit {
 
   get firstName() {
     return this.user?.name?.split(' ')[0] || 'Usuario';
+  }
+
+  abrirModalEntregar(task: any) {
+    this.selectedSubmitTask = task;
+    this.showSubmitTaskModal = true;
+    this.submissionType = 'FILE';
+    this.submissionFileName = '';
+    this.submissionContent = '';
+    this.studentComment = '';
+    this.cdr.detectChanges();
+  }
+
+  cerrarModalEntregar() {
+    this.showSubmitTaskModal = false;
+    this.selectedSubmitTask = null;
+    this.cdr.detectChanges();
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.submissionFileName = file.name;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.submissionContent = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  confirmarEntregarTarea() {
+    if (!this.selectedSubmitTask) return;
+
+    if (this.submissionType === 'FILE' && !this.submissionFileName) {
+      alert("Por favor, selecciona un archivo (Word, PPT, imagen, etc.).");
+      return;
+    }
+    if (this.submissionType === 'LINK' && !this.submissionContent.trim()) {
+      alert("Por favor, ingresa el enlace de tu tarea.");
+      return;
+    }
+
+    const payload = {
+      submissionType: this.submissionType,
+      submissionFileName: this.submissionType === 'FILE' ? this.submissionFileName : 'Enlace Web',
+      submissionContent: this.submissionContent,
+      studentComment: this.studentComment
+    };
+
+    this.http.put(`${API_BASE_URL}/student-tasks/${this.selectedSubmitTask.id}/submit`, payload).subscribe({
+      next: () => {
+        this.showSubmitTaskModal = false;
+        this.selectedSubmitTask = null;
+        this.fetchData();
+      },
+      error: (err) => {
+        console.error("Error al entregar tarea:", err);
+      }
+    });
   }
 }
