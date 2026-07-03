@@ -1,333 +1,510 @@
-<main class="flex-1 ml-0 md:ml-64 bg-[#F8FAFC] min-h-screen flex flex-col font-['Inter'] text-left transition-all">
+<main class="dashboard-main">
 
-    <div class="p-4 md:p-8 pb-0 w-full relative z-[60]">
-        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex flex-wrap md:flex-nowrap items-center justify-between px-4 md:px-6 gap-4">
-            <div class="flex items-center gap-3 flex-1 min-w-[200px]">
-                <span class="text-lg opacity-40">🔍</span>
-                <input 
-                    type="text" 
-                    placeholder="Buscar estudiantes, recursos, tutorías..." 
-                    class="bg-transparent border-none outline-none text-sm font-medium text-slate-400 w-full"
-                />
+    <div class="dashboard-header-wrap">
+        <div class="search-bar">
+            <div class="search-input-wrapper">
+                <lucide-icon [img]="Search" [size]="18" class="opacity-40"></lucide-icon>
+                <input type="text" placeholder="Buscar estudiantes, recursos, tutorías..." class="search-input" />
             </div>
-            <div class="flex items-center gap-4 overflow-visible">
+            <div class="header-actions">
                 <app-notification-bell [user]="user"></app-notification-bell>
-                <div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/60">{{user.role}}</span>
+                <div class="header-divider"></div>
+                <span class="user-role-badge">{{user.role}}</span>
             </div>
         </div>
     </div>
 
-    <div class="flex-1 p-8 space-y-6">
+    <div class="dashboard-body">
 
-        <div *ngIf="!loading && (user.role === 'docente' || user.role === 'DOCENTE') && data" class="space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h2 class="text-2xl font-black text-slate-800 tracking-tight">Dashboard de Seguimiento Académico</h2>
-                <p class="text-slate-400 text-sm font-medium">Monitoreo integral basado en el nivel de riesgo y rendimiento por sección</p>
+        <div *ngIf="!loading && (user.role === 'docente' || user.role === 'DOCENTE') && data"
+            class="dashboard-view-docente animate-in fade-in duration-500">
+            <div class="dashboard-title-block">
+                <h2 class="dashboard-title">Dashboard de Seguimiento Académico</h2>
+                <p class="dashboard-subtitle">Monitoreo integral basado en el nivel de riesgo y rendimiento por sección</p>
             </div>
 
-            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex flex-col justify-between">
-                    <div class="flex justify-between items-start">
-                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Total Estudiantes</p>
-                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-lg">👥</div>
+            <section class="kpis-grid">
+                <div class="kpi-card">
+                    <div class="kpi-card-header">
+                        <p class="kpi-card-label">Total Estudiantes</p>
+                        <div class="kpi-card-icon-container icon-blue">
+                            <lucide-icon [img]="Users" [size]="20"></lucide-icon>
+                        </div>
                     </div>
-                    <div class="mt-4">
-                        <h3 class="text-4xl font-black text-slate-900 tracking-tighter">{{data.totalStudents}}</h3>
-                        <p class="text-[10px] font-bold text-slate-300 mt-1 italic">Alumnos registrados</p>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex flex-col justify-between">
-                    <div class="flex justify-between items-start">
-                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Promedio General</p>
-                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-lg">🏅</div>
-                    </div>
-                    <div class="mt-4">
-                        <h3 class="text-4xl font-black text-slate-900 tracking-tighter">{{data.averageGrade | number:'1.1-1'}}</h3>
-                        <p class="text-[10px] font-bold text-emerald-600 mt-1">Rendimiento óptimo</p>
+                    <div class="kpi-card-body">
+                        <h3 class="kpi-card-value">{{data.totalStudents}}</h3>
+                        <p class="kpi-card-subtext">Alumnos registrados</p>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex flex-col justify-between">
-                    <div class="flex justify-between items-start">
-                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Tasa de Salud</p>
-                        <div class="w-10 h-10 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center text-lg">🎯</div>
+                <div class="kpi-card">
+                    <div class="kpi-card-header">
+                        <p class="kpi-card-label">Promedio General</p>
+                        <div class="kpi-card-icon-container icon-emerald">
+                            <lucide-icon [img]="Award" [size]="20"></lucide-icon>
+                        </div>
                     </div>
-                    <div class="mt-4">
-                        <h3 class="text-4xl font-black text-slate-900 tracking-tighter">{{globalHealth}}%</h3>
-                        <p class="text-[10px] font-bold text-slate-300 mt-1">Fuera de riesgo alto</p>
+                    <div class="kpi-card-body">
+                        <h3 class="kpi-card-value">{{data.averageGrade | number:'1.1-1'}}</h3>
+                        <p class="kpi-card-subtext-emerald">Rendimiento óptimo</p>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex flex-col justify-between">
-                    <div class="flex justify-between items-start">
-                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">En Riesgo Alto</p>
-                        <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-lg">⚠️</div>
+                <div class="kpi-card">
+                    <div class="kpi-card-header">
+                        <p class="kpi-card-label">Tasa de Salud</p>
+                        <div class="kpi-card-icon-container icon-violet">
+                            <lucide-icon [img]="Target" [size]="20"></lucide-icon>
+                        </div>
                     </div>
-                    <div class="mt-4">
-                        <h3 class="text-4xl font-black text-slate-900 tracking-tighter">{{data.highRiskCount}}</h3>
-                        <p class="text-[10px] font-bold text-rose-600 mt-1 italic">Requieren atención</p>
+                    <div class="kpi-card-body">
+                        <h3 class="kpi-card-value">{{globalHealth}}%</h3>
+                        <p class="kpi-card-subtext">Fuera de riesgo alto</p>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-card-header">
+                        <p class="kpi-card-label">En Riesgo Alto</p>
+                        <div class="kpi-card-icon-container icon-rose">
+                            <lucide-icon [img]="AlertTriangle" [size]="20"></lucide-icon>
+                        </div>
+                    </div>
+                    <div class="kpi-card-body">
+                        <h3 class="kpi-card-value">{{data.highRiskCount}}</h3>
+                        <p class="kpi-card-subtext-rose">Requieren atención</p>
                     </div>
                 </div>
             </section>
 
-            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-                <div class="col-span-1 lg:col-span-2 bg-white rounded-[1.5rem] p-6 md:p-8 border border-slate-100">
-                    <div class="flex justify-between items-start mb-8">
+            <section class="charts-row">
+                <div class="trend-chart-card">
+                    <div class="chart-header">
                         <div>
-                            <h3 class="font-bold text-slate-800 text-lg">Tendencia de Rendimiento</h3>
-                            <p class="text-slate-400 text-xs">Evolución mensual proyectada según promedios actuales</p>
+                            <h3 class="chart-title">Tendencia de Rendimiento</h3>
+                            <p class="chart-subtitle">Evolución mensual proyectada según promedios actuales</p>
                         </div>
                     </div>
-                    <div class="h-64 relative flex items-end justify-between px-2 border-l border-b border-slate-100">
-                        <div class="absolute inset-0 bg-gradient-to-t from-emerald-500/10 to-transparent opacity-50"></div>
-                        <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-                            <path [attr.d]="'M0,150 Q150,' + (200 - data.averageGrade*6) + ' 300,140 T600,110'" fill="none" stroke="#10b981" stroke-width="3" />
+                    <div class="svg-chart-container">
+                        <svg class="svg-chart" viewBox="0 0 600 240" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="gradientDocente" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#10b981" stop-opacity="0.2" />
+                                    <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+                                </linearGradient>
+                            </defs>
+                            <path [attr.d]="trendAreaPath" fill="url(#gradientDocente)" />
+                            <path [attr.d]="trendLinePath" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        <span *ngFor="let mes of ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']" class="text-[10px] font-bold text-slate-300 pb-2 z-10">{{mes}}</span>
+                        <span *ngFor="let mes of ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']"
+                            class="svg-chart-labels">{{mes}}</span>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-[1.5rem] p-6 md:p-8 border border-slate-100">
-                    <h3 class="font-bold text-slate-800 text-lg mb-8">Distribución de Riesgo</h3>
-                    <div class="relative flex items-center justify-center mb-8">
-                        <div class="w-44 h-44 rounded-full border-[14px] border-emerald-500 border-t-amber-500 border-r-rose-500 rotate-45 shadow-inner"></div>
-                        <div class="absolute flex flex-col items-center">
-                            <span class="text-[10px] font-bold text-slate-300 uppercase">Salud Aula</span>
-                            <span class="text-2xl font-black text-slate-800">{{globalHealth}}%</span>
+                <div class="donut-chart-card">
+                    <h3 class="donut-chart-title">Distribución de Riesgo</h3>
+                    <div class="donut-chart-wrapper">
+                        <div class="donut-chart" [style.background]="getConicGradient()">
+                            <div class="donut-chart-center">
+                                <span class="donut-chart-label">Salud Aula</span>
+                                <span class="donut-chart-value">{{globalHealth}}%</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="w-full space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
-                                <span class="text-xs font-bold text-slate-500">Estable</span>
+                    <div class="legend-list">
+                        <div class="legend-item">
+                            <div class="legend-label-wrapper">
+                                <div class="legend-dot-emerald"></div>
+                                <span class="legend-text">Estable</span>
                             </div>
-                            <span class="text-xs font-black text-slate-800">{{distribucionRiesgo.bajo}}%</span>
+                            <span class="legend-value">{{distribucionRiesgo.bajo}}%</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
-                                <span class="text-xs font-bold text-slate-500">Riesgo Medio</span>
+                        <div class="legend-item">
+                            <div class="legend-label-wrapper">
+                                <div class="legend-dot-amber"></div>
+                                <span class="legend-text">Riesgo Medio</span>
                             </div>
-                            <span class="text-xs font-black text-slate-800">{{distribucionRiesgo.medio}}%</span>
+                            <span class="legend-value">{{distribucionRiesgo.medio}}%</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-3 h-3 bg-rose-500 rounded-full"></div>
-                                <span class="text-xs font-bold text-slate-500">Alto Riesgo</span>
+                        <div class="legend-item">
+                            <div class="legend-label-wrapper">
+                                <div class="legend-dot-rose"></div>
+                                <span class="legend-text">Alto Riesgo</span>
                             </div>
-                            <span class="text-xs font-black text-slate-800">{{distribucionRiesgo.alto}}%</span>
+                            <span class="legend-value">{{distribucionRiesgo.alto}}%</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8">
-                <div class="col-span-1 md:col-span-2 bg-white rounded-[1.5rem] p-6 md:p-8 border border-slate-100">
-                    <h3 class="font-bold text-slate-800 text-lg mb-2">Estudiantes por Sección</h3>
-                    <p class="text-slate-400 text-xs mb-8">Distribución actual en base de datos</p>
-                    <div class="h-56 flex items-end justify-around gap-4 px-4">
-                        <div *ngFor="let g of statsGrados" class="flex flex-col items-center gap-3 flex-1 h-full justify-end group">
-                            <div class="w-8 sm:w-12 bg-blue-600/80 rounded-t-xl transition-all duration-700 hover:bg-blue-600" 
-                                 [style.height]="g.h"></div>
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{{g.l}}</span>
+            <section class="stats-and-risk-row">
+                <div class="students-per-course-card">
+                    <h3 class="card-title">Estudiantes por Curso</h3>
+                    <p class="card-subtitle">Distribución de alumnos matriculados por materia</p>
+                    <div class="bar-chart-container">
+                        <div *ngFor="let g of statsGrados" class="bar-chart-group group">
+                            <div class="bar-chart-fill" [style.height]="g.h"></div>
+                            <span class="bar-chart-label">{{g.l}}</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-[1.5rem] p-6 md:p-8 border border-slate-100">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                        <div>
-                            <h3 class="font-bold text-slate-800 text-lg">Estudiantes en Riesgo</h3>
-                            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest text-rose-500">Personal con estado: Alto Riesgo</p>
+                <div class="high-risk-card">
+                    <div class="high-risk-header">
+                        <div class="high-risk-title-wrapper">
+                            <h3 class="high-risk-title">Estudiantes en Riesgo</h3>
+                            <p class="high-risk-subtitle">Personal con estado: Alto Riesgo</p>
                         </div>
-                        <button class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700 transition-colors">Ver todos</button>
+                        <button class="btn-view-all">Ver todos</button>
                     </div>
 
-                    <div class="space-y-3 overflow-x-auto pb-2">
+                    <div class="high-risk-list">
                         <ng-container *ngFor="let s of students">
-                            <div *ngIf="s.riskLevel === 'Alto Riesgo'" 
-                                 class="min-w-[450px] lg:min-w-0 flex items-center justify-between p-4 bg-rose-50/40 border border-rose-100 rounded-2xl transition-all hover:bg-rose-50/60">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 bg-white shadow-sm border border-rose-200 rounded-full flex items-center justify-center font-black text-xs text-rose-600">
+                            <div *ngIf="s.riskLevel === 'Alto Riesgo'" class="high-risk-item">
+                                <div class="student-info">
+                                    <div class="avatar-rose">
                                         {{s.name[0]}}
                                     </div>
                                     <div>
-                                        <p class="text-sm font-bold text-slate-800">{{s.name}}</p>
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase">Sección {{s.grade}} • Cod: {{s.code}}</p>
+                                        <p class="student-name">{{s.name}}</p>
+                                        <p class="student-meta">Sección {{s.grade}} • Cod: {{s.code}}</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-8">
-                                    <div class="text-right">
-                                        <p class="text-[8px] font-black text-slate-400 uppercase">Promedio</p>
-                                        <p class="text-sm font-black text-rose-600 italic">{{s.averageGrade | number:'1.1-1'}}</p>
+                                <div class="student-stats-group">
+                                    <div class="student-stat-block">
+                                        <p class="student-stat-label">Promedio</p>
+                                        <p class="student-stat-value student-stat-value-rose">{{s.averageGrade | number:'1.1-1'}}</p>
                                     </div>
-                                    <div class="text-right">
-                                        <p class="text-[8px] font-black text-slate-400 uppercase">Faltas</p>
-                                        <p class="text-sm font-bold text-slate-700">{{s.absences}}</p>
+                                    <div class="student-stat-block">
+                                        <p class="student-stat-label">Faltas</p>
+                                        <p class="student-stat-value student-stat-value-dark">{{s.absences}}</p>
                                     </div>
-                                    <span class="px-3 py-1 rounded-lg text-[8px] font-black uppercase bg-rose-600 text-white shadow-sm">
+                                    <span class="risk-badge-rose">
                                         {{s.riskLevel}}
                                     </span>
                                 </div>
                             </div>
                         </ng-container>
-                        
-                        <div *ngIf="data?.highRiskCount === 0" class="py-10 text-center">
-                            <p class="text-xs font-bold text-slate-400 italic">No hay estudiantes en situación de riesgo alto actualmente.</p>
+
+                        <div *ngIf="data?.highRiskCount === 0" class="empty-risk-state">
+                            <p class="empty-risk-text">No hay estudiantes en situación de riesgo alto actualmente.</p>
                         </div>
                     </div>
                 </div>
             </section>
         </div>
 
-        <div *ngIf="user.role === 'estudiante'" class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-xl shadow-blue-200">
-                <div class="relative z-10 text-left">
-                    <h2 class="text-3xl font-black tracking-tighter">¡Bienvenido de vuelta, {{firstName}}!</h2>
-                    <p class="text-blue-100 font-medium mt-1">Aquí está tu resumen académico del día</p>
+        <div *ngIf="user.role === 'estudiante'"
+            class="dashboard-view-estudiante animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div class="welcome-banner">
+                <div class="welcome-banner-content">
+                    <h2 class="welcome-banner-title">¡Bienvenido de vuelta, {{firstName}}!</h2>
+                    <p class="welcome-banner-subtitle">Aquí está tu resumen académico del día</p>
                 </div>
-                <div class="absolute top-[-50px] right-[-50px] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="welcome-banner-bg-circle"></div>
             </div>
 
-            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                <div class="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex flex-col justify-between">
-                    <div class="text-left">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Promedio General</p>
-                        <h4 class="text-2xl font-black text-slate-900 leading-none">16.5</h4>
-                        <p class="text-[9px] font-bold text-emerald-500 mt-2">+0.5 vs mes anterior</p>
+            <section class="estudiante-kpis-grid">
+                <div class="estudiante-kpi-card">
+                    <div class="estudiante-kpi-text-block">
+                        <p class="estudiante-kpi-label">Promedio General</p>
+                        <h4 class="estudiante-kpi-value">
+                            {{ promedioCalculadoEstudiante | number:'1.1-1' }}
+                        </h4>
+                        <p class="estudiante-kpi-trend" [ngClass]="esTendenciaPositiva ? 'text-emerald-500' : 'text-rose-500'">
+                            <span *ngIf="tendenciaMensual !== 'Estable'">{{ tendenciaMensual }} vs mes anterior</span>
+                            <span *ngIf="tendenciaMensual === 'Estable'">Inicio de ciclo académico</span>
+                        </p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl">🏅</div>
+                    <div class="estudiante-kpi-icon-wrapper-blue">
+                        <lucide-icon [img]="Award" [size]="24"></lucide-icon>
+                    </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
-                    <div class="text-left">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Asistencia</p>
-                        <h4 class="text-2xl font-black text-slate-900 leading-none">94%</h4>
-                        <p class="text-[9px] font-bold text-emerald-500 mt-2">38 de 40 clases</p>
+                <div class="estudiante-kpi-card">
+                    <div class="estudiante-kpi-text-block">
+                        <p class="estudiante-kpi-label">Asistencia</p>
+                        <h4 class="estudiante-kpi-value">{{studentAttendancePct}}%</h4>
+                        <p class="estudiante-kpi-subtext">{{studentAttendedClasses}} de {{studentTotalClasses}} clases</p>
                     </div>
-                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl">✅</div>
+                    <div class="estudiante-kpi-icon-wrapper-emerald">
+                        <lucide-icon [img]="Check" [size]="24"></lucide-icon>
+                    </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
-                    <div class="text-left">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tareas Pendientes</p>
-                        <h4 class="text-2xl font-black text-slate-900 leading-none">4</h4>
-                        <p class="text-[9px] font-bold text-orange-600 mt-2">2 urgentes</p>
+                <div class="estudiante-kpi-card">
+                    <div class="estudiante-kpi-text-block">
+                        <p class="estudiante-kpi-label">Tareas Pendientes</p>
+                        <h4 class="estudiante-kpi-value">{{studentPendingTasksCount}}</h4>
+                        <p class="estudiante-kpi-subtext-orange">Por entregar</p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center text-xl">⏰</div>
+                    <div class="estudiante-kpi-icon-wrapper-orange">
+                        <lucide-icon [img]="Clock" [size]="24"></lucide-icon>
+                    </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
-                    <div class="text-left">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Cursos Matriculados</p>
-                        <h4 class="text-2xl font-black text-slate-900 leading-none">6</h4>
-                        <p class="text-[9px] font-bold text-purple-600 mt-2">Ciclo 2026-I</p>
+                <div class="estudiante-kpi-card">
+                    <div class="estudiante-kpi-text-block">
+                        <p class="estudiante-kpi-label">Tasa de Entrega</p>
+                        <h4 class="estudiante-kpi-value">{{studentSubmissionRate}}%</h4>
+                        <p class="estudiante-kpi-subtext-indigo">{{studentSubmittedTasksCount}} entregadas</p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-xl">📖</div>
+                    <div class="estudiante-kpi-icon-wrapper-indigo">
+                        <lucide-icon [img]="Target" [size]="24"></lucide-icon>
+                    </div>
+                </div>
+
+                <div class="estudiante-kpi-card">
+                    <div class="estudiante-kpi-text-block">
+                        <p class="estudiante-kpi-label">Puntualidad</p>
+                        <h4 class="estudiante-kpi-value">{{studentPunctualityRate}}%</h4>
+                        <p class="estudiante-kpi-subtext-rose">{{studentOnTimeTasksCount}} a tiempo</p>
+                    </div>
+                    <div class="estudiante-kpi-icon-wrapper-rose">
+                        <lucide-icon [img]="TrendingUp" [size]="24"></lucide-icon>
+                    </div>
                 </div>
             </section>
 
-            <!-- SECCIÓN DE GRÁFICOS DINÁMICOS -->
-            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                <!-- 1. GRÁFICO DE EVOLUCIÓN (Dinámico basado en BD) -->
-                <div class="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-[2.5rem] p-6 md:p-8 border border-slate-100 shadow-sm">
-                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">📈 Evolución de Promedio</h3>
-                    <div class="h-48 w-full bg-slate-50/50 rounded-2xl flex items-end justify-between px-6 pb-6 border-2 border-dashed border-slate-100 relative overflow-hidden">
-                        <!-- Puntos de evolución -->
-                        <div *ngFor="let ev of averageEvolution" 
-                             class="flex flex-col items-center gap-2 z-10 group cursor-help">
-                            <div class="w-3 h-3 bg-blue-600 rounded-full shadow-lg shadow-blue-200 group-hover:scale-150 transition-transform relative"
-                                 [style.marginBottom.px]="ev.value * 4">
-                                <span class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                    {{ev.value | number:'1.1-1'}}
-                                </span>
-                            </div>
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">{{ev.month}}</span>
+            <section *ngIf="coursesInRisk.length > 0" class="refuerzo-section alert-active animate-in fade-in duration-500">
+                <div class="refuerzo-header">
+                    <div class="refuerzo-title-area">
+                        <div class="refuerzo-icon-wrapper pulse-animation">
+                            <lucide-icon [img]="Sparkles" [size]="20" class="text-amber-600"></lucide-icon>
                         </div>
-                        
-                        <!-- Estado vacío -->
-                        <div *ngIf="averageEvolution.length === 0" class="absolute inset-0 flex items-center justify-center">
-                            <p class="text-[10px] font-black text-slate-300 uppercase italic">Sin datos de evolución</p>
+                        <div>
+                            <h3 class="refuerzo-title">Plan de Refuerzo Académico Sugerido</h3>
+                            <p class="refuerzo-subtitle">
+                                Basado en tu rendimiento actual, te recomendamos repasar material de apoyo para las siguientes asignaturas:
+                                <span class="badge-risk-course" *ngFor="let course of coursesInRisk">{{course}}</span>
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. GRÁFICO DE BARRAS DINÁMICO (Notas reales por Curso) -->
-                <div class="col-span-1 md:col-span-2 bg-white rounded-[2.5rem] p-6 md:p-8 border border-slate-100 shadow-sm">
-                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">📊 Notas por Curso</h3>
-                    <div class="h-48 flex items-end justify-between gap-2 px-2">
-                        <!-- Renderiza una barra por cada curso -->
-                        <div *ngFor="let grade of studentGrades" class="flex flex-col items-center gap-3 flex-1 h-full justify-end group">
-                            <div class="w-full bg-blue-500/10 rounded-t-lg relative flex items-end h-32 overflow-hidden">
-                                <div class="w-full bg-blue-600 rounded-t-lg transition-all duration-1000 shadow-[0_-4px_10px_rgba(37,99,235,0.2)] group-hover:bg-blue-500" 
-                                     [style.height]="grade.percentage">
-                                    <div class="absolute top-2 left-0 w-full text-center text-[8px] font-black text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="refuerzo-grid" *ngIf="recommendedResources.length > 0; else noResourcesFound">
+                    <div *ngFor="let recurso of recommendedResources" class="recurso-card-mini group">
+                        <div class="recurso-card-mini-body">
+                            <div class="recurso-icon-box" [ngClass]="{
+                                'pdf-bg': recurso.type === 'PDF',
+                                'video-bg': recurso.type === 'Video',
+                                'ppt-bg': recurso.type === 'PPT' || recurso.type === 'Presentacion',
+                                'default-bg': recurso.type !== 'PDF' && recurso.type !== 'Video' && recurso.type !== 'PPT' && recurso.type !== 'Presentacion'
+                            }">
+                                <lucide-icon *ngIf="recurso.type === 'PDF'" [img]="FileText" [size]="20" class="text-rose-500"></lucide-icon>
+                                <lucide-icon *ngIf="recurso.type === 'Video'" [img]="Video" [size]="20" class="text-blue-500"></lucide-icon>
+                                <lucide-icon *ngIf="recurso.type !== 'PDF' && recurso.type !== 'Video'" [img]="Presentation" [size]="20" class="text-orange-500"></lucide-icon>
+                            </div>
+                            <div class="recurso-card-mini-info">
+                                <h4 class="recurso-card-mini-title">{{recurso.title}}</h4>
+                                <div class="recurso-card-mini-meta">
+                                    <span class="meta-subject">{{recurso.subject}}</span>
+                                    <span class="meta-divider">•</span>
+                                    <span class="meta-type">{{recurso.type}}</span>
+                                    <span class="meta-divider" *ngIf="recurso.stats">•</span>
+                                    <span class="meta-stats" *ngIf="recurso.stats">{{recurso.stats}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="recurso-card-mini-actions">
+                            <button (click)="viewResource(recurso)" class="btn-action-mini" title="Visualizar">
+                                <lucide-icon [img]="BookOpen" [size]="16"></lucide-icon>
+                                <span>Ver</span>
+                            </button>
+                            <button (click)="downloadResource(recurso)" class="btn-action-mini secondary" title="Descargar" *ngIf="recurso.img">
+                                <lucide-icon [img]="Download" [size]="16"></lucide-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <ng-template #noResourcesFound>
+                    <div class="refuerzo-empty-resources">
+                        <p>No se encontraron materiales de estudio cargados en el sistema específicamente para estas asignaturas. Te recomendamos consultar directamente con tu tutor.</p>
+                    </div>
+                </ng-template>
+            </section>
+
+            <section *ngIf="coursesInRisk.length === 0" class="refuerzo-section no-risk animate-in fade-in duration-500">
+                <div class="refuerzo-header">
+                    <div class="refuerzo-title-area">
+                        <div class="refuerzo-icon-wrapper-success">
+                            <lucide-icon [img]="ThumbsUp" [size]="20" class="text-emerald-600"></lucide-icon>
+                        </div>
+                        <div>
+                            <h3 class="refuerzo-title">¡Excelente rendimiento académico!</h3>
+                            <p class="refuerzo-subtitle-success">
+                                Mantienes un promedio saludable superior a 13.0 en todas tus asignaturas matriculadas. ¡Sigue esforzándote de la misma manera!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="estudiante-charts-row">
+                <div class="evolution-chart-card">
+                    <h3 class="evolution-chart-title">
+                        <lucide-icon [img]="TrendingUp" [size]="16" class="text-orange-500"></lucide-icon> Evolución de Promedio
+                    </h3>
+                    <div class="evolution-chart-container">
+                        <div *ngFor="let ev of averageEvolution" class="evolution-point-group group">
+                            <div class="evolution-point" [style.marginBottom.px]="ev.value * 4">
+                                <span class="evolution-point-tooltip">
+                                    {{ev.value | number:'1.1-1'}}
+                                </span>
+                            </div>
+                            <span class="evolution-point-label">{{ev.month}}</span>
+                        </div>
+                        <div *ngIf="averageEvolution.length === 0" class="evolution-empty-state">
+                            <p class="evolution-empty-text">Sin datos de evolución</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grades-chart-card">
+                    <h3 class="grades-chart-title">
+                        <lucide-icon [img]="BarChart3" [size]="16" class="text-indigo-500"></lucide-icon> Notas por Curso
+                    </h3>
+                    <div class="grades-chart-container">
+                        <div *ngFor="let grade of studentGrades" class="grades-bar-group group">
+                            <div class="grades-bar-wrap">
+                                <div class="grades-bar-fill" [style.height]="grade.percentage">
+                                    <div class="grades-bar-tooltip">
                                         {{grade.value}}
                                     </div>
                                 </div>
                             </div>
-                            <span class="text-[9px] font-black text-slate-400 uppercase truncate w-full text-center">{{grade.label}}</span>
+                            <span class="grades-bar-label">{{grade.label}}</span>
                         </div>
-                        
-                        <!-- Estado de carga/vacío -->
-                        <div *ngIf="studentGrades.length === 0" class="w-full text-center py-10">
-                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-tighter italic">Sincronizando notas...</p>
+                        <div *ngIf="studentGrades.length === 0" class="grades-empty-state">
+                            <p class="grades-empty-text">Sincronizando notas...</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
-                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <span class="text-orange-500">🕙</span> Tareas Pendientes
+            <section class="estudiante-tasks-evals-row">
+                <div class="tasks-card">
+                    <h3 class="tasks-card-title">
+                        <lucide-icon [img]="Clock" [size]="16" class="text-orange-500"></lucide-icon> Tareas Pendientes
                     </h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-50 text-left">
-                            <div class="flex items-center gap-4">
-                                <div class="w-2 h-2 bg-rose-500 rounded-full"></div>
-                                <div>
-                                    <p class="text-xs font-black text-slate-800 leading-tight">Ensayo sobre la Revolución Industrial</p>
-                                    <p class="text-[10px] font-bold text-slate-400 mt-1">Historia • 🗓️ 17 abr</p>
+                    <div class="tasks-list">
+                        <div *ngFor="let task of studentTasks" class="task-item">
+                            <div class="task-info-wrapper">
+                                <div [ngClass]="task.status === 'Pendiente' ? 'task-dot-rose' : 'task-dot-emerald'"></div>
+                                <div class="task-details">
+                                    <p class="task-title" [ngStyle]="{'text-decoration': task.status !== 'Pendiente' ? 'line-through' : 'none'}">{{task.title}}</p>
+                                    <p class="task-meta">{{task.courseName}} • <lucide-icon [img]="Calendar" [size]="10" class="inline"></lucide-icon> {{task.dueDate}}</p>
                                 </div>
                             </div>
-                            <span class="px-3 py-1 bg-white rounded-lg text-[9px] font-black text-slate-400 uppercase border border-slate-100">Pendiente</span>
+                            <div class="flex items-center gap-2">
+                                <button *ngIf="task.status === 'Pendiente'" (click)="abrirModalEntregar(task)" class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1 shadow-sm">
+                                    <lucide-icon [img]="Check" [size]="12"></lucide-icon> Entregar
+                                </button>
+                                <span class="task-status-badge" [ngClass]="task.status === 'Pendiente' ? 'bg-amber-100 text-amber-800' : (task.status === 'Atrasado' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800')">
+                                    {{task.status}}
+                                </span>
+                            </div>
                         </div>
-                        <div class="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-50 text-left">
-                            <div class="flex items-center gap-4">
-                                <div class="w-2 h-2 bg-rose-500 rounded-full"></div>
-                                <div>
-                                    <p class="text-xs font-black text-slate-800 leading-tight">Resolver ejercicios de Cálculo Integral</p>
-                                    <p class="text-[10px] font-bold text-slate-400 mt-1">Matemáticas • 🗓️ 18 abr</p>
-                                </div>
-                            </div>
-                            <span class="px-3 py-1 bg-white rounded-lg text-[9px] font-black text-slate-400 uppercase border border-slate-100">Pendiente</span>
+                        <div *ngIf="studentTasks.length === 0" class="py-6 text-center text-slate-400 text-sm">
+                            No tienes tareas pendientes
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm text-left">
-                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <span class="text-blue-500">🗓️</span> Próximas Evaluaciones
+                <div class="upcoming-evals-card">
+                    <h3 class="upcoming-evals-title">
+                        <lucide-icon [img]="Calendar" [size]="16" class="text-blue-500"></lucide-icon> Próximas Evaluaciones
                     </h3>
-                    <div class="space-y-4 text-left">
-                        <div class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl transition-colors text-left">
-                            <div class="bg-blue-600 text-white p-3 rounded-xl text-center min-w-[50px] shadow-lg shadow-blue-100">
-                                <p class="text-[10px] font-black leading-none">18</p>
-                                <p class="text-[8px] font-bold uppercase mt-1">abr</p>
+                    <div class="upcoming-evals-list">
+                        <div class="upcoming-eval-item">
+                            <div class="upcoming-eval-date-badge">
+                                <p class="upcoming-eval-date-day">18</p>
+                                <p class="upcoming-eval-date-month">abr</p>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-xs font-black text-slate-800">Examen Parcial - Álgebra</p>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase mt-1">🕒 08:00 AM</p>
+                            <div class="upcoming-eval-info">
+                                <p class="upcoming-eval-title">Examen Parcial - Álgebra</p>
+                                <p class="upcoming-eval-time">
+                                    <lucide-icon [img]="Clock" [size]="10" class="inline"></lucide-icon> 08:00 AM
+                                </p>
                             </div>
-                            <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase bg-purple-100 text-purple-600">Examen</span>
+                            <span class="upcoming-eval-type-badge">Examen</span>
                         </div>
                     </div>
                 </div>
             </section>
+        </div>
+    </div>
+
+    <div *ngIf="showSubmitTaskModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 flex flex-col animate-in zoom-in-95 duration-300">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                <div>
+                    <h3 class="text-base font-black text-slate-800 uppercase tracking-wider">Entregar Asignación</h3>
+                    <p class="text-xs text-slate-500 font-bold mt-0.5">{{ selectedSubmitTask?.title }}</p>
+                </div>
+                <button (click)="cerrarModalEntregar()" class="p-2 hover:bg-slate-200/60 text-slate-400 hover:text-slate-600 rounded-full transition-colors">
+                    <lucide-icon [img]="X" [size]="18"></lucide-icon>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Formato de Entrega</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button (click)="submissionType = 'FILE'" [ngClass]="submissionType === 'FILE' ? 'border-emerald-500 bg-emerald-50/40 text-emerald-800' : 'border-slate-200 hover:border-slate-300 text-slate-600'" class="py-3 px-4 rounded-2xl border-2 font-bold text-xs flex flex-col items-center justify-center gap-1.5 transition-all">
+                            <lucide-icon [img]="Upload" [size]="20" [class.text-emerald-600]="submissionType === 'FILE'"></lucide-icon>
+                            Subir Archivo
+                            <span class="text-[9px] font-medium text-slate-400 mt-0.5">(Word, PPT, Imagen, PDF)</span>
+                        </button>
+                        <button (click)="submissionType = 'LINK'" [ngClass]="submissionType === 'LINK' ? 'border-emerald-500 bg-emerald-50/40 text-emerald-800' : 'border-slate-200 hover:border-slate-300 text-slate-600'" class="py-3 px-4 rounded-2xl border-2 font-bold text-xs flex flex-col items-center justify-center gap-1.5 transition-all">
+                            <lucide-icon [img]="Link" [size]="20" [class.text-emerald-600]="submissionType === 'LINK'"></lucide-icon>
+                            Compartir Enlace
+                            <span class="text-[9px] font-medium text-slate-400 mt-0.5">(Video URL, Google Drive)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="submissionType === 'FILE'" class="space-y-2">
+                    <label class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Seleccionar Documento</label>
+                    <div class="relative border-2 border-dashed border-slate-200 rounded-2xl p-6 hover:border-emerald-400 hover:bg-emerald-50/10 transition-colors flex flex-col items-center justify-center text-center">
+                        <input type="file" (change)="onFileSelected($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" />
+                        <lucide-icon [img]="Upload" [size]="28" class="text-slate-300 mb-2"></lucide-icon>
+                        <p class="text-xs font-bold text-slate-700">Arrastra tu archivo aquí o haz clic para buscar</p>
+                        <p class="text-[10px] font-semibold text-slate-400 mt-1">Formatos permitidos: Word, PPT, PDF, PNG, JPG (máx. 10MB)</p>
+                    </div>
+                    <div *ngIf="submissionFileName" class="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between animate-in slide-in-from-top-2 duration-200">
+                        <div class="flex items-center gap-2">
+                            <lucide-icon [img]="FileText" [size]="16" class="text-emerald-500"></lucide-icon>
+                            <span class="text-xs font-bold text-slate-700 max-w-[280px] truncate">{{ submissionFileName }}</span>
+                        </div>
+                        <button (click)="submissionFileName = ''; submissionContent = ''" class="text-slate-400 hover:text-rose-500 p-1 rounded-lg hover:bg-slate-200/50 transition-colors">
+                            <lucide-icon [img]="X" [size]="14"></lucide-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="submissionType === 'LINK'" class="space-y-2">
+                    <label class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Enlace o URL de la Tarea</label>
+                    <div class="flex items-center gap-2 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus-within:border-emerald-500 transition-colors">
+                        <lucide-icon [img]="Link" [size]="16" class="text-slate-400"></lucide-icon>
+                        <input type="url" [(ngModel)]="submissionContent" placeholder="https://youtube.com/watch?v=... o https://drive.google.com/..." class="w-full bg-transparent border-none text-xs font-bold text-slate-700 placeholder:text-slate-400 outline-none" />
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Comentario para el Profesor (Opcional)</label>
+                    <textarea [(ngModel)]="studentComment" placeholder="Escribe un mensaje o indicación adicional para el docente..." rows="3" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl focus:border-emerald-500 outline-none text-xs font-bold text-slate-700 placeholder:text-slate-400 resize-none transition-colors"></textarea>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                <button (click)="cerrarModalEntregar()" class="px-4 py-2 border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-bold rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button (click)="confirmarEntregarTarea()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-500/10 transition-colors">
+                    Enviar Tarea
+                </button>
+            </div>
         </div>
     </div>
 </main>
