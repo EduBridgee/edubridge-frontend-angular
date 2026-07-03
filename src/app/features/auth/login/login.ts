@@ -116,6 +116,7 @@ export class LoginComponent implements OnInit {
 
         if (token) {
           localStorage.setItem('token', token);
+          localStorage.setItem('auth_token', token);
         } else {
           console.warn("No se recibió un token en la respuesta del login.");
         }
@@ -190,7 +191,7 @@ export class LoginComponent implements OnInit {
         this.notificationService.showSuccess("Código de verificación enviado a tu correo.", "Correo Enviado");
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.loading = false;
         this.notificationService.showError("No se pudo enviar el correo de recuperación.", "Error");
         this.cdr.detectChanges();
@@ -226,7 +227,7 @@ export class LoginComponent implements OnInit {
         this.notificationService.showSuccess("Contraseña restablecida con éxito.", "Contraseña Actualizada");
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.loading = false;
         this.notificationService.showError(err.error?.message || "Código inválido o expirado.", "Error al cambiar contraseña");
         this.cdr.detectChanges();
