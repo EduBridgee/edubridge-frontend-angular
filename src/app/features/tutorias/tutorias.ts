@@ -4,42 +4,24 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell';
-import { NotificationService } from '../../core/services/notification';
-import { RoleService } from '../../core/services/role';
-import { API_BASE_URL } from '../../core/config/api.config';
-import { LucideAngularModule, Search, Plus, Calendar, Users, Clock, Star, MessageCircle, Monitor, BookOpen, ChevronDown, Check, X } from 'lucide-angular';
 
 @Component({
   selector: 'app-tutorias',
   standalone: true,
-  imports: [CommonModule, FormsModule, NotificationBellComponent, LucideAngularModule],
+  imports: [CommonModule, FormsModule, NotificationBellComponent],
   templateUrl: './tutorias.html',
   styleUrl: './tutorias.css'
 })
 export class TutoriasComponent implements OnInit {
   @Input() user: any = JSON.parse(localStorage.getItem('user') || '{}');
 
-  readonly Search = Search;
-  readonly Plus = Plus;
-  readonly Calendar = Calendar;
-  readonly Users = Users;
-  readonly Clock = Clock;
-  readonly Star = Star;
-  readonly MessageCircle = MessageCircle;
-  readonly Monitor = Monitor;
-  readonly BookOpen = BookOpen;
-  readonly ChevronDown = ChevronDown;
-  readonly Check = Check;
-  readonly X = X;
-
   sessions: any[] = [];
   filteredSessions: any[] = [];
-  teachers: any[] = [];
   searchTerm: string = '';
   loading: boolean = true;
   activeTab: string = 'mis-tutorias';
 
-  private apiUrl = `${API_BASE_URL}/tutoring`;
+  private apiUrl = 'http://localhost:8081/api/tutoring';
 
   teacherKpis = {
     todaySessions: 0,
@@ -48,16 +30,10 @@ export class TutoriasComponent implements OnInit {
     satisfaction: 4.8
   };
 
-  constructor(
-    private http: HttpClient,
-    private cdr: ChangeDetectorRef,
-    private notificationService: NotificationService,
-    private roleService: RoleService
-  ) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.fetchTutorias();
-    this.fetchTeachers();
   }
 
   fetchTutorias() {
@@ -65,19 +41,14 @@ export class TutoriasComponent implements OnInit {
     this.http.get<any[]>(this.apiUrl)
       .subscribe({
         next: (data) => {
-          const isDocente = this.roleService.isDocente(this.user.role);
-          if (isDocente) {
-            this.sessions = data.filter(s => {
-              const sName = s.teacherName ? s.teacherName.trim() : '';
-              const uName = this.user.name ? this.user.name.trim() : '';
-              return sName === uName && s.status !== 'Cancelada';
-            });
+          if (this.user.role === 'docente' || this.user.role === 'DOCENTE') {
+            this.sessions = data.filter(s => s.teacherName === this.user.name && s.status !== 'Cancelada');
             this.calcularKpisDocente();
           } else {
             this.sessions = data.filter(s => s.status !== 'Cancelada');
           }
 
-          this.filtrarTutorias();
+          this.filteredSessions = [...this.sessions];
           this.loading = false;
           this.cdr.detectChanges();
         },
@@ -89,52 +60,26 @@ export class TutoriasComponent implements OnInit {
       });
   }
 
-  fetchTeachers() {
-    
-    this.http.get<any[]>(`${API_BASE_URL}/teachers`).subscribe({
-      next: (data) => {
-        this.teachers = data.map(t => ({
-          n: t.name,
-          s: t.specialization || (t.course ? t.course.name : 'General'),
-          i: this.getInitials(t.name)
-        }));
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error("Error al cargar docentes:", err)
-    });
-  }
-  getInitials(name: string): string {
-    if (!name) return '??';
-    const parts = name.split(' ');
-    return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
-  }
-
   calcularKpisDocente() {
     const hoy = new Date().toLocaleDateString();
     this.teacherKpis.todaySessions = this.sessions.filter(s => new Date(s.startTime).toLocaleDateString() === hoy).length;
     this.teacherKpis.activeStudents = this.sessions.reduce((acc, s) => acc + (s.studentCount || 0), 0);
-    this.teacherKpis.totalHours = this.sessions.length * 1.5; 
+    this.teacherKpis.totalHours = this.sessions.length * 1.5; // Estimación: 1.5 horas por sesión
   }
 
   finalizarTutoria(id: number) {
     if (confirm('¿Deseas marcar esta tutoría como finalizada?')) {
       this.http.patch(`${this.apiUrl}/${id}/finalize`, {}).subscribe({
-        next: () => {
-          this.fetchTutorias();
-          this.notificationService.showSuccess("La tutoría ha sido marcada como finalizada.");
-        },
-        error: () => this.notificationService.showError('Error al intentar finalizar la sesión.')
+        next: () => this.fetchTutorias(),
+        error: () => alert('Error al finalizar la sesión')
       });
     }
   }
 
   aceptarSolicitud(id: number) {
     this.http.patch(`${this.apiUrl}/${id}/accept`, {}).subscribe({
-      next: () => {
-        this.fetchTutorias();
-        this.notificationService.showSuccess("Solicitud de tutoría aceptada correctamente.");
-      },
-      error: () => this.notificationService.showError('Error al confirmar la solicitud.')
+      next: () => this.fetchTutorias(),
+      error: () => alert('Error al confirmar la solicitud')
     });
   }
 
@@ -147,21 +92,16 @@ export class TutoriasComponent implements OnInit {
     const term = this.searchTerm.toLowerCase().trim();
     let base = [...this.sessions];
 
-    const isDocente = this.roleService.isDocente(this.user.role);
-    if (isDocente) {
+    // Filtrado por pestaña para Docente
+    if (this.user.role === 'docente' || this.user.role === 'DOCENTE') {
       if (this.activeTab === 'proximas' || this.activeTab === 'mis-tutorias') {
         base = base.filter(s => s.status === 'Pendiente' || s.status === 'Confirmada');
       } else if (this.activeTab === 'historial-docente') {
         base = base.filter(s => s.status === 'Finalizada');
       }
-    } else {
-      if (this.activeTab === 'mis-tutorias') {
-        base = base.filter(s => s.status === 'Pendiente' || s.status === 'Confirmada');
-      } else if (this.activeTab === 'historial') {
-        base = base.filter(s => s.status === 'Finalizada');
-      }
     }
 
+    // Filtrado por búsqueda
     if (!term) {
       this.filteredSessions = base;
     } else {
@@ -173,75 +113,10 @@ export class TutoriasComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  unirseASesion(session: any) {
-    const sessionObj = typeof session === 'string' ? { courseName: session, id: 0, status: '' } : session;
-    
-    if (sessionObj.status && sessionObj.status.toLowerCase() === 'pendiente') {
-      this.notificationService.showInfo('Espera que el profesor confirme esta reunion', 'Tutoría Pendiente');
-      return;
-    }
-
-    this.activeMeetingCourse = sessionObj.courseName;
-    this.showVideoModal = true;
-    this.cdr.detectChanges();
-
-    const cleanCourseName = sessionObj.courseName
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
-    const roomName = `EduBridge-${cleanCourseName}-${sessionObj.id}`;
-    const domain = 'meet.opensuse.org';
-    
-    if (this.jitsiAPI) {
-      this.jitsiAPI.dispose();
-      this.jitsiAPI = null;
-    }
-
-    setTimeout(() => {
-      const options = {
-        roomName: roomName,
-        width: '100%',
-        height: '100%',
-        parentNode: document.querySelector('#jitsi-iframe-container'),
-        userInfo: {
-          displayName: this.user.name || 'Usuario EduBridge',
-          email: this.user.email || ''
-        },
-        configOverwrite: {
-          lobbyEnabled: false,
-          prejoinPageEnabled: true,
-          disableDeepLinking: true,
-          startWithAudioMuted: true,
-          startWithVideoMuted: true
-        },
-        interfaceConfigOverwrite: {
-          SHOW_JITSI_WATERMARK: false,
-          SHOW_WATERMARK_FOR_GUESTS: false
-        }
-      };
-
-      this.jitsiAPI = new (window as any).JitsiMeetExternalAPI(domain, options);
-
-      if (this.roleService.isDocente(this.user.role)) {
-        this.jitsiAPI.addEventListener('videoConferenceJoined', () => {
-          this.jitsiAPI.executeCommand('toggleLobby', true);
-        });
-      }
-    }, 100);
-  }
-
-  cerrarVideoLlamada() {
-    if (this.jitsiAPI) {
-      this.jitsiAPI.dispose();
-      this.jitsiAPI = null;
-    }
-    this.showVideoModal = false;
-    this.activeMeetingCourse = '';
-    this.cdr.detectChanges();
+  unirseASesion(curso: string) {
+    const roomName = curso.toLowerCase().replace(/\s+/g, '-');
+    const meetingUrl = `https://meet.jit.si/EduBridge-${roomName}`;
+    window.open(meetingUrl, '_blank');
   }
 
   abrirPizarra(curso: string) {
@@ -253,13 +128,12 @@ export class TutoriasComponent implements OnInit {
 
   cancelarTutoria(id: number) {
     if (confirm('¿Estás seguro de que deseas cancelar esta tutoría?')) {
-      
+      // Ajustado al endpoint del backend: PATCH /api/tutoring/{id}/cancel
       this.http.patch(`${this.apiUrl}/${id}/cancel`, {}).subscribe({
         next: () => {
           this.fetchTutorias();
-          this.notificationService.showSuccess("La tutoría ha sido cancelada.");
         },
-        error: (err) => this.notificationService.showError('Error al intentar cancelar la sesión.')
+        error: (err) => alert('Error al cancelar la sesión')
       });
     }
   }
@@ -271,33 +145,15 @@ export class TutoriasComponent implements OnInit {
     const fechaActual = new Date(session.startTime);
     fechaActual.setDate(fechaActual.getDate() + 7);
 
-    
+    // Ajustado al backend: Espera un Map con "newDate" y formato ISO
     const body = { newDate: fechaActual.toISOString() };
 
     this.http.patch(`${this.apiUrl}/${id}/reschedule`, body).subscribe({
       next: (res: any) => {
         console.log("Actualizado en DB:", res);
         this.fetchTutorias();
-        this.notificationService.showSuccess("La tutoría ha sido reprogramada para la próxima semana.");
       },
-      error: (err) => this.notificationService.showError('No se pudo reprogramar la sesión automáticamente.')
-    });
-  }
-
-  calificarSesion(id: number, rating: number) {
-    this.http.patch(`${this.apiUrl}/${id}/rate`, { rating: rating }).subscribe({
-      next: (res: any) => {
-        const session = this.sessions.find(s => s.id === id);
-        if (session) {
-          session.rating = rating;
-        }
-        this.filtrarTutorias();
-        this.notificationService.showSuccess("¡Muchas gracias por calificar la tutoría!");
-      },
-      error: (err) => {
-        console.error("Error al calificar:", err);
-        this.notificationService.showError("No se pudo registrar la calificación.");
-      }
+      error: (err) => alert('Error al reprogramar automáticamente')
     });
   }
 
@@ -312,9 +168,6 @@ export class TutoriasComponent implements OnInit {
   }
 
   showModal = false;
-  showVideoModal = false;
-  activeMeetingCourse = '';
-  jitsiAPI: any = null;
   nuevaTutoria = {
     courseName: '',
     teacherName: '',
@@ -324,45 +177,45 @@ export class TutoriasComponent implements OnInit {
   };
 
   abrirModal(teacher: string) {
-    
+    // Limpiamos el objeto antes de abrir para evitar basura de registros anteriores
     this.nuevaTutoria = {
       courseName: '',
-      teacherName: teacher, 
+      teacherName: teacher, // Aquí recibe user.name
       topic: '',
       startTime: '',
       type: 'INDIVIDUAL'
     };
     this.showModal = true;
-    this.cdr.detectChanges(); 
+    this.cdr.detectChanges(); // Forzamos la detección de cambios para mostrar el modal
   }
 
   guardarTutoria() {
-    if (this.roleService.isDocente(this.user.role)) {
+    // Aseguramos que el nombre del docente sea el del usuario actual si es docente
+    if (this.user.role?.toLowerCase() === 'docente') {
       this.nuevaTutoria.teacherName = this.user.name;
     }
 
     if (!this.nuevaTutoria.courseName || !this.nuevaTutoria.startTime) {
-      this.notificationService.showInfo('Por favor completa el curso y la fecha seleccionada.', 'Información necesaria');
+      alert('Por favor completa el curso y la fecha');
       return;
     }
 
-    this.http.post(`${API_BASE_URL}/tutoring/request`, this.nuevaTutoria)
+    this.http.post('http://localhost:8081/api/tutoring/request', this.nuevaTutoria)
       .subscribe({
         next: () => {
           this.showModal = false;
           this.fetchTutorias();
-          this.notificationService.showSuccess("Tu solicitud de tutoría ha sido enviada exitosamente.");
-          
+          // Reset completo
           this.nuevaTutoria = { courseName: '', teacherName: '', topic: '', startTime: '', type: 'INDIVIDUAL' };
         },
         error: (err) => {
           console.error(err);
-          this.notificationService.showError('Hubo un problema al procesar tu solicitud de tutoría.');
+          alert('Error al procesar la tutoría');
         }
       });
   }
 
-  
+  // --- LÓGICA DE FAQ ---
   faqs = [
     {
       category: 'Proceso de Tutorías',

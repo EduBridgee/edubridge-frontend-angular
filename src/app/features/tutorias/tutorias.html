@@ -1,135 +1,140 @@
-<main class="tutorias-main">
+<main class="flex-1 ml-0 md:ml-64 bg-[#F8FAFC] min-h-screen flex flex-col font-['Inter'] text-left transition-all">
 
-  <div *ngIf="loading" class="loading-state">
+  <div *ngIf="loading" class="p-10 font-black text-slate-400 animate-pulse text-sm uppercase tracking-widest">
     Sincronizando con Servidor EduBridge...
   </div>
 
   <div *ngIf="!loading">
-    <div class="header-wrap">
-      <div class="search-bar">
-        <div class="search-input-wrapper">
-          <lucide-icon [img]="Search" [size]="18" class="opacity-40"></lucide-icon>
+    <div class="p-4 md:p-8 pb-0 w-full">
+      <div
+        class="bg-white/70 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-slate-100 flex items-center justify-between px-4 md:px-6 gap-4">
+        <div class="flex items-center gap-3 flex-1 min-w-[150px]">
+          <span class="text-lg opacity-40">🔍</span>
           <input type="text" placeholder="Buscar por curso o profesor..." [(ngModel)]="searchTerm"
-            (input)="filtrarTutorias()" class="search-input" />
+            (input)="filtrarTutorias()"
+            class="bg-transparent border-none outline-none text-sm font-medium text-slate-400 w-full" />
         </div>
-        <div class="header-actions">
+        <div class="flex items-center gap-2 md:gap-4 shrink-0">
           <app-notification-bell [user]="user"></app-notification-bell>
-          <div class="header-divider"></div>
-          <span class="user-role-badge">{{user?.role}}</span>
+          <div class="h-8 w-[1px] bg-slate-200 mx-1 md:mx-2"></div>
+          <span
+            class="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-blue-600/60">{{user?.role}}</span>
         </div>
       </div>
     </div>
 
-    <div class="tutorias-body">
+    <div class="p-4 md:p-8 space-y-8">
 
-      <section *ngIf="user.role === 'docente'" class="docente-section animate-in fade-in duration-500">
-        <div class="title-row">
-          <div>
-            <h2 class="tutorias-title">Sistema de Tutorías en Línea</h2>
-            <p class="tutorias-subtitle">Gestión de sesiones sincrónicas y asincrónicas</p>
+      <section *ngIf="user.role === 'docente'" class="space-y-8 animate-in fade-in duration-500">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div class="text-left">
+            <h2 class="text-xl md:text-2xl font-black text-slate-900 leading-none tracking-tighter uppercase italic">
+              Sistema de Tutorías en Línea
+            </h2>
+            <p class="text-slate-500 text-[10px] mt-2 font-bold uppercase tracking-widest opacity-60">
+              Gestión de sesiones sincrónicas y asincrónicas
+            </p>
           </div>
-          <button (click)="abrirModal(user.name)" class="btn-create-tutoria">
-            <lucide-icon [img]="Plus" [size]="14" class="inline mr-1"></lucide-icon> Nueva Tutoría
+          <button (click)="abrirModal(user.name)"
+            class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/20 active:scale-95 transition-all cursor-pointer relative z-50">
+            + Nueva Tutoría
           </button>
         </div>
 
-        <div class="kpi-cards-grid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div *ngFor="let kpi of [
-            {label: 'Sesiones Hoy', val: teacherKpis.todaySessions, color: 'blue'},
-            {label: 'Estudiantes Activos', val: teacherKpis.activeStudents, color: 'emerald'},
-            {label: 'Horas Totales', val: teacherKpis.totalHours, color: 'purple'},
-            {label: 'Satisfacción', val: teacherKpis.satisfaction, color: 'amber'}
-          ]" class="kpi-card">
-            <div class="kpi-text-block">
-              <p class="kpi-label">{{kpi.label}}</p>
-              <p class="kpi-value">{{kpi.val}}</p>
+            {label: 'Sesiones Hoy', val: teacherKpis.todaySessions, icon: '📅', color: 'blue'},
+            {label: 'Estudiantes Activos', val: teacherKpis.activeStudents, icon: '👥', color: 'emerald'},
+            {label: 'Horas Totales', val: teacherKpis.totalHours, icon: '🕒', color: 'purple'},
+            {label: 'Satisfacción', val: teacherKpis.satisfaction, icon: '⭐', color: 'amber'}
+          ]"
+            class="bg-white p-6 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
+            <div class="text-left">
+              <p class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-1">{{kpi.label}}</p>
+              <p class="text-2xl font-black text-slate-900 leading-none tracking-tighter">{{kpi.val}}</p>
             </div>
             <div [ngClass]="{
                 'bg-blue-50 text-blue-600': kpi.color === 'blue',
                 'bg-emerald-50 text-emerald-600': kpi.color === 'emerald',
                 'bg-purple-50 text-purple-600': kpi.color === 'purple',
                 'bg-amber-50 text-amber-600': kpi.color === 'amber'
-              }" class="kpi-icon-box">
-              <lucide-icon *ngIf="kpi.label === 'Sesiones Hoy'" [img]="Calendar" [size]="20"></lucide-icon>
-              <lucide-icon *ngIf="kpi.label === 'Estudiantes Activos'" [img]="Users" [size]="20"></lucide-icon>
-              <lucide-icon *ngIf="kpi.label === 'Horas Totales'" [img]="Clock" [size]="20"></lucide-icon>
-              <lucide-icon *ngIf="kpi.label === 'Satisfacción'" [img]="Star" [size]="20"></lucide-icon>
+              }" class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm">
+              {{kpi.icon}}
             </div>
           </div>
         </div>
 
-        <div class="sessions-panel">
-          <div class="tab-buttons-row custom-scrollbar">
+        <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
+          <div class="flex border-b border-slate-50 overflow-x-auto custom-scrollbar">
             <button (click)="setActiveTab('proximas')"
               [class.text-blue-600]="activeTab === 'proximas' || activeTab === 'mis-tutorias'"
               [class.border-blue-600]="activeTab === 'proximas' || activeTab === 'mis-tutorias'"
-              class="tab-btn">
+              class="whitespace-nowrap px-6 md:px-8 py-4 text-[10px] font-black uppercase tracking-widest border-b-2 transition-all">
               Próximas Sesiones
             </button>
             <button (click)="setActiveTab('historial-docente')"
               [class.text-blue-600]="activeTab === 'historial-docente'"
               [class.border-blue-600]="activeTab === 'historial-docente'"
-              class="tab-btn text-slate-400 border-transparent">
+              class="whitespace-nowrap px-6 md:px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent transition-all">
               Historial
             </button>
           </div>
 
-          <div class="sessions-list">
-            <div *ngIf="filteredSessions.length === 0" class="empty-sessions-state">
-              <lucide-icon [img]="Search" [size]="32" class="mx-auto mb-2"></lucide-icon>
-              <p class="empty-sessions-text">No tienes tutorías pendientes</p>
+          <div class="p-4 md:p-6 space-y-4">
+            <div *ngIf="filteredSessions.length === 0" class="py-10 text-center opacity-40">
+              <span class="text-4xl block mb-2">🔍</span>
+              <p class="font-bold text-xs uppercase">No tienes tutorías pendientes</p>
             </div>
 
-            <div *ngFor="let session of filteredSessions" class="session-item group">
-              <div class="session-item-header">
-                <div class="session-course-info">
-                  <div class="session-avatar">
+            <div *ngFor="let session of filteredSessions"
+              class="border border-slate-50 rounded-2xl p-4 md:p-6 bg-white group hover:border-blue-100 transition-all">
+              <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+                <div class="flex gap-4 items-center">
+                  <div
+                    class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg shadow-blue-200">
                     {{session.courseName[0]}}
                   </div>
-                  <div class="session-details-wrapper">
-                    <h4 class="session-course-name">{{session.courseName}}</h4>
-                    <p class="session-topic">Tema: {{session.topic || 'General'}}</p>
+                  <div class="text-left">
+                    <h4 class="font-black text-slate-800 tracking-tight leading-tight">{{session.courseName}}</h4>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Tema: {{session.topic ||
+                      'General'}}</p>
                   </div>
                 </div>
                 <span [ngClass]="{
                     'bg-amber-50 text-amber-600': session.status === 'Pendiente',
                     'bg-emerald-50 text-emerald-600': session.status === 'Confirmada',
                     'bg-blue-50 text-blue-600': session.status === 'Finalizada'
-                  }" class="session-status-badge">
+                  }" class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter">
                   {{session.status}}
                 </span>
               </div>
 
-              <div class="session-meta-grid">
-                <div class="session-meta-item">
-                  <lucide-icon [img]="Calendar" [size]="12"></lucide-icon> {{getFormattedDate(session.startTime)}}
-                </div>
-                <div class="session-meta-item">
-                  <lucide-icon [img]="Clock" [size]="12"></lucide-icon> {{getFormattedTime(session.startTime)}}
-                </div>
-                <div class="session-meta-item">
-                  <lucide-icon [img]="Users" [size]="12"></lucide-icon> {{session.studentCount || 0}}/12 estudiantes
-                </div>
-                <div class="session-meta-item">
-                  <lucide-icon [img]="Monitor" [size]="12"></lucide-icon> {{session.type}}
-                </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-3 text-[10px] font-bold text-slate-500 mb-6 text-left">
+                <div class="flex items-center gap-2">🗓️ {{getFormattedDate(session.startTime)}}</div>
+                <div class="flex items-center gap-2">🕒 {{getFormattedTime(session.startTime)}}</div>
+                <div class="flex items-center gap-2">👥 {{session.studentCount || 0}}/12 estudiantes</div>
+                <div class="flex items-center gap-2">💻 {{session.type}}</div>
               </div>
 
-              <div class="session-actions-row">
+              <div class="flex flex-col sm:flex-row gap-3">
                 <ng-container *ngIf="session.status === 'Pendiente'">
-                  <button (click)="aceptarSolicitud(session.id)" class="btn-accept-session">
+                  <button (click)="aceptarSolicitud(session.id)"
+                    class="w-full sm:flex-1 bg-emerald-600 text-white py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition-all">
                     Aceptar Solicitud
                   </button>
-                  <button (click)="cancelarTutoria(session.id)" class="btn-cancel-session">
+                  <button (click)="cancelarTutoria(session.id)"
+                    class="w-full sm:w-auto px-6 py-3 border border-rose-100 text-rose-500 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-50 transition-all">
                     Rechazar
                   </button>
                 </ng-container>
 
                 <ng-container *ngIf="session.status === 'Confirmada'">
-                  <button (click)="unirseASesion(session)" class="btn-start-session">
+                  <button (click)="unirseASesion(session.courseName)"
+                    class="w-full sm:flex-1 bg-blue-600 text-white py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">
                     Iniciar Sesión
                   </button>
-                  <button (click)="finalizarTutoria(session.id)" class="btn-finish-session">
+                  <button (click)="finalizarTutoria(session.id)"
+                    class="w-full sm:w-auto px-6 py-3 border border-slate-100 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all">
                     Finalizar
                   </button>
                 </ng-container>
@@ -138,158 +143,156 @@
           </div>
         </div>
 
-        <div class="whiteboard-panel">
-          <div class="whiteboard-header-row">
-            <div>
-              <h3 class="whiteboard-title">Pizarra Virtual</h3>
-              <p class="whiteboard-subtitle">Herramienta colaborativa para sesiones en vivo</p>
+        <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border border-slate-100 shadow-sm">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div class="text-left">
+              <h3 class="font-black text-slate-800 text-lg uppercase italic tracking-tighter">Pizarra Virtual</h3>
+              <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Herramienta colaborativa para
+                sesiones en vivo</p>
             </div>
-            <button (click)="abrirPizarra('General')" class="btn-open-whiteboard">
+            <button (click)="abrirPizarra('General')"
+              class="w-full sm:w-auto bg-slate-900 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all">
               Abrir pizarra
             </button>
           </div>
-          <div class="whiteboard-area">
-            <lucide-icon [img]="BookOpen" [size]="32" class="mb-3"></lucide-icon>
-            <p class="whiteboard-text">Comparte conceptos en tiempo real</p>
+          <div
+            class="h-48 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-100 flex flex-col items-center justify-center text-slate-400">
+            <span class="text-4xl mb-3">📖</span>
+            <p class="text-xs font-black text-slate-800 uppercase tracking-tighter">Comparte conceptos en tiempo real
+            </p>
           </div>
         </div>
       </section>
 
-      <section *ngIf="user.role === 'estudiante'" class="estudiante-section animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div class="title-row">
-          <div>
-            <h2 class="tutorias-title">Tutorías</h2>
-            <p class="tutorias-subtitle">Solicita ayuda personalizada con tus profesores</p>
-          </div>
+      <section *ngIf="user.role === 'estudiante'"
+        class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div class="text-left">
+          <h2 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tighter">Tutorías</h2>
+          <p class="text-slate-500 font-medium text-sm">Solicita ayuda personalizada con tus profesores</p>
         </div>
 
-        <div class="estudiante-tabs-panel">
-          <div class="estudiante-tabs-row custom-scrollbar">
+        <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden min-h-[500px]">
+          <div class="flex p-2 bg-slate-50/50 border-b border-slate-100 overflow-x-auto custom-scrollbar">
             <button *ngFor="let tab of [
               {id: 'mis-tutorias', label: 'Mis Tutorías'},
               {id: 'buscar', label: 'Buscar Tutor'},
               {id: 'historial', label: 'Historial'},
               {id: 'faq', label: 'FAQ'}
-            ]" (click)="setActiveTab(tab.id)"
-              [class.bg-white]="activeTab === tab.id"
-              [class.text-blue-600]="activeTab === tab.id"
-              [class.shadow-sm]="activeTab === tab.id"
-              class="estudiante-tab-btn">
+            ]" (click)="setActiveTab(tab.id)" [class.bg-white]="activeTab === tab.id"
+              [class.text-blue-600]="activeTab === tab.id" [class.shadow-sm]="activeTab === tab.id"
+              class="flex-1 min-w-[120px] py-3 text-[10px] md:text-xs font-bold rounded-xl transition-all text-slate-400 whitespace-nowrap">
               {{tab.label}}
             </button>
           </div>
 
-          <div class="tab-content-area">
+          <div class="p-4 md:p-8">
             <div *ngIf="activeTab === 'mis-tutorias'" class="space-y-4">
-              <div *ngIf="filteredSessions.length === 0" class="empty-sessions-state">
-                <lucide-icon [img]="MessageCircle" [size]="40" class="mx-auto mb-4"></lucide-icon>
-                <p class="empty-sessions-text">No se encontraron tutorías</p>
+              <div *ngIf="filteredSessions.length === 0" class="text-center py-20 opacity-40">
+                <span class="text-5xl block mb-4">📭</span>
+                <p class="font-black uppercase tracking-widest text-xs">No se encontraron tutorías</p>
               </div>
 
-              <div *ngFor="let session of filteredSessions" class="session-item group">
-                <div class="session-item-header">
-                  <div class="session-details-wrapper">
-                    <h4 class="session-course-name">{{session.courseName}}</h4>
-                    <p class="session-topic">Prof. {{session.teacherName}}</p>
+              <div *ngFor="let session of filteredSessions"
+                class="border border-slate-100 rounded-[1.5rem] p-4 md:p-6 space-y-4 hover:border-blue-100 transition-colors bg-white">
+                <div class="flex justify-between items-start gap-2">
+                  <div class="text-left">
+                    <h4 class="font-black text-slate-800 text-base md:text-lg leading-tight">{{session.courseName}}</h4>
+                    <p class="text-slate-400 text-[10px] md:text-xs font-bold">Prof. {{session.teacherName}}</p>
                   </div>
-                  <span class="session-status-badge bg-blue-50 text-blue-600">
+                  <span
+                    class="shrink-0 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-tighter">
                     {{session.studentCount > 1 ? 'Grupal' : 'Individual'}}
                   </span>
                 </div>
 
-                <div class="session-meta-grid">
-                  <div class="session-meta-item"><lucide-icon [img]="Calendar" [size]="10" class="inline mr-1"></lucide-icon>
-                    {{getFormattedDate(session.startTime)}}</div>
-                  <div class="session-meta-item"><lucide-icon [img]="Clock" [size]="10" class="inline mr-1"></lucide-icon>
-                    {{getFormattedTime(session.startTime)}}</div>
-                  <div class="session-meta-item-left">
+                <div
+                  class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-tighter text-left">
+                  <div>🗓️ {{getFormattedDate(session.startTime)}}</div>
+                  <div>🕒 {{getFormattedTime(session.startTime)}}</div>
+                  <div class="flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                     {{session.status}}
                   </div>
                 </div>
 
-                <div *ngIf="session.status?.toLowerCase() !== 'finalizada' && session.status?.toLowerCase() !== 'cancelada'" class="session-actions-row pt-2">
-                  <button (click)="unirseASesion(session)" 
-                          [style.opacity]="session.status?.toLowerCase() === 'pendiente' ? 0.6 : 1"
-                          [style.cursor]="session.status?.toLowerCase() === 'pendiente' ? 'not-allowed' : 'pointer'"
-                          class="btn-join-session">
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button (click)="unirseASesion(session.courseName)"
+                    class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold text-xs shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">
                     Unirse a la Sesión
                   </button>
-                  <button (click)="reprogramarTutoria(session.id)" class="btn-reschedule-session">
+                  <button (click)="reprogramarTutoria(session.id)"
+                    class="px-6 py-3 border border-slate-200 rounded-xl text-slate-500 font-bold text-xs hover:bg-slate-50 transition-all">
                     Reprogramar
                   </button>
                 </div>
               </div>
             </div>
 
-            <div *ngIf="activeTab === 'buscar'" class="tab-content-area animate-in fade-in duration-500">
-              <div class="teachers-grid">
-                <div *ngFor="let p of teachers" class="teacher-card group">
-                  <div class="teacher-header w-full">
-                    <div class="teacher-avatar">
+            <div *ngIf="activeTab === 'buscar'" class="space-y-6">
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div
+                  *ngFor="let p of [{n: 'Prof. Roberto Silva', s: 'Matemáticas', i: 'RS'}, {n: 'Prof. Laura Méndez', s: 'Física', i: 'LM'}]"
+                  class="border border-slate-100 rounded-[2rem] p-6 space-y-6 flex flex-col items-center md:items-start text-center md:text-left transition-all hover:border-blue-100">
+                  <div class="flex flex-col md:flex-row gap-4 items-center">
+                    <div
+                      class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-lg shadow-lg shadow-blue-200">
                       {{p.i}}
                     </div>
-                    <div class="teacher-info">
-                      <h4 class="teacher-name">{{p.n}}</h4>
-                      <p class="teacher-subject">{{p.s}}</p>
+                    <div>
+                      <h4 class="font-black text-slate-800 text-lg leading-none">{{p.n}}</h4>
+                      <p class="text-slate-400 text-xs font-bold mt-1 uppercase tracking-widest">{{p.s}}</p>
                     </div>
                   </div>
-                  <button (click)="abrirModal(p.n)" class="btn-request-session">
-                    <lucide-icon [img]="Plus" [size]="12" class="inline mr-1"></lucide-icon>
-                    Solicitar Tutoría
+                  <button (click)="abrirModal(p.n)"
+                    class="w-full bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-blue-200 active:scale-95 transition-all">
+                    + Solicitar Tutoría
                   </button>
-                </div>
-                <div *ngIf="teachers.length === 0" class="empty-teachers-state">
-                  <lucide-icon [img]="Users" [size]="32" class="mx-auto mb-4"></lucide-icon>
-                  <p class="empty-teachers-text">No hay tutores disponibles actualmente</p>
                 </div>
               </div>
             </div>
 
+
+
             <div *ngIf="activeTab === 'historial'" class="space-y-4">
-              <div *ngIf="filteredSessions.length === 0" class="empty-sessions-state">
-                <lucide-icon [img]="Calendar" [size]="40" class="mx-auto mb-4"></lucide-icon>
-                <p class="empty-sessions-text">No hay tutorías finalizadas en tu historial</p>
-              </div>
-              <div *ngFor="let session of filteredSessions" class="session-item flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 group">
+              <div *ngFor="let i of [1, 2, 3]"
+                class="border border-slate-100 rounded-[1.5rem] p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 group hover:bg-slate-50/50 transition-all">
                 <div class="text-left space-y-1">
-                  <h4 class="session-course-name">{{session.courseName}}</h4>
-                  <p class="session-topic">
-                    {{getFormattedDate(session.startTime)}} • {{session.durationMinutes || 60}} min • Prof. {{session.teacherName}}
+                  <h4 class="font-black text-slate-800 text-base md:text-lg tracking-tighter">Resolución de Ecuaciones
+                  </h4>
+                  <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">9 de abril de 2026 • 60 min
                   </p>
                 </div>
-                
-                <div class="session-rating-wrapper">
-                  <button *ngFor="let star of [1, 2, 3, 4, 5]" (click)="calificarSesion(session.id, star)" class="btn-star-rating">
-                    <span [class.text-amber-400]="star <= (session.rating || 0)"
-                          [class.text-slate-200]="star > (session.rating || 0)"
-                          class="text-lg md:text-2xl font-black">★</span>
-                  </button>
-                </div>
+                <div class="text-amber-400 text-sm md:text-lg font-black tracking-widest">⭐⭐⭐⭐⭐</div>
               </div>
             </div>
 
             <div *ngIf="activeTab === 'faq'" class="space-y-10">
-              <div *ngFor="let cat of faqs; let ci = index" class="faq-category-section">
-                <h4 class="faq-category-title">
-                  <lucide-icon [img]="MessageCircle" [size]="16" class="text-blue-600"></lucide-icon>
+              <div *ngFor="let cat of faqs; let ci = index" class="space-y-4 text-left">
+                <h4 class="font-black text-slate-800 flex items-center gap-2 text-sm uppercase tracking-widest italic">
+                  <span
+                    class="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-xs">💬</span>
                   {{cat.category}}
                 </h4>
 
-                <div class="faq-questions-list">
-                  <div *ngFor="let item of cat.questions; let qi = index" class="faq-item">
-                    <button (click)="toggleFaq(ci, qi)" class="faq-trigger group">
-                      <span class="faq-question-text">
+                <div class="space-y-3">
+                  <div *ngFor="let item of cat.questions; let qi = index"
+                    class="border border-slate-100 rounded-2xl overflow-hidden bg-white hover:border-blue-100 transition-colors">
+                    <button (click)="toggleFaq(ci, qi)"
+                      class="w-full p-5 flex items-center justify-between gap-4 text-left group">
+                      <span
+                        class="text-[13px] font-bold text-slate-700 leading-snug group-hover:text-blue-600 transition-colors">
                         {{item.q}}
                       </span>
-                      <span [class.rotate-180]="item.open" class="faq-icon">
+                      <span [class.rotate-180]="item.open"
+                        class="text-blue-500 font-black transition-transform duration-300">
                         {{ item.open ? '−' : '+' }}
                       </span>
                     </button>
 
-                    <div *ngIf="item.open" class="faq-answer-wrapper animate-in slide-in-from-top-2 duration-300">
-                      <div class="faq-answer-divider"></div>
-                      <p class="faq-answer-text">
+                    <div *ngIf="item.open" class="px-5 pb-5 animate-in slide-in-from-top-2 duration-300">
+                      <div class="h-[1px] bg-slate-50 mb-4"></div>
+                      <p class="text-[12px] font-medium text-slate-500 leading-relaxed italic">
                         {{item.a}}
                       </p>
                     </div>
@@ -301,63 +304,48 @@
         </div>
       </section>
 
-      
-      <div *ngIf="showModal" class="modal-overlay animate-in fade-in duration-300">
-        <div class="modal-container">
-          <h3 class="modal-title">
+      <!-- MODAL GLOBAL (Fuera de los condicionales de pestañas) -->
+      <div *ngIf="showModal"
+        class="fixed inset-0 z-[300] flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-300">
+        <div
+          class="bg-white w-full sm:w-[450px] rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 md:p-10 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+          <h3 class="text-xl font-black text-slate-800 mb-2 italic tracking-tighter uppercase text-left">
             {{ user.role === 'docente' ? 'Nueva Tutoría' : 'Nueva Solicitud' }}
           </h3>
-          <p class="modal-subtitle">
-            {{ user.role === 'docente' ? 'Programar sesión para tus estudiantes' : 'Sesión con ' + nuevaTutoria.teacherName }}
+          <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 text-left">
+            {{ user.role === 'docente' ? 'Programar sesión para tus estudiantes' : 'Sesión con ' +
+            nuevaTutoria.teacherName }}
           </p>
 
-          <form (ngSubmit)="guardarTutoria()" class="modal-form">
-            <div class="form-field">
-              <label class="form-label">Curso</label>
-              <input type="text" [(ngModel)]="nuevaTutoria.courseName" name="course" class="form-input" placeholder="Ej: Cálculo Diferencial" required>
+          <form (ngSubmit)="guardarTutoria()" class="space-y-4 text-left">
+            <div>
+              <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Curso</label>
+              <input type="text" [(ngModel)]="nuevaTutoria.courseName" name="course"
+                class="w-full bg-slate-50 border-none p-4 rounded-2xl text-xs font-bold outline-none focus:ring-2 focus:ring-blue-500/20"
+                placeholder="Ej: Cálculo Diferencial" required>
             </div>
-            <div class="form-row">
-              <div class="form-field">
-                <label class="form-label">Fecha y Hora</label>
-                <input type="datetime-local" [(ngModel)]="nuevaTutoria.startTime" name="time" class="form-input" required>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Fecha y Hora</label>
+                <input type="datetime-local" [(ngModel)]="nuevaTutoria.startTime" name="time"
+                  class="w-full bg-slate-50 border-none p-4 rounded-2xl text-xs font-bold outline-none" required>
               </div>
-              <div class="form-field">
-                <label class="form-label">Tipo</label>
-                <select [(ngModel)]="nuevaTutoria.type" name="type" class="form-select">
+              <div>
+                <label class="text-[9px] font-black uppercase text-slate-400 ml-2">Tipo</label>
+                <select [(ngModel)]="nuevaTutoria.type" name="type"
+                  class="w-full bg-slate-50 border-none p-4 rounded-2xl text-xs font-bold outline-none">
                   <option value="INDIVIDUAL">Individual</option>
                   <option value="GRUPAL">Grupal</option>
                 </select>
               </div>
             </div>
-            <div class="modal-buttons-row">
-              <button type="button" (click)="showModal = false" class="btn-cancel-modal">
-                <lucide-icon [img]="X" [size]="14" class="inline"></lucide-icon> Cancelar
-              </button>
-              <button type="submit" class="btn-confirm-modal">Confirmar</button>
+            <div class="flex flex-col-reverse sm:flex-row gap-3 pt-6">
+              <button type="button" (click)="showModal = false"
+                class="w-full py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 rounded-2xl transition-all">Cancelar</button>
+              <button type="submit"
+                class="w-full bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">Confirmar</button>
             </div>
           </form>
-        </div>
-      </div>
-      
-      <div *ngIf="showVideoModal" class="videocall-overlay animate-in fade-in duration-300">
-        <div class="videocall-container">
-          
-          <div class="videocall-header">
-            <div class="videocall-title-block">
-              <h3 class="videocall-title">Tutoría en Vivo</h3>
-              <p class="videocall-subtitle">
-                Conectado como {{user.role}} • {{activeMeetingCourse}}
-              </p>
-            </div>
-            <button (click)="cerrarVideoLlamada()" class="btn-close-videocall">
-              <lucide-icon [img]="X" [size]="20"></lucide-icon>
-            </button>
-          </div>
-
-          <div class="jitsi-frame-wrapper">
-            <div id="jitsi-iframe-container" class="jitsi-iframe"></div>
-          </div>
-          
         </div>
       </div>
     </div>
