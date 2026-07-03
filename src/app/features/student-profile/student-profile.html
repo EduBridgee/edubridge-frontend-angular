@@ -1,258 +1,212 @@
-<div class="profile-container animate-in fade-in duration-700">
+<div class="ml-0 md:ml-64 p-4 md:p-8 space-y-8 animate-in fade-in duration-700 text-left min-h-screen bg-[#F8FAFC]">
 
-  <div class="profile-header-row">
-    <div class="profile-header-title-block">
-      <h2 class="profile-header-title">Mi Perfil</h2>
-      <p class="profile-header-subtitle">Información académica y personal</p>
+  <div class="max-w-[1400px] mx-auto w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h2 class="text-xl md:text-3xl font-black text-slate-900 tracking-tighter uppercase italic">Mi Perfil</h2>
+      <p class="text-slate-400 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mt-1 opacity-70">Información académica y personal</p>
     </div>
-    <div class="profile-header-buttons-row">
-      <button (click)="abrirEdicion()" class="btn-edit-trigger">
-        <lucide-icon [img]="Settings" [size]="14"></lucide-icon>
-        <span class="uppercase tracking-widest text-[10px]">Editar Perfil</span>
-      </button>
-      <button (click)="toggleTwoFactorSwitch()"
-        [class]="twoFactorAuth ? 'bg-orange-50 text-orange-600 border-orange-200/60 btn-totp-trigger' : 'bg-white text-slate-600 border-slate-100 btn-totp-trigger'">
-        <lucide-icon [img]="Shield" [size]="14"></lucide-icon>
-        <span class="uppercase tracking-widest text-[10px]">{{ twoFactorAuth ? '2FA: Activo' : 'Activar 2FA' }}</span>
-      </button>
-    </div>
+    <button (click)="abrirEdicion()" class="w-full sm:w-auto bg-white border border-slate-100 px-5 py-3 rounded-xl font-bold text-xs text-slate-600 shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2 active:scale-95">
+      ⚙️ <span class="uppercase tracking-widest text-[10px]">Editar Perfil</span>
+    </button>
   </div>
 
-  <div class="profile-card-wrapper">
-    <div *ngIf="loading" class="profile-card-loading">
-      <p class="kpi-card-label">Cargando datos del servidor...</p>
+  <div class="max-w-[1400px] mx-auto w-full">
+    <div *ngIf="loading" class="bg-white rounded-[2rem] p-10 border border-slate-100 shadow-sm animate-pulse text-center">
+      <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cargando datos del servidor...</p>
     </div>
 
-    <div *ngIf="!loading && selectedStudent" class="profile-main-card">
-      <div class="profile-card-avatar">
+    <div *ngIf="!loading && selectedStudent" class="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm flex flex-col xl:flex-row gap-8 items-center relative overflow-hidden">
+      
+      <div class="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center text-white text-3xl md:text-4xl font-black shadow-xl z-10 shrink-0 transform hover:rotate-3 transition-transform">
         {{getInitials(selectedStudent.name)}}
       </div>
-
-      <div class="profile-card-details">
-        <div class="profile-card-info-header">
-          <h3 class="profile-card-name">{{selectedStudent.name}}</h3>
-          <p class="profile-card-code-label">
+      
+      <div class="flex-1 z-10 text-center xl:text-left w-full">
+        <div class="space-y-1">
+          <h3 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight leading-tight">
+            {{selectedStudent.name}}
+          </h3>
+          <p class="text-slate-400 text-[10px] md:text-xs font-bold uppercase tracking-widest">
             Código: <span class="text-blue-600">{{selectedStudent.code || 'S/N'}}</span>
           </p>
         </div>
-
-        <div class="profile-card-fields-grid">
-          <div class="profile-card-field-item break-all">
-            <lucide-icon [img]="Mail" [size]="12" class="opacity-50"></lucide-icon> {{selectedStudent.email}}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-6 text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-tight">
+          <div class="flex items-center justify-center xl:justify-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100/50 break-all">
+            <span class="opacity-50">📧</span> {{selectedStudent.email}}
           </div>
-          <div class="profile-card-field-item">
-            <lucide-icon [img]="Phone" [size]="12" class="opacity-50"></lucide-icon> {{selectedStudent.phone || 'No registrado'}}
+          <div class="flex items-center justify-center xl:justify-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100/50">
+            <span class="opacity-50">📞</span> {{selectedStudent.phone || 'No registrado'}}
           </div>
-          <div class="profile-card-field-item-wide">
-            <lucide-icon [img]="MapPin" [size]="12" class="opacity-50"></lucide-icon> {{selectedStudent.address || 'No registrada'}}
+          <div class="flex items-center justify-center xl:justify-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100/50 md:col-span-2">
+            <span class="opacity-50">📍</span> {{selectedStudent.address || 'No registrada'}}
           </div>
         </div>
       </div>
 
-      <div class="profile-academic-sidebar">
-        <div class="profile-academic-item">
-          <p class="academic-item-label">Programa</p>
-          <p class="academic-item-value">{{selectedStudent.program || 'Ingeniería de Sistemas'}}</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 xl:flex xl:flex-col gap-6 border-t xl:border-t-0 xl:border-l border-slate-100 pt-8 xl:pt-0 xl:pl-10 w-full xl:w-auto">
+        <div class="text-center xl:text-left">
+          <p class="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Programa</p>
+          <p class="text-xs md:text-sm font-black text-slate-800 tracking-tight leading-tight">{{selectedStudent.program || 'Ingeniería de Sistemas'}}</p>
         </div>
-        <div class="profile-academic-item">
-          <p class="academic-item-label">Semestre</p>
-          <p class="academic-item-value">{{selectedStudent.semester || '2026-I'}}</p>
+        <div class="text-center xl:text-left">
+          <p class="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Semestre</p>
+          <p class="text-xs md:text-sm font-black text-slate-800 tracking-tight">{{selectedStudent.semester || '2026-I'}}</p>
         </div>
-        <div class="profile-academic-item">
-          <p class="academic-item-label">Estado</p>
-          <p class="academic-item-value-emerald">
+        <div class="text-center xl:text-left">
+          <p class="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Estado</p>
+          <p class="text-xs md:text-sm font-black text-emerald-500 tracking-tight flex items-center justify-center xl:justify-start gap-1">
             <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> {{selectedStudent.status || 'Regular'}}
           </p>
         </div>
       </div>
-
-      <div class="profile-card-bg-circle"></div>
+      
+      <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-slate-50 rounded-full blur-3xl -z-0"></div>
     </div>
   </div>
 
-  <div *ngIf="selectedStudent" class="kpi-cards-grid">
-    <div class="kpi-card-blue">
-      <div class="kpi-card-text-block">
-        <p class="kpi-card-label">Promedio General</p>
-        <p class="kpi-card-value-blue">{{promedioGeneralReal | number:'1.2-2'}}</p>
+  <div *ngIf="selectedStudent" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-[1400px] mx-auto w-full">
+    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+      <div class="text-left">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Promedio General</p>
+        <p class="text-2xl md:text-3xl font-black text-blue-600 leading-none">{{selectedStudent.averageGrade | number:'1.2-2'}}</p>
       </div>
-      <div class="kpi-card-icon-box-blue">
-        <lucide-icon [img]="Award" [size]="24"></lucide-icon>
-      </div>
+      <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-blue-50 text-blue-600">🏅</div>
     </div>
 
-    <div class="kpi-card-purple">
-      <div class="kpi-card-text-block">
-        <p class="kpi-card-label">Faltas Totales</p>
-        <p class="kpi-card-value-purple">{{faltasTotalesReales}}</p>
+    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
+      <div class="text-left">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Faltas Totales</p>
+        <p class="text-2xl md:text-3xl font-black text-purple-600 leading-none">{{selectedStudent.absences || 0}}</p>
       </div>
-      <div class="kpi-card-icon-box-purple">
-        <lucide-icon [img]="Calendar" [size]="24"></lucide-icon>
-      </div>
+      <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-purple-50 text-purple-600">📅</div>
     </div>
 
-    <div class="kpi-card-risk">
-      <div class="kpi-card-header-row">
-        <p class="kpi-card-label">Nivel de Riesgo</p>
+    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm sm:col-span-2 lg:col-span-1 space-y-4">
+      <div class="flex justify-between items-center">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Nivel de Riesgo</p>
         <span [ngClass]="{
           'text-emerald-500': selectedStudent.riskLevel === 'Estable',
           'text-amber-500': selectedStudent.riskLevel === 'Riesgo Medio',
           'text-rose-500': selectedStudent.riskLevel === 'Alto Riesgo'
-        }" class="kpi-card-risk-status">{{selectedStudent.riskLevel || 'Estable'}}</span>
+        }" class="font-black text-xs uppercase">{{selectedStudent.riskLevel || 'Estable'}}</span>
       </div>
-      <div class="kpi-card-progress-bar-bg">
+      <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
         <div [ngClass]="{
           'bg-emerald-500': selectedStudent.riskLevel === 'Estable',
           'bg-amber-500': selectedStudent.riskLevel === 'Riesgo Medio',
           'bg-rose-500': selectedStudent.riskLevel === 'Alto Riesgo'
-        }" class="kpi-card-progress-bar-fill"
-          [style.width.%]="selectedStudent.riskLevel === 'Alto Riesgo' ? 90 : (selectedStudent.riskLevel === 'Riesgo Medio' ? 50 : 15)">
-        </div>
+        }" class="h-full rounded-full transition-all duration-1000" [style.width.%]="selectedStudent.riskLevel === 'Alto Riesgo' ? 90 : (selectedStudent.riskLevel === 'Riesgo Medio' ? 50 : 15)"></div>
       </div>
     </div>
   </div>
 
-  <div *ngIf="showEditModal" class="modal-overlay">
-    <div class="modal-container animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
-      <div class="modal-header-blue">
-        <h3 class="modal-header-title">Editar Mi Perfil</h3>
-        <button (click)="showEditModal = false" class="modal-close-btn">
-          <lucide-icon [img]="X" [size]="24"></lucide-icon>
-        </button>
+  <!-- MODAL DE EDICIÓN -->
+  <div *ngIf="showEditModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex justify-center items-end sm:items-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
+      <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-blue-50/30">
+        <h3 class="font-black text-slate-800 text-lg uppercase tracking-tighter italic">Editar Mi Perfil</h3>
+        <button (click)="showEditModal = false" class="text-3xl font-light hover:rotate-90 transition-transform">×</button>
       </div>
-      <form (ngSubmit)="guardarCambios()" class="modal-form">
-        <div class="form-field">
-          <label class="form-label">Nombre Completo</label>
-          <input type="text" name="editName" [(ngModel)]="editingStudent.name" required class="form-input" />
+      <form (ngSubmit)="guardarCambios()" class="p-6 space-y-4">
+        <div>
+          <label class="text-[9px] font-black text-slate-400 uppercase block mb-2 tracking-widest">Nombre Completo</label>
+          <input type="text" name="editName" [(ngModel)]="editingStudent.name" required
+                 class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all" />
         </div>
-        <div class="form-row">
-          <div class="form-field">
-            <label class="form-label">Código</label>
-            <input type="text" name="editCode" [(ngModel)]="editingStudent.code" class="form-input" />
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase block mb-2 tracking-widest">Código</label>
+            <input type="text" name="editCode" [(ngModel)]="editingStudent.code"
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all" />
           </div>
-          <div class="form-field">
-            <label class="form-label">Teléfono</label>
-            <input type="text" name="editPhone" [(ngModel)]="editingStudent.phone" class="form-input" />
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase block mb-2 tracking-widest">Teléfono</label>
+            <input type="text" name="editPhone" [(ngModel)]="editingStudent.phone"
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all" />
           </div>
         </div>
-        <div class="form-field">
-          <label class="form-label">Dirección</label>
-          <input type="text" name="editAddress" [(ngModel)]="editingStudent.address" class="form-input" />
-        </div>
-
-        <div class="form-row">
-          <div class="form-field">
-            <label class="form-label">Programa / Carrera</label>
-            <input type="text" name="editProgram" [(ngModel)]="editingStudent.program" class="form-input" />
-          </div>
-          <div class="form-field">
-            <label class="form-label">Semestre Actual</label>
-            <input type="text" name="editSemester" [(ngModel)]="editingStudent.semester" class="form-input" />
-          </div>
+        <div>
+          <label class="text-[9px] font-black text-slate-400 uppercase block mb-2 tracking-widest">Dirección</label>
+          <input type="text" name="editAddress" [(ngModel)]="editingStudent.address"
+                 class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all" />
         </div>
 
-        <button type="submit" [disabled]="saving" class="btn-submit-modal-blue">
-          <lucide-icon *ngIf="!saving" [img]="Check" [size]="14"></lucide-icon>
-          {{ saving ? 'Guardando cambios...' : 'Guardar Cambios' }}
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase block mb-2 tracking-widest">Programa / Carrera</label>
+            <input type="text" name="editProgram" [(ngModel)]="editingStudent.program"
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all" />
+          </div>
+          <div>
+            <label class="text-[9px] font-black text-slate-400 uppercase block mb-2 tracking-widest">Semestre Actual</label>
+            <input type="text" name="editSemester" [(ngModel)]="editingStudent.semester"
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all" />
+          </div>
+        </div>
+        
+        <button type="submit" [disabled]="saving"
+                class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-blue-700 active:scale-95 disabled:opacity-50 transition-all">
+          {{ saving ? 'Guardando cambios...' : 'Guardar Cambios 🚀' }}
         </button>
       </form>
     </div>
   </div>
 
-  <div class="history-card">
-    <div class="history-header-row">
-      <h3 class="history-title">
-        <span class="p-2 bg-blue-50 text-blue-600 rounded-xl text-sm"><lucide-icon [img]="FileText" [size]="16"></lucide-icon></span> Historial Académico
+  <div class="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm max-w-[1400px] mx-auto w-full overflow-hidden">
+    <div class="flex items-center justify-between mb-8">
+      <h3 class="font-black text-slate-800 text-lg md:text-xl flex items-center gap-3 uppercase tracking-tighter italic leading-none">
+        <span class="p-2 bg-blue-50 text-blue-600 rounded-xl text-sm">📜</span> Historial Académico
       </h3>
     </div>
-
-    <div class="table-scroll-wrapper custom-scrollbar">
-      <table class="history-table">
+    
+    <div class="overflow-x-auto custom-scrollbar -mx-2">
+      <table class="w-full min-w-[550px] border-separate border-spacing-y-2">
         <thead>
-          <tr class="table-header-row">
-            <th class="table-header-col">Curso y Detalle de Evaluaciones</th>
-            <th class="table-header-col text-center">Créditos</th>
-            <th class="table-header-col text-right">Estatus Final</th>
+          <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-left">
+            <th class="px-4 pb-4">Curso / Materia</th>
+            <th class="px-4 pb-4 text-center">Calificación</th>
+            <th class="px-4 pb-4 text-right">Estatus</th>
           </tr>
         </thead>
-        <tbody class="table-body">
-          <tr *ngFor="let curso of academicGrades" class="table-row group">
-            <td class="table-cell-evals">
-              <div class="flex flex-col gap-4">
-                <span class="table-evals-title">{{curso.name}}</span>
-                <div class="table-eval-tags">
-                  <div *ngFor="let eval of curso.evaluaciones" class="table-eval-tag">
-                    <span class="table-eval-type">{{eval.type}}</span>
-                    <span [ngClass]="eval.value >= 12.5 ? 'text-blue-600' : 'text-rose-500'" class="table-eval-value">
-                      {{eval.value | number:'1.1-1'}}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </td>
-            <td class="table-cell-credits">
-              <span>{{curso.credits}}</span>
-            </td>
-            <td class="table-cell-status">
-              <span [ngClass]="curso.promedio >= 12.5 ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'" class="status-badge">
-                {{curso.promedio >= 12.5 ? 'Aprobado' : 'En Proceso'}}
-              </span>
-            </td>
-          </tr>
-          <tr *ngIf="academicGrades.length === 0">
-            <td colspan="3" class="table-empty-row">
-              No hay registros académicos para mostrar
-            </td>
-          </tr>
+        <tbody class="text-xs md:text-sm">
+          <!-- Mostrar notas reales si existen -->
+          <ng-container *ngIf="academicGrades.length > 0">
+            <tr *ngFor="let course of academicGrades" class="group">
+              <td class="bg-slate-50/50 group-hover:bg-slate-50 p-4 rounded-l-2xl font-bold text-slate-700 transition-colors">
+                {{course.name}}
+              </td>
+              <td class="bg-slate-50/50 group-hover:bg-slate-50 p-4 text-center font-black transition-colors"
+                  [ngClass]="course.grade >= 10.5 ? 'text-emerald-600' : 'text-rose-600'">
+                {{course.grade}}
+              </td>
+              <td class="bg-slate-50/50 group-hover:bg-slate-50 p-4 text-right rounded-r-2xl transition-colors">
+                <span [ngClass]="course.grade >= 10.5 ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'"
+                      class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                  {{course.status}}
+                </span>
+              </td>
+            </tr>
+          </ng-container>
+
+          <!-- Mostrar datos de ejemplo solo si no hay notas reales -->
+          <ng-container *ngIf="academicGrades.length === 0">
+            <tr *ngFor="let course of academicHistory[1].courses" class="group">
+              <td class="bg-slate-50/50 group-hover:bg-slate-50 p-4 rounded-l-2xl font-bold text-slate-700 transition-colors">
+                {{course.name}}
+              </td>
+              <td class="bg-slate-50/50 group-hover:bg-slate-50 p-4 text-center text-emerald-600 font-black transition-colors">
+                {{course.grade}}
+              </td>
+              <td class="bg-slate-50/50 group-hover:bg-slate-50 p-4 text-right rounded-r-2xl transition-colors">
+                <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                  {{course.status}}
+                </span>
+              </td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>
   </div>
-
-  <div *ngIf="show2faSetupModal" class="modal-overlay-center animate-in fade-in duration-200">
-    <div class="modal-container-padded animate-in zoom-in-95 duration-200">
-      <div class="modal-header-indigo">
-        <h2 class="modal-header-title-totp">Activar Seguridad 2FA</h2>
-        <button (click)="cancelarActivacion2fa()" class="modal-close-btn">
-          <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
-        </button>
-      </div>
-
-      <div class="space-y-4 text-xs text-slate-600 font-medium">
-        <p>Añade una capa adicional de seguridad a tu cuenta mediante un autenticador móvil (Google Authenticator, Authy, etc.).</p>
-        
-        <div class="space-y-2">
-          <p class="totp-step-title">Paso 1: Escanear Código QR</p>
-          <div class="qr-code-wrapper">
-            <img [src]="scanned2faQRCodeUrl" alt="Código QR 2FA" class="qr-code-img" />
-          </div>
-        </div>
-
-        <div class="secret-key-card">
-          <div>
-            <p class="secret-key-label">Clave Secreta Manual</p>
-            <p class="secret-key-val">{{ totpSecretKey }}</p>
-          </div>
-          <span class="secret-key-btn-copy">Copiar</span>
-        </div>
-
-        <div class="space-y-1.5">
-          <p class="totp-step-title">Paso 2: Ingresar Código de 6 Dígitos</p>
-          <input type="text" maxlength="6" [(ngModel)]="totpVerificationCode" placeholder="Ej. 123456" class="totp-verification-input">
-        </div>
-      </div>
-
-      <div class="modal-buttons-row">
-        <button (click)="cancelarActivacion2fa()" class="btn-cancel-modal">
-          Cancelar
-        </button>
-        <button (click)="confirmarActivacion2fa()"
-          [disabled]="!totpVerificationCode || totpVerificationCode.length !== 6"
-          class="btn-confirm-modal">
-          Activar 2FA
-        </button>
-      </div>
-    </div>
-  </div>
-
 </div>
