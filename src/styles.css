@@ -1,3 +1,49 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss';
 
-@import "tailwindcss";
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+* {
+  font-family: inherit;
+}
+
+/* iOS Safe Area & Mobile Responsive Adjustments */
+@media (max-width: 767px) {
+  /* Dynamic Menu Button adjustment to avoid dynamic island/notch */
+  .menu-toggle-btn {
+    top: calc(env(safe-area-inset-top, 0px) + 1rem) !important;
+    left: calc(env(safe-area-inset-left, 0px) + 1rem) !important;
+  }
+
+  /* Chatbot adjustments to avoid iOS home indicator */
+  .chatbot-floating-container {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem) !important;
+    right: calc(env(safe-area-inset-right, 0px) + 1rem) !important;
+  }
+
+  /* Push headers vertically below the menu button to prevent overlapping, while keeping original symmetric design and width */
+  .dashboard-header-wrap,
+  .cursos-header-wrap,
+  .header-wrap,
+  .profile-header-row {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 4.5rem) !important;
+    padding-left: calc(env(safe-area-inset-left, 0px) + 1rem) !important;
+    padding-right: calc(env(safe-area-inset-right, 0px) + 1rem) !important;
+  }
+
+  /* Ensure content body leaves space at the bottom for iOS home indicator */
+  .dashboard-body,
+  .cursos-container,
+  .recursos-main,
+  .docente-main,
+  .tutorias-main,
+  .profile-container {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 2rem) !important;
+  }
+}

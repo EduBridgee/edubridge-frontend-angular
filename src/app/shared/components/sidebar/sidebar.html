@@ -1,6 +1,7 @@
-<button (click)="toggleMenu()"
-  class="md:hidden fixed top-4 left-4 z-[110] p-3 bg-[#0F172A] text-white rounded-xl shadow-2xl border border-slate-700 active:scale-90 transition-all duration-200">
-  <lucide-icon [img]="isMenuOpen ? X : Menu" [size]="20"></lucide-icon>
+<!-- Botón flotante para abrir el menú (solo visible cuando está cerrado) -->
+<button *ngIf="!isMenuOpen" (click)="toggleMenu()"
+  class="md:hidden fixed top-4 left-4 z-[110] p-3 bg-[#0F172A] text-white rounded-xl shadow-2xl border border-slate-700 active:scale-90 transition-all duration-200 menu-toggle-btn">
+  <lucide-icon [img]="Menu" [size]="20"></lucide-icon>
 </button>
 
 <div *ngIf="isMenuOpen" (click)="isMenuOpen = false"
@@ -10,16 +11,24 @@
 <div [class.translate-x-0]="isMenuOpen"
   class="w-64 bg-[#0F172A] h-screen flex flex-col fixed left-0 top-0 z-[100] shadow-2xl text-slate-300 transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0">
 
-  <div class="p-8 pt-20 md:pt-8 flex items-center gap-3">
-    <img src="assets/images/logo.jpeg" class="w-10 h-10 rounded-xl object-cover shadow-lg" alt="EduBridge">
-    <div class="text-left">
-      <h1 class="font-bold text-white text-lg leading-none tracking-tight">EduBridge</h1>
-      <span
-        [class]="userRole.toLowerCase() === 'admin' ? 'bg-orange-500/10 text-orange-400' : (userRole.toLowerCase() === 'docente' ? 'bg-blue-500/10 text-blue-400' : 'bg-emerald-500/10 text-emerald-400')"
-        class="text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-md mt-1 inline-block">
-        Portal {{userRole}}
-      </span>
+  <div class="p-6 pt-20 md:pt-8 flex items-center justify-between gap-3 relative">
+    <div class="flex items-center gap-3">
+      <img src="assets/images/logo.jpeg" class="w-10 h-10 rounded-xl object-cover shadow-lg" alt="EduBridge">
+      <div class="text-left">
+        <h1 class="font-bold text-white text-lg leading-none tracking-tight">EduBridge</h1>
+        <span
+          [class]="userRole.toLowerCase() === 'admin' ? 'bg-orange-500/10 text-orange-400' : (userRole.toLowerCase() === 'docente' ? 'bg-blue-500/10 text-blue-400' : 'bg-emerald-500/10 text-emerald-400')"
+          class="text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-md mt-1 inline-block">
+          Portal {{userRole}}
+        </span>
+      </div>
     </div>
+    
+    <!-- Botón para cerrar el menú (visible dentro de la barra lateral abierta en móvil) -->
+    <button (click)="toggleMenu()"
+      class="md:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors menu-close-btn">
+      <lucide-icon [img]="X" [size]="18"></lucide-icon>
+    </button>
   </div>
 
   <nav class="flex-1 px-4 space-y-2 mt-4 overflow-y-auto custom-scrollbar">
