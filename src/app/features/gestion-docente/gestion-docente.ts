@@ -5,8 +5,9 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell';
 import { NotificationService } from '../../core/services/notification';
 import { RoleService, UserRole } from '../../core/services/role';
-import { LucideAngularModule, Search, BarChart3, Users, Calendar, Clock, Star, User, UserPlus, Edit, Bell, Download, Check, Plus, X, Shield } from 'lucide-angular';
-import { firstValueFrom } from 'rxjs'; 
+import { LucideAngularModule, Search, BarChart3, Users, Calendar, Clock, Star, User, UserPlus, Edit, Bell, Download, Check, Plus, X, Shield, MessageSquare, Send, Link, FileText } from 'lucide-angular';
+import { firstValueFrom, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { TotpService } from '../../core/services/totp';
 import { API_BASE_URL } from '../../core/config/api.config';
 
@@ -33,7 +34,10 @@ export class GestionDocenteComponent implements OnInit {
   readonly Plus = Plus;
   readonly X = X;
   readonly Shield = Shield;
-
+  readonly MessageSquare = MessageSquare;
+  readonly Send = Send;
+  readonly Link = Link;
+  readonly FileText = FileText;
   user: any = {
     id: localStorage.getItem('user_id'),
     name: localStorage.getItem('user_name'),
@@ -69,17 +73,24 @@ export class GestionDocenteComponent implements OnInit {
   }
 
   loading: boolean = true;
-  estudiantes: any[] = [];         
-  estudiantesCurso: any[] = [];    
-  courses: any[] = [];             
+  estudiantes: any[] = [];
+  estudiantesCurso: any[] = [];
+  courses: any[] = [];
   matriculasCurso: any[] = [];
   tasks: any[] = [];
+  studentTasks: any[] = [];
+  tasaEntregaAula: number = 0;
+  tasaPuntualidadAula: number = 0;
   showAsignarTareaModal: boolean = false;
   nuevaTareaEstudiante = { studentId: null, title: '', dueDate: '' };
 
+  selectedReviewTask: any = null;
+  notaReview: number | null = null;
+  tipoEvaluacionReview: string | null = 'TAREAS';
+
   cursoSeleccionadoId: number | null = null;
 
-  
+
   notasEstudiante: any[] = [];
   firstName: string = '';
 
@@ -122,7 +133,7 @@ export class GestionDocenteComponent implements OnInit {
 
   ngOnInit(): void {
     this.firstName = this.user.name ? this.user.name.split(' ')[0] : 'Docente';
-    
+
     setTimeout(() => {
       this.inicializarPanel();
     }, 100);
@@ -146,7 +157,7 @@ export class GestionDocenteComponent implements OnInit {
     this.updateQRCodeUrl();
   }
 
-  
+
 
 
 
@@ -155,13 +166,17 @@ export class GestionDocenteComponent implements OnInit {
     try {
       if (this.roleService.isDocente(this.user.role)) {
 
-        
+
         await this.cargarEstudiantesGlobales();
 
-        
+
+        // Cargar tareas administrativas
         await this.cargarTareasServidor();
 
-        
+        // Cargar tareas de estudiantes
+        await this.cargarTareasEstudiantes();
+
+        // Cargar cursos
         await this.cargarCursosDelProfesor();
 
         this.calcularMetricas();
@@ -171,7 +186,7 @@ export class GestionDocenteComponent implements OnInit {
     } catch (error) {
       console.error("Error al sincronizar datos protegidos por JWT con el panel:", error);
     } finally {
-      
+
       setTimeout(() => {
         this.loading = false;
         this.cdr.detectChanges();
@@ -179,7 +194,7 @@ export class GestionDocenteComponent implements OnInit {
     }
   }
 
-  
+
   cargarNotasPersonales(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.get<any[]>(`${this.apiBaseUrl}/grades/student/${this.user.id}`).subscribe({
@@ -196,23 +211,23 @@ export class GestionDocenteComponent implements OnInit {
     });
   }
 
-  
+
 
 
   async cargarCursosDelProfesor(): Promise<void> {
     try {
       const profesores = await firstValueFrom(this.http.get<any[]>(`${this.apiBaseUrl}/teachers`));
       const allCourses = await firstValueFrom(this.http.get<any[]>(`${this.apiBaseUrl}/courses`));
-      
+
       const profReal = profesores.find(p => Number(p.id) === Number(this.user.id));
 
-      
+
       const nuevosCursos = allCourses.filter(c => c.teacher && Number(c.teacher.id) === Number(this.user.id));
 
-      
+
       const viejosCursos = profesores.filter(p => Number(p.id) === Number(this.user.id) && p.course).map(p => p.course);
 
-      
+
       const combinados = [...nuevosCursos];
       viejosCursos.forEach(vc => {
         if (!combinados.some(c => c.id === vc.id)) {
@@ -227,7 +242,7 @@ export class GestionDocenteComponent implements OnInit {
         this.nuevaNota.courseId = this.courses[0].id;
       }
 
-      
+
       if (this.cursoSeleccionadoId) {
         this.onCursoSeleccionadoChange(this.cursoSeleccionadoId);
       }
@@ -255,7 +270,7 @@ export class GestionDocenteComponent implements OnInit {
         });
         this.matriculasCurso = activeMatriculas;
 
-        
+
         this.estudiantesCurso = this.estudiantes.filter(alumno => {
           return activeMatriculas.some(m => {
             const idMatriculaAlumno = m.studentId ? Number(m.studentId) : (m.student ? Number(m.student.id) : null);
@@ -263,18 +278,25 @@ export class GestionDocenteComponent implements OnInit {
           });
         });
 
-        
+
         this.estudiantesCurso.forEach(s => {
           if (!(s.id in this.asistencia)) {
             this.asistencia[s.id] = true;
           }
         });
 
-        this.calcularMetricas();
-
-        setTimeout(() => {
-          this.loading = false;
-          this.cdr.detectChanges();
+        this.cargarTareasEstudiantes().then(() => {
+          this.calcularMetricas();
+          setTimeout(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          });
+        }).catch(() => {
+          this.calcularMetricas();
+          setTimeout(() => {
+            this.loading = false;
+            this.cdr.detectChanges();
+          });
         });
       },
       error: (err) => {
@@ -288,7 +310,7 @@ export class GestionDocenteComponent implements OnInit {
     });
   }
 
-  
+
 
 
 
@@ -300,7 +322,7 @@ export class GestionDocenteComponent implements OnInit {
     }
   }
 
-  
+
 
 
   async cargarTareasServidor(): Promise<void> {
@@ -311,11 +333,21 @@ export class GestionDocenteComponent implements OnInit {
     }
   }
 
+  async cargarTareasEstudiantes(): Promise<void> {
+    try {
+      this.studentTasks = await firstValueFrom(this.http.get<any[]>(`${this.apiBaseUrl}/student-tasks`));
+    } catch (err) {
+      console.error("Error al recuperar tareas de estudiantes:", err);
+    }
+  }
+
   calcularMetricas() {
     const objetivos = this.estudiantesCurso.length > 0 ? this.estudiantesCurso : this.estudiantes;
     if (!objetivos || objetivos.length === 0) {
       this.promedioAula = '0.0';
       this.statsAprobados = 0;
+      this.tasaEntregaAula = 0;
+      this.tasaPuntualidadAula = 100;
       return;
     }
     const notas = objetivos.map(s => s.averageGrade || 0);
@@ -324,6 +356,27 @@ export class GestionDocenteComponent implements OnInit {
 
     const aprobadosCount = objetivos.filter(s => (s.averageGrade || 0) >= 10.5).length;
     this.statsAprobados = Math.round((aprobadosCount / objetivos.length) * 100);
+
+    const studentIds = new Set(objetivos.map(s => Number(s.id)));
+    const cursoNombre = this.courses.find(c => Number(c.id) === this.cursoSeleccionadoId)?.name || '';
+
+    const courseTasks = this.studentTasks.filter(t => {
+      const sId = t.student ? Number(t.student.id) : null;
+      return sId && studentIds.has(sId) && (t.courseName === cursoNombre || cursoNombre === '');
+    });
+
+    const totalTasks = courseTasks.length;
+    if (totalTasks > 0) {
+      const onTime = courseTasks.filter(t => t.status === 'Entregado').length;
+      const late = courseTasks.filter(t => t.status === 'Atrasado').length;
+      const submitted = onTime + late;
+
+      this.tasaEntregaAula = Math.round((submitted / totalTasks) * 100);
+      this.tasaPuntualidadAula = submitted > 0 ? Math.round((onTime / submitted) * 100) : 100;
+    } else {
+      this.tasaEntregaAula = 0;
+      this.tasaPuntualidadAula = 100;
+    }
   }
 
   manejarSubirNota() {
@@ -356,7 +409,7 @@ export class GestionDocenteComponent implements OnInit {
     });
   }
 
-  
+
 
 
 
@@ -378,7 +431,7 @@ export class GestionDocenteComponent implements OnInit {
 
     this.loading = true;
 
-    
+
     const payload = [{
       studentId: Number(this.nuevaParticipacion.studentId),
       courseId: Number(cursoIdActual),
@@ -388,7 +441,7 @@ export class GestionDocenteComponent implements OnInit {
     const token = localStorage.getItem('token') || localStorage.getItem('jwt') || localStorage.getItem('access_token');
     const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
 
-    
+
     this.http.post(`${this.apiBaseUrl}/enrollments/participations/bulk`, payload, options).subscribe({
       next: () => {
         setTimeout(() => {
@@ -608,11 +661,68 @@ export class GestionDocenteComponent implements OnInit {
       next: () => {
         this.notificationService.showSuccess("Tarea asignada correctamente al estudiante.");
         this.showAsignarTareaModal = false;
-        this.cdr.detectChanges();
+        this.cargarTareasEstudiantes().then(() => {
+          this.calcularMetricas();
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => {
         console.error("Error al asignar tarea:", err);
         this.notificationService.showError("Error al asignar tarea en el servidor.");
+      }
+    });
+  }
+
+  get tareasPorRevisar(): any[] {
+    const cursoNombre = this.courses.find(c => Number(c.id) === this.cursoSeleccionadoId)?.name || '';
+    return this.studentTasks.filter(t =>
+      (t.status === 'Entregado' || t.status === 'Atrasado') &&
+      (t.courseName === cursoNombre || cursoNombre === '')
+    );
+  }
+
+  seleccionarTareaRevisar(task: any) {
+    this.selectedReviewTask = task;
+    this.notaReview = null;
+    this.tipoEvaluacionReview = 'TAREAS';
+    this.cdr.detectChanges();
+  }
+
+  descargarArchivoEntregado(task: any) {
+    if (!task || !task.submissionContent) return;
+    const content = task.submissionContent;
+    const filename = task.submissionFileName || 'archivo_entregado';
+    const link = document.createElement('a');
+    link.href = content;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  guardarRevisionTarea() {
+    if (!this.selectedReviewTask) return;
+    if (this.notaReview === null || this.notaReview < 0 || this.notaReview > 20) {
+      this.notificationService.showError("Por favor ingresa una nota válida entre 0 y 20.");
+      return;
+    }
+
+    const payload = {
+      score: String(this.notaReview)
+    };
+
+    this.http.put(`${this.apiBaseUrl}/student-tasks/${this.selectedReviewTask.id}/grade`, payload).subscribe({
+      next: () => {
+        this.notificationService.showSuccess("La tarea ha sido calificada y el promedio de DD del estudiante ha sido actualizado.");
+        this.selectedReviewTask = null;
+        this.cargarTareasEstudiantes().then(() => {
+          this.calcularMetricas();
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        console.error("Error al calificar tarea:", err);
+        this.notificationService.showError("Hubo un error al registrar la calificación de la tarea.");
       }
     });
   }

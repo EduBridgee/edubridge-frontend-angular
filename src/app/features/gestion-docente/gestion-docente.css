@@ -1875,3 +1875,26 @@
     }
   }
 }
+
+/* US17: Teacher support modal custom styles */
+#teacher-chat-box {
+  scroll-behavior: smooth;
+}
+
+#teacher-chat-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+#teacher-chat-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#teacher-chat-box::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+#teacher-chat-box::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+

@@ -30,8 +30,8 @@
         <div *ngFor="let kpi of [
           {label: 'Promedio Aula', val: promedioAula, sub: 'General', color: 'blue'},
           {label: 'Estudiantes', val: estudiantesCurso.length, sub: 'En este curso', color: 'emerald'},
-          {label: 'Clases Hoy', val: '5', sub: 'Sincrónicas', color: 'purple'},
-          {label: 'Horas Ahorro', val: '24h', sub: 'Automatización', color: 'orange'}
+          {label: 'Tasa de Entrega', val: tasaEntregaAula + '%', sub: 'Tareas completadas', color: 'purple'},
+          {label: 'Puntualidad Aula', val: tasaPuntualidadAula + '%', sub: 'Entregas a tiempo', color: 'orange'}
         ]" class="kpi-card">
           <div class="text-left">
             <p class="kpi-label">{{kpi.label}}</p>
@@ -41,8 +41,8 @@
           <div [ngClass]="'bg-'+kpi.color+'-50 text-'+kpi.color+'-600'" class="kpi-icon-box">
             <lucide-icon *ngIf="kpi.label === 'Promedio Aula'" [img]="BarChart3" [size]="20"></lucide-icon>
             <lucide-icon *ngIf="kpi.label === 'Estudiantes'" [img]="Users" [size]="20"></lucide-icon>
-            <lucide-icon *ngIf="kpi.label === 'Clases Hoy'" [img]="Calendar" [size]="20"></lucide-icon>
-            <lucide-icon *ngIf="kpi.label === 'Horas Ahorro'" [img]="Clock" [size]="20"></lucide-icon>
+            <lucide-icon *ngIf="kpi.label === 'Tasa de Entrega'" [img]="Check" [size]="20"></lucide-icon>
+            <lucide-icon *ngIf="kpi.label === 'Puntualidad Aula'" [img]="Clock" [size]="20"></lucide-icon>
           </div>
         </div>
       </div>
@@ -78,57 +78,109 @@
         </div>
       </div>
 
-      <div class="tasks-panel">
-        <h3 class="panel-title">Tareas del Servidor</h3>
-        <div class="tasks-list">
-          <div *ngFor="let task of tasks" class="task-item group">
-            <div class="task-header">
-              <div>
-                <p class="task-title">{{task.title}}</p>
-                <p class="task-tag">{{task.tag}} Prioridad</p>
-              </div>
-              <span [class]="task.status === 'Pendiente' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'"
-                class="task-status">
-                {{task.status}}
-              </span>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col">
+          <div class="flex justify-between items-center mb-4 border-b border-slate-50 pb-3">
+            <div>
+              <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">Tareas por Revisar</h3>
+              <p class="text-xs text-slate-400 font-bold mt-0.5">Entregas de los alumnos en esta materia</p>
             </div>
-            <div class="task-progress-row">
-              <div class="task-progress-bar-bg">
-                <div class="task-progress-bar-fill" [style.width.%]="task.progress"></div>
+            <span class="px-2.5 py-1 bg-amber-50 text-amber-800 text-[10px] font-black uppercase rounded-lg tracking-wider">
+              {{ tareasPorRevisar.length }} pendientes
+            </span>
+          </div>
+
+          <div class="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+            <div *ngFor="let task of tareasPorRevisar" (click)="seleccionarTareaRevisar(task)" [ngClass]="selectedReviewTask?.id === task.id ? 'border-emerald-500 bg-emerald-50/10' : 'border-slate-100 hover:border-slate-200'" class="p-4 rounded-2xl border-2 cursor-pointer flex justify-between items-center transition-all">
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center font-black text-slate-500 text-xs border border-slate-100">
+                  {{ task.student?.name?.substring(0,2)?.toUpperCase() }}
+                </div>
+                <div>
+                  <p class="text-xs font-black text-slate-800">{{ task.title }}</p>
+                  <p class="text-[10px] font-bold text-slate-400 mt-0.5">Alumno: {{ task.student?.name }} • Código: {{ task.student?.code }}</p>
+                </div>
               </div>
-              <span class="task-progress-val">{{task.progress}}%</span>
+              <div class="flex items-center gap-3">
+                <span class="px-2 py-0.5 text-[9px] font-bold uppercase rounded-lg" [ngClass]="task.status === 'Atrasado' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'">
+                  {{ task.status }}
+                </span>
+                <lucide-icon [img]="Edit" [size]="14" class="text-slate-400 group-hover:text-slate-600"></lucide-icon>
+              </div>
             </div>
+
+            <div *ngIf="tareasPorRevisar.length === 0" class="py-12 text-center flex flex-col items-center justify-center text-slate-400">
+              <lucide-icon [img]="Check" [size]="28" class="text-emerald-500 mb-2"></lucide-icon>
+              <p class="text-xs font-bold text-slate-700">¡Al día con las calificaciones!</p>
+              <p class="text-[10px] font-bold text-slate-400 mt-1">No hay entregas pendientes de revisión en este curso.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col">
+          <div *ngIf="selectedReviewTask" class="space-y-4 animate-in fade-in duration-300">
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest border-b border-slate-50 pb-3">Detalle de Revisión</h3>
+
+            <div class="space-y-1">
+              <p class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Tarea</p>
+              <p class="text-xs font-black text-slate-800">{{ selectedReviewTask.title }}</p>
+            </div>
+
+            <div class="space-y-1">
+              <p class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Alumno</p>
+              <p class="text-xs font-bold text-slate-700">{{ selectedReviewTask.student?.name }} ({{ selectedReviewTask.student?.code }})</p>
+            </div>
+
+            <div *ngIf="selectedReviewTask.studentComment" class="space-y-1 bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <p class="text-[9px] font-black tracking-widest text-slate-400 uppercase">Comentario del alumno</p>
+              <p class="text-xs font-bold text-slate-600 italic mt-1">"{{ selectedReviewTask.studentComment }}"</p>
+            </div>
+
+            <div class="space-y-2">
+              <p class="text-[10px] font-black tracking-widest text-slate-400 uppercase">Material Entregado</p>
+
+              <div *ngIf="selectedReviewTask.submissionType === 'FILE'" class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+                <div class="flex items-center gap-2 truncate">
+                  <lucide-icon [img]="FileText" [size]="16" class="text-emerald-500"></lucide-icon>
+                  <span class="text-xs font-bold text-slate-700 truncate max-w-[120px]">{{ selectedReviewTask.submissionFileName }}</span>
+                </div>
+                <button (click)="descargarArchivoEntregado(selectedReviewTask)" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-lg transition-colors flex items-center gap-1 shadow-sm">
+                  <lucide-icon [img]="Download" [size]="10"></lucide-icon> Descargar
+                </button>
+              </div>
+
+              <div *ngIf="selectedReviewTask.submissionType === 'LINK'" class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+                <div class="flex items-center gap-2 truncate">
+                  <lucide-icon [img]="Link" [size]="16" class="text-blue-500"></lucide-icon>
+                  <span class="text-xs font-bold text-slate-700 truncate max-w-[120px]">Enlace de Entrega</span>
+                </div>
+                <a [href]="selectedReviewTask.submissionContent" target="_blank" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-800 text-[10px] font-bold rounded-lg transition-colors flex items-center gap-1 shadow-sm">
+                  Abrir Link
+                </a>
+              </div>
+            </div>
+
+            <div class="space-y-3 pt-3 border-t border-slate-100">
+              <div class="space-y-1">
+                <label class="text-[9px] font-black tracking-widest text-slate-400 uppercase">Nota de la Tarea (0-20)</label>
+                <input type="number" [(ngModel)]="notaReview" min="0" max="20" placeholder="Ej: 16" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none" />
+                <p class="text-[9px] text-slate-400 font-semibold mt-1">Esta calificación se promediará automáticamente en la nota de DD (Evaluación de Desempeño) del estudiante para este curso.</p>
+              </div>
+
+              <button (click)="guardarRevisionTarea()" class="w-full mt-2 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-colors shadow-sm">
+                Registrar Calificación
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="!selectedReviewTask" class="flex-1 flex flex-col items-center justify-center text-center p-6 text-slate-400">
+            <lucide-icon [img]="Edit" [size]="32" class="text-slate-200 mb-2"></lucide-icon>
+            <p class="text-xs font-bold text-slate-700">Detalle de Revisión</p>
+            <p class="text-[10px] font-bold text-slate-400 mt-1 max-w-[200px]">Selecciona la entrega de algún estudiante para evaluarla e ingresar su nota.</p>
           </div>
         </div>
       </div>
     </section>
-
-    <aside class="aside-section">
-      <div class="schedule-card">
-        <h3 class="schedule-card-title">Horario de Hoy</h3>
-        <div class="schedule-items-list">
-          <div class="schedule-item-past">
-            <p class="schedule-item-time">08:00 - 09:00</p>
-            <p class="schedule-item-title">Matemáticas</p>
-          </div>
-          <div class="schedule-item-active">
-            <p class="schedule-item-time">10:00 - 11:00</p>
-            <p class="schedule-item-title">Física</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="export-card group">
-        <div class="relative z-10 text-left">
-          <h3 class="export-title">Exportar Datos</h3>
-          <p class="export-subtitle">Generar consolidado en PDF.</p>
-          <button (click)="loading = true" class="btn-export-pdf">
-            <lucide-icon [img]="Download" [size]="14" class="inline mr-1"></lucide-icon> Descargar PDF
-          </button>
-        </div>
-        <div class="export-bg-circle"></div>
-      </div>
-    </aside>
   </div>
 
   <div *ngIf="showNotasModal" class="modal-overlay">
@@ -145,7 +197,7 @@
         <div class="form-field">
           <label class="form-label">Curso</label>
           <select [ngModel]="cursoSeleccionadoId" (ngModelChange)="onCursoSeleccionadoChange($event)"
-            name="courseIdSelector" class="form-select-sm">
+                  name="courseIdSelector" class="form-select-sm">
             <option [ngValue]="null" disabled>Seleccionar curso...</option>
             <option *ngFor="let curso of courses" [value]="curso.id">{{curso.name}}</option>
           </select>
@@ -164,6 +216,7 @@
             <label class="form-label">Evaluación</label>
             <select name="evaluationType" [(ngModel)]="nuevaNota.type" required class="form-select">
               <option [ngValue]="null" disabled>Tipo...</option>
+              <option value="TAREAS">Tareas</option>
               <option value="PC1">Práctica Calificada 1</option>
               <option value="PC2">Práctica Calificada 2</option>
               <option value="PC3">Práctica Calificada 3</option>
@@ -177,7 +230,7 @@
           <div class="form-field">
             <label class="form-label">Nota (0-20)</label>
             <input type="number" name="score" [(ngModel)]="nuevaNota.score" required min="0" max="20"
-              placeholder="Ej: 15.5" class="form-input" />
+                   placeholder="Ej: 15.5" class="form-input" />
           </div>
         </div>
 
@@ -208,14 +261,14 @@
 
       <div class="students-attendance-list custom-scrollbar">
         <div *ngFor="let alumno of estudiantesCurso"
-          [class]="asistencia[alumno.id] ? 'attendance-item bg-emerald-50 border-emerald-100' : 'attendance-item bg-rose-50 border-rose-100'">
+             [class]="asistencia[alumno.id] ? 'attendance-item bg-emerald-50 border-emerald-100' : 'attendance-item bg-rose-50 border-rose-100'">
           <div class="attendance-student-info">
             <span class="attendance-student-name">{{alumno.name}}</span>
             <span class="attendance-student-meta">
               Riesgo: {{alumno.riskLevel || 'Bajo'}} • Asistencia: {{getStudentAttendanceText(alumno.id)}}</span>
           </div>
           <button (click)="toggleCheck(alumno.id)"
-            [class]="asistencia[alumno.id] ? 'btn-attendance-toggle bg-emerald-500 text-white' : 'btn-attendance-toggle bg-rose-500 text-white'">
+                  [class]="asistencia[alumno.id] ? 'btn-attendance-toggle bg-emerald-500 text-white' : 'btn-attendance-toggle bg-rose-500 text-white'">
             {{asistencia[alumno.id] ? 'Presente' : 'Falta'}}
           </button>
         </div>
@@ -272,10 +325,10 @@
           <div class="radial-chart-wrapper">
             <svg class="radial-chart-svg">
               <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="10" fill="transparent"
-                class="radial-chart-bg-circle" />
+                      class="radial-chart-bg-circle" />
               <circle cx="50%" cy="50%" r="45%" stroke="currentColor" stroke-width="10" fill="transparent"
-                [style.strokeDasharray]="364" [style.strokeDashoffset]="364 - (364 * (+promedioAula/20))"
-                class="radial-chart-fill-circle" />
+                      [style.strokeDasharray]="364" [style.strokeDashoffset]="364 - (364 * (+promedioAula/20))"
+                      class="radial-chart-fill-circle" />
             </svg>
             <span class="radial-chart-value">{{promedioAula}}</span>
           </div>
@@ -287,7 +340,7 @@
 
   <div *ngIf="showNotifyModal" class="modal-overlay" (click)="showNotifyModal = false">
     <div (click)="$event.stopPropagation()"
-      class="modal-container animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
+         class="modal-container animate-in fade-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
       <div class="modal-header-orange">
         <div>
           <h3 class="modal-title">
@@ -320,7 +373,7 @@
         <div class="form-field">
           <label class="form-label">Mensaje</label>
           <textarea required name="message" [(ngModel)]="nuevaNotif.message" placeholder="Escribe el aviso aquí..."
-            class="form-textarea"></textarea>
+                    class="form-textarea"></textarea>
         </div>
         <button type="submit" [disabled]="loading" class="btn-submit-modal-blue">
           <lucide-icon [img]="Bell" [size]="14" class="inline mr-1"></lucide-icon> {{ loading ? 'Enviando...' : 'Enviar Notificación' }}
@@ -360,7 +413,7 @@
         <div class="form-field">
           <label class="form-label">Observación Conductual</label>
           <textarea name="pObs" [(ngModel)]="nuevaParticipacion.observation"
-            placeholder="Ej: Participó activamente en el debate..." class="form-textarea-sm"></textarea>
+                    placeholder="Ej: Participó activamente en el debate..." class="form-textarea-sm"></textarea>
         </div>
         <button type="submit" class="btn-submit-modal-amber">
           Registrar Compromiso
@@ -449,5 +502,4 @@
       </form>
     </div>
   </div>
-
 </div>
