@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../core/services/notification';
 import { TotpService } from '../../core/services/totp';
 import { API_BASE_URL } from '../../core/config/api.config';
-import { LucideAngularModule, Settings, Mail, Phone, MapPin, Award, Calendar, X, FileText, Check, Shield } from 'lucide-angular';
+import { LucideAngularModule, Settings, Mail, Phone, MapPin, Award, Calendar, X, FileText, Check, Shield, Download } from 'lucide-angular';
 
 @Component({
   selector: 'app-student-profile',
@@ -25,8 +25,9 @@ export class StudentProfileComponent implements OnInit {
   readonly FileText = FileText;
   readonly Check = Check;
   readonly Shield = Shield;
+  readonly Download = Download;
 
-  
+
   get userEmail(): string {
     const email = localStorage.getItem('user_email');
     if (email) return email.toLowerCase().trim();
@@ -64,7 +65,7 @@ export class StudentProfileComponent implements OnInit {
   editingStudent: any = {};
   newGrade = { courseId: null, value: null };
 
-  
+
   promedioGeneralReal: number = 0;
   faltasTotalesReales: number = 0;
 
@@ -159,7 +160,7 @@ export class StudentProfileComponent implements OnInit {
         this.students = data;
         this.filteredStudents = data;
 
-        
+
         this.selectedStudent = data.find(s =>
           (currentUserIdNum && s.id === currentUserIdNum) ||
           (currentUser.email && s.email === currentUser.email)
@@ -219,7 +220,7 @@ export class StudentProfileComponent implements OnInit {
           promedio: c.evaluaciones.length > 0 ? c.suma / c.evaluaciones.length : 0
         }));
 
-        
+
         if (this.academicGrades.length > 0) {
           const sumaPromedios = this.academicGrades.reduce((acc, c) => acc + c.promedio, 0);
           this.promedioGeneralReal = sumaPromedios / this.academicGrades.length;
@@ -413,5 +414,406 @@ export class StudentProfileComponent implements OnInit {
     this.show2faSetupModal = false;
     this.twoFactorAuth = false;
     this.cdr.detectChanges();
+  }
+
+  exportarCSV() {
+    if (!this.selectedStudent || !this.academicGrades || this.academicGrades.length === 0) {
+      this.notificationService.showInfo("No hay notas disponibles para exportar.", "Reporte Vacío");
+      return;
+    }
+
+    const headers = ["Curso", "Créditos", "Evaluaciones", "Promedio", "Estado"];
+    const rows = this.academicGrades.map(curso => {
+      const evs = curso.evaluaciones.map((e: any) => `${e.type}: ${e.value}`).join(' | ');
+      const promedio = (Math.round(curso.promedio * 10) / 10).toFixed(1);
+      const estado = curso.promedio >= 12.5 ? "Aprobado" : "En Proceso";
+      return [
+        `"${curso.name}"`,
+        curso.credits,
+        `"${evs}"`,
+        promedio,
+        `"${estado}"`
+      ];
+    });
+
+    const csvContent = "\ufeff" + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const studentCode = this.selectedStudent.code || 'Estudiante';
+    a.href = url;
+    a.download = `Reporte_Notas_${studentCode.replace(/\s+/g, '_')}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+    this.notificationService.showSuccess("El reporte de notas en formato CSV se ha descargado correctamente.");
+  }
+
+  exportarPDF() {
+    if (!this.selectedStudent || !this.academicGrades || this.academicGrades.length === 0) {
+      this.notificationService.showInfo("No hay notas disponibles para exportar.", "Reporte Vacío");
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      this.notificationService.showError("El navegador bloqueó la ventana emergente. Por favor, permite ventanas emergentes para este sitio.");
+      return;
+    }
+
+    const studentName = this.selectedStudent.name;
+    const studentCode = this.selectedStudent.code || 'N/A';
+    const program = this.selectedStudent.program || 'Ingeniería de Sistemas';
+    const semester = this.selectedStudent.semester || '2026-I';
+    const promGeneral = (Math.round(this.promedioGeneralReal * 100) / 100).toFixed(2);
+    const absences = this.faltasTotalesReales;
+    const today = new Date().toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    let tableRowsHtml = '';
+    this.academicGrades.forEach(curso => {
+      const evs = curso.evaluaciones.map((e: any) => `<span class="eval-badge">${e.type}: <strong>${e.value.toFixed(1)}</strong></span>`).join(' ');
+      const promedio = curso.promedio.toFixed(1);
+      const estado = curso.promedio >= 12.5 ? 'APROBADO' : 'EN PROCESO';
+      const statusClass = curso.promedio >= 12.5 ? 'status-approved' : 'status-pending';
+      tableRowsHtml += `
+        <tr>
+          <td>
+            <div class="course-name">${curso.name}</div>
+            <div class="eval-list">${evs}</div>
+          </td>
+          <td class="text-center font-semibold">${curso.credits}</td>
+          <td class="text-center font-bold text-slate-800">${promedio}</td>
+          <td class="text-right"><span class="status-badge ${statusClass}">${estado}</span></td>
+        </tr>
+      `;
+    });
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Reporte de Notas - ${studentName}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+          body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #1e293b;
+            background-color: #ffffff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+          }
+
+          .logo-area h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+            color: #4f46e5;
+            letter-spacing: -0.02em;
+          }
+
+          .logo-area p {
+            margin: 2px 0 0 0;
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+          }
+
+          .report-meta {
+            text-align: right;
+          }
+
+          .report-meta h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+          }
+
+          .report-meta p {
+            margin: 4px 0 0 0;
+            font-size: 12px;
+            color: #64748b;
+          }
+
+          .student-info-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+          }
+
+          .info-block {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px 10px;
+          }
+
+          .info-item {
+            display: flex;
+            flex-direction: column;
+          }
+
+          .info-item label {
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+          }
+
+          .info-item span {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+          }
+
+          .stats-block {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-left: 1px solid #cbd5e1;
+            padding-left: 25px;
+            gap: 15px;
+          }
+
+          .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+          }
+
+          .stat-item label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 500;
+          }
+
+          .stat-item span {
+            font-size: 20px;
+            font-weight: 800;
+          }
+
+          .stat-item.promedio span {
+            color: #4f46e5;
+          }
+
+          .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+          }
+
+          .grades-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            border-bottom: 2px solid #cbd5e1;
+            background-color: #f1f5f9;
+          }
+
+          .grades-table td {
+            padding: 16px;
+            font-size: 13px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+          }
+
+          .course-name {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 14px;
+          }
+
+          .eval-list {
+            margin-top: 6px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+          }
+
+          .eval-badge {
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #475569;
+          }
+
+          .eval-badge strong {
+            color: #0f172a;
+          }
+
+          .status-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            text-align: center;
+          }
+
+          .status-approved {
+            background-color: #d1fae5;
+            color: #065f46;
+          }
+
+          .status-pending {
+            background-color: #fee2e2;
+            color: #991b1b;
+          }
+
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+          .font-semibold { font-weight: 600; }
+          .font-bold { font-weight: 700; }
+
+          .report-footer {
+            margin-top: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+          }
+
+          .signature-area {
+            text-align: center;
+            width: 200px;
+          }
+
+          .signature-line {
+            border-top: 1px solid #94a3b8;
+            margin-bottom: 8px;
+          }
+
+          .signature-title {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 500;
+          }
+
+          .sys-date {
+            font-size: 11px;
+            color: #94a3b8;
+          }
+
+          @media print {
+            body {
+              padding: 0;
+            }
+            .no-print {
+              display: none;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="report-header">
+          <div class="logo-area">
+            <h1>EduBridge</h1>
+            <p>Portal de Gestión Académica</p>
+          </div>
+          <div class="report-meta">
+            <h2>Reporte Oficial de Calificaciones</h2>
+            <p>Generado el ${today}</p>
+          </div>
+        </div>
+
+        <div class="student-info-grid">
+          <div class="info-block">
+            <div class="info-item">
+              <label>Estudiante</label>
+              <span>${studentName}</span>
+            </div>
+            <div class="info-item">
+              <label>Código</label>
+              <span>${studentCode}</span>
+            </div>
+            <div class="info-item">
+              <label>Programa Académico</label>
+              <span>${program}</span>
+            </div>
+            <div class="info-item">
+              <label>Semestre</label>
+              <span>${semester}</span>
+            </div>
+          </div>
+
+          <div class="stats-block">
+            <div class="stat-item promedio">
+              <label>Promedio General:</label>
+              <span>${promGeneral}</span>
+            </div>
+            <div class="stat-item">
+              <label>Inasistencias Totales:</label>
+              <span>${absences}</span>
+            </div>
+          </div>
+        </div>
+
+        <table class="grades-table">
+          <thead>
+            <tr>
+              <th style="width: 55%;">Curso y Detalle de Evaluaciones</th>
+              <th style="width: 15%; text-align: center;">Créditos</th>
+              <th style="width: 15%; text-align: center;">Promedio</th>
+              <th style="width: 15%; text-align: right;">Estatus</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRowsHtml}
+          </tbody>
+        </table>
+
+        <div class="report-footer">
+          <div class="sys-date">
+            * Este reporte es de carácter informativo generado desde el sistema oficial EduBridge.
+          </div>
+          <div class="signature-area">
+            <div class="signature-line"></div>
+            <div class="signature-title">Oficina de Registro Académico</div>
+          </div>
+        </div>
+
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 300);
+          }
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   }
 }

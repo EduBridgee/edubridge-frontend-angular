@@ -11,7 +11,7 @@
         <span class="uppercase tracking-widest text-[10px]">Editar Perfil</span>
       </button>
       <button (click)="toggleTwoFactorSwitch()"
-        [class]="twoFactorAuth ? 'bg-orange-50 text-orange-600 border-orange-200/60 btn-totp-trigger' : 'bg-white text-slate-600 border-slate-100 btn-totp-trigger'">
+              [class]="twoFactorAuth ? 'bg-orange-50 text-orange-600 border-orange-200/60 btn-totp-trigger' : 'bg-white text-slate-600 border-slate-100 btn-totp-trigger'">
         <lucide-icon [img]="Shield" [size]="14"></lucide-icon>
         <span class="uppercase tracking-widest text-[10px]">{{ twoFactorAuth ? '2FA: Activo' : 'Activar 2FA' }}</span>
       </button>
@@ -106,7 +106,7 @@
           'bg-amber-500': selectedStudent.riskLevel === 'Riesgo Medio',
           'bg-rose-500': selectedStudent.riskLevel === 'Alto Riesgo'
         }" class="kpi-card-progress-bar-fill"
-          [style.width.%]="selectedStudent.riskLevel === 'Alto Riesgo' ? 90 : (selectedStudent.riskLevel === 'Riesgo Medio' ? 50 : 15)">
+             [style.width.%]="selectedStudent.riskLevel === 'Alto Riesgo' ? 90 : (selectedStudent.riskLevel === 'Riesgo Medio' ? 50 : 15)">
         </div>
       </div>
     </div>
@@ -164,46 +164,56 @@
       <h3 class="history-title">
         <span class="p-2 bg-blue-50 text-blue-600 rounded-xl text-sm"><lucide-icon [img]="FileText" [size]="16"></lucide-icon></span> Historial Académico
       </h3>
+      <div class="profile-export-buttons-group">
+        <button type="button" (click)="exportarCSV()" class="btn-export-csv" title="Exportar a CSV para Excel">
+          <lucide-icon [img]="Download" [size]="14"></lucide-icon>
+          <span>Exportar CSV</span>
+        </button>
+        <button type="button" (click)="exportarPDF()" class="btn-export-pdf" title="Exportar reporte en PDF / Imprimir">
+          <lucide-icon [img]="FileText" [size]="14"></lucide-icon>
+          <span>Exportar PDF</span>
+        </button>
+      </div>
     </div>
 
     <div class="table-scroll-wrapper custom-scrollbar">
       <table class="history-table">
         <thead>
-          <tr class="table-header-row">
-            <th class="table-header-col">Curso y Detalle de Evaluaciones</th>
-            <th class="table-header-col text-center">Créditos</th>
-            <th class="table-header-col text-right">Estatus Final</th>
-          </tr>
+        <tr class="table-header-row">
+          <th class="table-header-col">Curso y Detalle de Evaluaciones</th>
+          <th class="table-header-col text-center">Créditos</th>
+          <th class="table-header-col text-right">Estatus Final</th>
+        </tr>
         </thead>
         <tbody class="table-body">
-          <tr *ngFor="let curso of academicGrades" class="table-row group">
-            <td class="table-cell-evals">
-              <div class="flex flex-col gap-4">
-                <span class="table-evals-title">{{curso.name}}</span>
-                <div class="table-eval-tags">
-                  <div *ngFor="let eval of curso.evaluaciones" class="table-eval-tag">
-                    <span class="table-eval-type">{{eval.type}}</span>
-                    <span [ngClass]="eval.value >= 12.5 ? 'text-blue-600' : 'text-rose-500'" class="table-eval-value">
+        <tr *ngFor="let curso of academicGrades" class="table-row group">
+          <td class="table-cell-evals">
+            <div class="flex flex-col gap-4">
+              <span class="table-evals-title">{{curso.name}}</span>
+              <div class="table-eval-tags">
+                <div *ngFor="let eval of curso.evaluaciones" class="table-eval-tag">
+                  <span class="table-eval-type">{{eval.type}}</span>
+                  <span [ngClass]="eval.value >= 12.5 ? 'text-blue-600' : 'text-rose-500'" class="table-eval-value">
                       {{eval.value | number:'1.1-1'}}
                     </span>
-                  </div>
                 </div>
               </div>
-            </td>
-            <td class="table-cell-credits">
-              <span>{{curso.credits}}</span>
-            </td>
-            <td class="table-cell-status">
+            </div>
+          </td>
+          <td class="table-cell-credits">
+            <span>{{curso.credits}}</span>
+          </td>
+          <td class="table-cell-status">
               <span [ngClass]="curso.promedio >= 12.5 ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'" class="status-badge">
                 {{curso.promedio >= 12.5 ? 'Aprobado' : 'En Proceso'}}
               </span>
-            </td>
-          </tr>
-          <tr *ngIf="academicGrades.length === 0">
-            <td colspan="3" class="table-empty-row">
-              No hay registros académicos para mostrar
-            </td>
-          </tr>
+          </td>
+        </tr>
+        <tr *ngIf="academicGrades.length === 0">
+          <td colspan="3" class="table-empty-row">
+            No hay registros académicos para mostrar
+          </td>
+        </tr>
         </tbody>
       </table>
     </div>
@@ -220,7 +230,7 @@
 
       <div class="space-y-4 text-xs text-slate-600 font-medium">
         <p>Añade una capa adicional de seguridad a tu cuenta mediante un autenticador móvil (Google Authenticator, Authy, etc.).</p>
-        
+
         <div class="space-y-2">
           <p class="totp-step-title">Paso 1: Escanear Código QR</p>
           <div class="qr-code-wrapper">
@@ -247,8 +257,8 @@
           Cancelar
         </button>
         <button (click)="confirmarActivacion2fa()"
-          [disabled]="!totpVerificationCode || totpVerificationCode.length !== 6"
-          class="btn-confirm-modal">
+                [disabled]="!totpVerificationCode || totpVerificationCode.length !== 6"
+                class="btn-confirm-modal">
           Activar 2FA
         </button>
       </div>
