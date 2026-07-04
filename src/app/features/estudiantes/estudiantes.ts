@@ -9,6 +9,7 @@ import { LucideAngularModule, Search, BookOpen, Calendar, AlertTriangle, Smartph
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RoleService, UserRole } from '../../core/services/role';
+import { API_BASE_URL } from '../../core/config/api.config';
 
 @Component({
   selector: 'app-estudiantes',
@@ -58,7 +59,7 @@ export class EstudiantesComponent implements OnInit {
     value: null
   };
 
-  private readonly API_URL = 'https://edubridge-backend-prueba-v2.onrender.com/api';
+  private readonly API_URL = API_BASE_URL;
 
   private breakpointObserver = inject(BreakpointObserver);
   private http = inject(HttpClient);
@@ -128,6 +129,9 @@ export class EstudiantesComponent implements OnInit {
           const teacherCourseIds = combinados.map(c => Number(c.id));
           const myStudentIds = new Set<number>();
           res.allEnrollments.forEach(m => {
+            const status = (m.status || '').toUpperCase();
+            const isActive = status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+            if (!isActive) return;
             const cId = m.courseId ? Number(m.courseId) : (m.course ? Number(m.course.id) : null);
             const sId = m.studentId ? Number(m.studentId) : (m.student ? Number(m.student.id) : null);
             if (cId && sId && teacherCourseIds.includes(cId)) {
@@ -182,13 +186,17 @@ export class EstudiantesComponent implements OnInit {
 
     this.http.get<any[]>(`${this.API_URL}/enrollments/student/${studentId}`).subscribe({
       next: (dataMatriculas) => {
-        this.courses = dataMatriculas.map(m => m.course);
+        const activeMatriculas = dataMatriculas.filter(m => {
+          const status = (m.status || '').toUpperCase();
+          return status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+        });
+        this.courses = activeMatriculas.map(m => m.course);
 
         
         let sumAttended = 0;
         let sumTotal = 0;
 
-        dataMatriculas.forEach(m => {
+        activeMatriculas.forEach(m => {
           sumAttended += m.attendedClasses || 0;
           sumTotal += m.totalClasses || 0;
         });

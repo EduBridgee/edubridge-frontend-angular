@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { RoleService, UserRole } from '../../../core/services/role';
-import { LucideAngularModule, LayoutDashboard, BookOpen, GraduationCap, Calendar, FolderOpen, User, Settings, LogOut, Menu, X, Home, Users, FileText, Clock } from 'lucide-angular';
+import { LucideAngularModule, LayoutDashboard, BookOpen, GraduationCap, Calendar, FolderOpen, User, Settings, LogOut, Menu, X, Users, FileText } from 'lucide-angular';
 
 @Component({
   selector: 'app-sidebar',
@@ -21,10 +21,8 @@ export class SidebarComponent {
   readonly LogOut = LogOut;
   readonly Menu = Menu;
   readonly X = X;
-  readonly Home = Home;
   readonly Users = Users;
   readonly FileText = FileText;
-  readonly Clock = Clock;
 
   @Input() userName = '';
   @Input() userRole = '';

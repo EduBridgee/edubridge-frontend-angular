@@ -5,7 +5,8 @@ import { FormsModule } from '@angular/forms';
 
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell';
 import { NotificationService } from '../../core/services/notification';
-import { LucideAngularModule, Search, Plus, FileText, Video, Image, Music, Presentation, Globe, Upload, Download, Link, Rocket, X } from 'lucide-angular';
+import { LucideAngularModule, Search, Plus, FileText, Video, Image, Music, Presentation, Globe, Download, Link, Rocket, X } from 'lucide-angular';
+import { API_BASE_URL } from '../../core/config/api.config';
 
 @Component({
   selector: 'app-recursos',
@@ -25,7 +26,6 @@ export class RecursosComponent implements OnInit {
   readonly Music = Music;
   readonly Presentation = Presentation;
   readonly Globe = Globe;
-  readonly Upload = Upload;
   readonly Download = Download;
   readonly Link = Link;
   readonly Rocket = Rocket;
@@ -46,7 +46,7 @@ export class RecursosComponent implements OnInit {
 
   nuevoRecurso = {
     title: '',
-    subject: '',
+    subject: '', 
     type: 'PDF',
     meta: '',
     img: '',
@@ -55,7 +55,7 @@ export class RecursosComponent implements OnInit {
   };
 
   constructor(
-    private http: HttpClient,
+    private http: HttpClient, 
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService
   ) {}
@@ -76,7 +76,7 @@ export class RecursosComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
-
+    
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
       this.handleFile(files[0]);
@@ -90,8 +90,42 @@ export class RecursosComponent implements OnInit {
     }
   }
 
-  private handleFile(file: File) {
+  compressImage(dataUrl: string, callback: (res: string) => void) {
+    const img = new window.Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+      const MAX_SIZE = 800;
 
+      if (width > height) {
+        if (width > MAX_SIZE) {
+          height = Math.round((height * MAX_SIZE) / width);
+          width = MAX_SIZE;
+        }
+      } else {
+        if (height > MAX_SIZE) {
+          width = Math.round((width * MAX_SIZE) / height);
+          height = MAX_SIZE;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressed = canvas.toDataURL('image/jpeg', 0.7);
+        callback(compressed);
+      } else {
+        callback(dataUrl);
+      }
+    };
+    img.onerror = () => callback(dataUrl);
+    img.src = dataUrl;
+  }
+
+  private handleFile(file: File) {
     const MAX_SIZE_KB = 500;
     if (file.size > MAX_SIZE_KB * 1024) {
       this.notificationService.showError(`El archivo es demasiado grande (${(file.size / 1024).toFixed(1)}KB). Límite permitido: ${MAX_SIZE_KB}KB.`, 'Archivo excedido');
@@ -105,9 +139,16 @@ export class RecursosComponent implements OnInit {
 
     const reader = new FileReader();
     reader.onload = (e: any) => {
-
-      this.nuevoRecurso.img = e.target.result;
-      this.cdr.detectChanges();
+      const base64Str = e.target.result as string;
+      if (file.type.startsWith('image/')) {
+        this.compressImage(base64Str, (compressed) => {
+          this.nuevoRecurso.img = compressed;
+          this.cdr.detectChanges();
+        });
+      } else {
+        this.nuevoRecurso.img = base64Str;
+        this.cdr.detectChanges();
+      }
     };
     reader.readAsDataURL(file);
   }
@@ -115,33 +156,37 @@ export class RecursosComponent implements OnInit {
   manejarSubida() {
     if (!this.nuevoRecurso.title) return;
 
-
+    
     const payload = {
       type: this.nuevoRecurso.type,
       title: this.nuevoRecurso.title,
-      subject: this.nuevoRecurso.subject,
+      subject: this.nuevoRecurso.subject, 
       meta: this.nuevoRecurso.meta || 'Material académico',
       stats: this.nuevoRecurso.stats,
       rating: this.nuevoRecurso.rating,
-      img: this.nuevoRecurso.type === 'Video' ? this.videoUrl : this.nuevoRecurso.img
+      img: this.nuevoRecurso.type === 'Video' ? this.videoUrl : this.nuevoRecurso.img 
     };
 
     console.log('Enviando recurso al backend (Modelo exacto):', { ...payload, img: payload.img?.substring(0, 50) + '...' });
 
-    this.http.post('https://edubridge-backend-prueba-v2.onrender.com/api/resources', payload).subscribe({
+    this.http.post(`${API_BASE_URL}/resources`, payload).subscribe({
       next: () => {
-        this.notificationService.showSuccess("El recurso ha sido publicado exitosamente.");
-        this.showModal = false;
-        this.cargarDatos();
-        this.resetForm();
+        setTimeout(() => {
+          this.notificationService.showSuccess("El recurso ha sido publicado exitosamente.");
+          this.showModal = false;
+          this.cargarDatos();
+          this.resetForm();
+        });
       },
       error: (err) => {
         console.error("Error al subir:", err);
-        if (err.status === 500) {
-          this.notificationService.showError("El servidor no pudo guardar el archivo. Verifica el tamaño o formato.", "Error de Servidor (500)");
-        } else {
-          this.notificationService.showError(`No se pudo subir el recurso (Error ${err.status}).`, "Error al publicar");
-        }
+        setTimeout(() => {
+          if (err.status === 500) {
+            this.notificationService.showError("El servidor no pudo guardar el archivo. Verifica el tamaño o formato.", "Error de Servidor (500)");
+          } else {
+            this.notificationService.showError(`No se pudo subir el recurso (Error ${err.status}).`, "Error al publicar");
+          }
+        });
       }
     });
   }
@@ -176,21 +221,21 @@ export class RecursosComponent implements OnInit {
 
   cargarCursos() {
     const role = this.user.role ? this.user.role.toLowerCase() : '';
-    this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/courses').subscribe({
+    this.http.get<any[]>(`${API_BASE_URL}/courses`).subscribe({
       next: (data) => {
         if (role === 'docente' || role === 'teacher') {
-          this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/teachers').subscribe({
+          this.http.get<any[]>(`${API_BASE_URL}/teachers`).subscribe({
             next: (profesores) => {
               const misCursos = data.filter(c => c.teacher && Number(c.teacher.id) === Number(this.user.id));
               const viejosCursos = profesores.filter(p => Number(p.id) === Number(this.user.id) && p.course).map(p => p.course);
-
+              
               const combinados = [...misCursos];
               viejosCursos.forEach(vc => {
                 if (!combinados.some(c => c.id === vc.id)) {
                   combinados.push(vc);
                 }
               });
-
+              
               this.cursos = combinados;
               if (this.cursos.length > 0) {
                 this.nuevoRecurso.subject = this.cursos[0].name;
@@ -223,10 +268,10 @@ export class RecursosComponent implements OnInit {
   }
 
   registrarActividad(recurso: any) {
-
+    
     this.recentActivity = this.recentActivity.filter(a => a.id !== recurso.id);
-
-
+    
+    
     this.recentActivity.unshift({
       id: recurso.id,
       title: recurso.title,
@@ -235,9 +280,9 @@ export class RecursosComponent implements OnInit {
       timestamp: new Date().getTime()
     });
 
-
+    
     this.recentActivity = this.recentActivity.slice(0, 4);
-
+    
     localStorage.setItem(this.ACTIVITY_KEY, JSON.stringify(this.recentActivity));
     this.cdr.detectChanges();
   }
@@ -245,13 +290,17 @@ export class RecursosComponent implements OnInit {
   cargarDatos() {
     this.loading = true;
     const role = this.user.role ? this.user.role.toLowerCase() : '';
-
-    this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/resources').subscribe({
+    
+    this.http.get<any[]>(`${API_BASE_URL}/resources`).subscribe({
       next: (dataRecursos) => {
         if (role === 'estudiante' || role === 'student') {
-          this.http.get<any[]>(`https://edubridge-backend-prueba-v2.onrender.com/api/enrollments/student/${this.user.id}`).subscribe({
+          this.http.get<any[]>(`${API_BASE_URL}/enrollments/student/${this.user.id}`).subscribe({
             next: (dataMatriculas) => {
-              const cursosMatriculados = dataMatriculas.map(m => m.course?.name?.toLowerCase().trim());
+              const activeMatriculas = dataMatriculas.filter(m => {
+                const status = (m.status || '').toUpperCase();
+                return status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+              });
+              const cursosMatriculados = activeMatriculas.map(m => m.course?.name?.toLowerCase().trim());
               this.recursos = dataRecursos.filter(r => {
                 const subjectLower = r.subject ? r.subject.toLowerCase().trim() : '';
                 return cursosMatriculados.includes(subjectLower);
@@ -292,11 +341,11 @@ export class RecursosComponent implements OnInit {
     if (this.activeFilter === 'Todos') {
       this.filteredRecursos = this.recursos;
     } else {
-      const typeMap: any = {
-        'Documentos': 'PDF',
-        'Videos': 'Video',
-        'Quizzes': 'Quiz',
-        'Audios': 'Audio',
+      const typeMap: any = { 
+        'Documentos': 'PDF', 
+        'Videos': 'Video', 
+        'Quizzes': 'Quiz', 
+        'Audios': 'Audio', 
         'Presentaciones': 'PPT',
         'Imágenes': 'Imagen'
       };
@@ -315,7 +364,7 @@ export class RecursosComponent implements OnInit {
 
   manejarAccion(recurso: any) {
     this.registrarActividad(recurso);
-
+    
     let content = recurso.img;
 
     if (!content) {
@@ -327,7 +376,7 @@ export class RecursosComponent implements OnInit {
       }
     }
 
-
+    
     if (content.startsWith('data:')) {
       try {
         const byteString = atob(content.split(',')[1]);
@@ -352,7 +401,7 @@ export class RecursosComponent implements OnInit {
 
   descargarRecurso(recurso: any) {
     const content = recurso.img;
-
+    
     if (!content) {
       this.notificationService.showInfo('No hay un archivo físico disponible para descargar.', 'Sin archivo');
       return;

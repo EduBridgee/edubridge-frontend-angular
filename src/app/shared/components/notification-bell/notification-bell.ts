@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RoleService } from '../../../core/services/role';
 import { LucideAngularModule, Bell, AlertTriangle, FileText, FolderOpen, Sparkles, Volume2, Check } from 'lucide-angular';
+import { API_BASE_URL } from '../../../core/config/api.config';
 
 @Component({
   selector: 'app-notification-bell',
@@ -25,7 +26,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy, OnChanges {
   notifications: any[] = [];
   isOpen = false;
   private intervalId: ReturnType<typeof setInterval> | null = null;
-  private readonly API_URL = 'https://edubridge-backend-prueba-v2.onrender.com/api/notifications';
+  private readonly API_URL = `${API_BASE_URL}/notifications`;
 
   
   private isFetching = false;
@@ -89,12 +90,11 @@ export class NotificationBellComponent implements OnInit, OnDestroy, OnChanges {
     const token = localStorage.getItem('token') || localStorage.getItem('jwt') || localStorage.getItem('access_token');
     const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
 
-    this.http.get<any[]>(`https://edubridge-backend-prueba-v2.onrender.com/api/notifications/student/${studentId}`, options).subscribe({
+    this.http.get<any[]>(`${this.API_URL}/student/${studentId}`, options).subscribe({
       next: (data) => {
         this.notifications = data || [];
 
-        console.log("=== ENVIANDO DESDE NEON A LA CAMPANA ===");
-        console.log(`Alertas del estudiante ${studentId}:`, this.notifications);
+
 
         
         setTimeout(() => {

@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { API_BASE_URL } from '../../core/config/api.config';
 
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell';
 import { LucideAngularModule, Search, User, Calendar, TrendingDown } from 'lucide-angular';
@@ -70,13 +71,13 @@ export class CursosComponent implements OnInit {
 
     const role = this.user.role ? this.user.role.toLowerCase() : '';
     if (role === 'docente' || role === 'teacher') {
-      this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/courses').subscribe({
+      this.http.get<any[]>(`${API_BASE_URL}/courses`).subscribe({
         next: (allCourses) => {
-          this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/teachers').subscribe({
+          this.http.get<any[]>(`${API_BASE_URL}/teachers`).subscribe({
             next: (profesores) => {
               const misCursos = allCourses.filter(c => c.teacher && Number(c.teacher.id) === Number(this.user.id));
               const viejosCursos = profesores.filter(p => Number(p.id) === Number(this.user.id) && p.course).map(p => p.course);
-
+              
               const combinados = [...misCursos];
               viejosCursos.forEach(vc => {
                 if (!combinados.some(c => c.id === vc.id)) {
@@ -120,14 +121,18 @@ export class CursosComponent implements OnInit {
       return;
     }
 
-    this.http.get<any[]>(`https://edubridge-backend-prueba-v2.onrender.com/api/enrollments/student/${this.user.id}`).subscribe({
+    this.http.get<any[]>(`${API_BASE_URL}/enrollments/student/${this.user.id}`).subscribe({
       next: (dataMatriculas) => {
-        this.http.get<any[]>(`https://edubridge-backend-prueba-v2.onrender.com/api/grades/student/${this.user.id}`).subscribe({
+        this.http.get<any[]>(`${API_BASE_URL}/grades/student/${this.user.id}`).subscribe({
           next: (notas) => {
-            this.http.get<any[]>('https://edubridge-backend-prueba-v2.onrender.com/api/teachers').subscribe({
+            this.http.get<any[]>(`${API_BASE_URL}/teachers`).subscribe({
               next: (profesores) => {
+                const activeMatriculas = dataMatriculas.filter(m => {
+                  const status = (m.status || '').toUpperCase();
+                  return status === 'APROBADO' || status === 'ACTIVA' || status === 'ACTIVO';
+                });
 
-                this.cursos = dataMatriculas.map((matricula, index) => {
+                this.cursos = activeMatriculas.map((matricula, index) => {
                   const curso = matricula.course;
                   const notasDelCurso = notas.filter(n => n.course && n.course.id === curso.id);
                   const profesorReal = curso.teacher || profesores.find(p => p.course && p.course.id === curso.id);
@@ -138,17 +143,17 @@ export class CursosComponent implements OnInit {
                     prof: profesorReal ? profesorReal.name : "Prof. Por Asignar",
                     evaluaciones: notasDelCurso.map(n => ({ type: n.type, value: n.value })),
 
-
+                    
                     notaPromedio: notasDelCurso.length > 0
                       ? notasDelCurso.reduce((acc, n) => acc + n.value, 0) / notasDelCurso.length
                       : 0,
 
-
+                    
                     asis: (matricula.attendancePercentage !== undefined && matricula.attendancePercentage !== null)
                       ? `${matricula.attendancePercentage}%`
                       : "0%",
 
-
+                    
                     puntosParticipacion: matricula.participations || 0,
 
                     prog: Math.floor(Math.random() * (90 - 60 + 1)) + 60
