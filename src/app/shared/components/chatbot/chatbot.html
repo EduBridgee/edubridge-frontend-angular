@@ -25,49 +25,294 @@
       </div>
     </div>
 
-    <div id="chat-box" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 bg-slate-50/50 scroll-smooth relative z-10">
-      <div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden">
-        <img src="assets/images/logo.jpeg" class="w-48 h-48 object-contain" alt="">
-      </div>
-      <div *ngFor="let msg of chatMessages" 
-           [ngClass]="msg.role === 'assistant' ? 'justify-start' : 'justify-end'" 
-           class="flex w-full message-fade-in relative z-10">
-      
-        <div [ngClass]="msg.role === 'assistant' 
-                ? 'bg-white text-slate-700 rounded-tr-[1.5rem] md:rounded-tr-[1.8rem] rounded-bl-[1.5rem] md:rounded-bl-[1.8rem] rounded-br-[1.5rem] md:rounded-br-[1.8rem] shadow-sm border border-slate-200' 
-                : 'bg-blue-600 text-white rounded-tl-[1.5rem] md:rounded-tl-[1.8rem] rounded-bl-[1.5rem] md:rounded-bl-[1.8rem] rounded-br-[1.5rem] md:rounded-br-[1.8rem] shadow-blue-200 shadow-lg'"
-             class="max-w-[90%] md:max-w-[88%] p-4 md:p-5 text-[12px] md:text-[13px] font-medium leading-relaxed tracking-tight message-content">
-          
-          <div [innerHTML]="msg.content"></div>
-        </div>
-      </div>
-
-      <div *ngIf="loading" class="flex justify-start animate-pulse relative z-10">
-        <div class="bg-white p-3 md:p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-2">
-          <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-600 rounded-full animate-bounce [animation-duration:0.6s]"></div>
-          <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-600 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.2s]"></div>
-          <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-600 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.4s]"></div>
-        </div>
-      </div>
+    <div *ngIf="!esEstudiante || (userRiskLevel !== 'Estable' || activeTicket)" 
+         class="flex border-b border-slate-100 shrink-0 bg-slate-50 p-1 md:p-1.5 gap-1">
+      <button type="button" (click)="currentTab = 'chat'" 
+              [ngClass]="currentTab === 'chat' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:bg-white/50'" 
+              class="flex-1 py-2 rounded-xl text-[10px] md:text-[11px] font-bold uppercase tracking-wider transition-all text-center">
+        Chat Tutor IA
+      </button>
+      <button type="button" (click)="currentTab = 'soporte'" 
+              [ngClass]="currentTab === 'soporte' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:bg-white/50'" 
+              class="flex-1 py-2 rounded-xl text-[10px] md:text-[11px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5">
+        <span>{{ esEstudiante ? 'Derivar a Soporte' : 'Derivaciones' }}</span>
+        <span *ngIf="esEstudiante && userRiskLevel && userRiskLevel !== 'Estable'" class="w-2 h-2 bg-rose-500 rounded-full animate-ping"></span>
+      </button>
     </div>
 
-    <div class="p-4 md:p-6 bg-white border-t border-slate-100 shrink-0">
-      <form (ngSubmit)="enviarMensaje()" class="relative flex items-center gap-2 md:gap-3">
-        <input type="text" name="msg" [(ngModel)]="mensajeUser"
-               placeholder="Escribe tu duda aquí..." 
-               class="flex-1 bg-slate-100 border-none p-3 md:p-4 rounded-xl md:rounded-2xl text-[12px] md:text-[13px] font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all shadow-inner" />
+    <ng-container *ngIf="currentTab === 'chat'">
+      <div id="chat-box" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 bg-slate-50/50 scroll-smooth relative z-10">
+        <div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden">
+          <img src="assets/images/logo.jpeg" class="w-48 h-48 object-contain" alt="">
+        </div>
+        <div *ngFor="let msg of chatMessages" 
+             [ngClass]="msg.role === 'assistant' ? 'justify-start' : 'justify-end'" 
+             class="flex w-full message-fade-in relative z-10">
         
-        <button type="submit" 
-                [disabled]="!mensajeUser.trim() || loading"
-                class="w-10 h-10 md:w-12 md:h-12 bg-blue-600 text-white rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-blue-700 transition-all active:scale-90 disabled:opacity-30 shadow-lg shadow-blue-200">
-          <lucide-icon [img]="Send" [size]="18" class="md:text-xl"></lucide-icon>
-        </button>
-      </form>
-      <div class="mt-3 md:mt-4 flex items-center justify-center gap-2 grayscale opacity-30">
-        <p class="text-[7px] md:text-[8px] font-black uppercase tracking-[0.3em] text-slate-500 text-center">
-          Powered by Gemini 3 Flash for EduBridge
-        </p>
+          <div [ngClass]="msg.role === 'assistant' 
+                  ? 'bg-white text-slate-700 rounded-tr-[1.5rem] md:rounded-tr-[1.8rem] rounded-bl-[1.5rem] md:rounded-bl-[1.8rem] rounded-br-[1.5rem] md:rounded-br-[1.8rem] shadow-sm border border-slate-200' 
+                  : 'bg-blue-600 text-white rounded-tl-[1.5rem] md:rounded-tl-[1.8rem] rounded-bl-[1.5rem] md:rounded-bl-[1.8rem] rounded-br-[1.5rem] md:rounded-br-[1.8rem] shadow-blue-200 shadow-lg'"
+               class="max-w-[90%] md:max-w-[88%] p-4 md:p-5 text-[12px] md:text-[13px] font-medium leading-relaxed tracking-tight message-content">
+            
+            <div [innerHTML]="msg.content"></div>
+          </div>
+        </div>
+
+        <div *ngIf="loading" class="flex justify-start animate-pulse relative z-10">
+          <div class="bg-white p-3 md:p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-2">
+            <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-600 rounded-full animate-bounce [animation-duration:0.6s]"></div>
+            <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-600 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.2s]"></div>
+            <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-600 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.4s]"></div>
+          </div>
+        </div>
       </div>
+
+      <div class="p-4 md:p-6 bg-white border-t border-slate-100 shrink-0">
+        <form (ngSubmit)="enviarMensaje()" class="relative flex items-center gap-2 md:gap-3">
+          <input type="text" name="msg" [(ngModel)]="mensajeUser"
+                 placeholder="Escribe tu duda aquí..." 
+                 class="flex-1 bg-slate-100 border-none p-3 md:p-4 rounded-xl md:rounded-2xl text-[12px] md:text-[13px] font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all shadow-inner" />
+          
+          <button type="submit" 
+                  [disabled]="!mensajeUser.trim() || loading"
+                  class="w-10 h-10 md:w-12 md:h-12 bg-blue-600 text-white rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-blue-700 transition-all active:scale-90 disabled:opacity-30 shadow-lg shadow-blue-200">
+            <lucide-icon [img]="Send" [size]="18" class="md:text-xl"></lucide-icon>
+          </button>
+        </form>
+        <div class="mt-3 md:mt-4 flex items-center justify-center gap-2 grayscale opacity-30">
+          <p class="text-[7px] md:text-[8px] font-black uppercase tracking-[0.3em] text-slate-500 text-center">
+            Powered by Gemini 3 Flash for EduBridge
+          </p>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Tab 2: Soporte / Derivación -->
+    <div *ngIf="currentTab === 'soporte'" class="flex-1 flex flex-col bg-slate-50/50 z-10 relative overflow-hidden">
+      <ng-container *ngIf="esEstudiante">
+        <div *ngIf="activeTicket" class="flex-1 flex flex-col h-full overflow-hidden">
+          <div class="p-4 bg-white border-b border-slate-100 flex items-center justify-between shrink-0">
+            <div>
+              <h4 class="text-xs font-bold text-slate-800 leading-tight">{{ activeTicket.motivo }}</h4>
+              <p class="text-[10px] text-slate-500 mt-0.5">
+                Docente: <strong>{{ activeTicket.teacherName }}</strong> ({{ activeTicket.courseName }})
+              </p>
+            </div>
+            <span [ngClass]="activeTicket.status === 'PENDIENTE' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100'"
+                  class="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border">
+              {{ activeTicket.status === 'PENDIENTE' ? 'Esperando Respuesta' : 'Respondido' }}
+            </span>
+          </div>
+
+          <div id="support-chat-box" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+            <div class="flex justify-end w-full">
+              <div class="bg-blue-50 text-slate-700 rounded-2xl p-3.5 max-w-[85%] text-[11px] font-medium leading-relaxed border border-blue-100/60 shadow-sm">
+                <p class="font-bold text-blue-800 text-[10px] uppercase tracking-wider mb-1">Descripción Inicial</p>
+                <p class="whitespace-pre-wrap">{{ activeTicket.description }}</p>
+                <p class="text-[8px] text-slate-400 text-right mt-1.5">{{ activeTicket.createdAt | date:'shortTime' }}</p>
+              </div>
+            </div>
+
+            <div *ngFor="let m of activeTicket.messages"
+                 [ngClass]="m.senderRole === 'ESTUDIANTE' ? 'justify-end' : 'justify-start'" 
+                 class="flex w-full">
+              <div [ngClass]="m.senderRole === 'ESTUDIANTE' 
+                      ? 'bg-blue-600 text-white rounded-tl-2xl rounded-bl-2xl rounded-br-2xl shadow-sm' 
+                      : 'bg-white text-slate-700 rounded-tr-2xl rounded-bl-2xl rounded-br-2xl shadow-sm border border-slate-200'"
+                   class="p-3.5 max-w-[85%] text-[11px] font-medium leading-relaxed">
+                <p [ngClass]="m.senderRole === 'ESTUDIANTE' ? 'text-blue-200' : 'text-orange-600'" 
+                   class="font-black text-[9px] uppercase tracking-wider mb-0.5">
+                  {{ m.senderName }} ({{ m.senderRole === 'ESTUDIANTE' ? 'Tú' : 'Docente' }})
+                </p>
+                <p class="whitespace-pre-wrap">{{ m.message }}</p>
+                <p [ngClass]="m.senderRole === 'ESTUDIANTE' ? 'text-blue-200' : 'text-slate-400'" 
+                   class="text-[8px] text-right mt-1.5">{{ m.createdAt | date:'shortTime' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Responder / Footer del Chat de Soporte -->
+          <div class="p-4 bg-white border-t border-slate-100 shrink-0">
+            <form (ngSubmit)="enviarMensajeSoporte()" class="relative flex items-center gap-2">
+              <input type="text" name="supportMsg" [(ngModel)]="mensajeRespuesta"
+                     placeholder="Escribe un mensaje al docente..." 
+                     class="flex-1 bg-slate-100 border-none p-3 rounded-xl text-[11px] font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all shadow-inner" />
+              
+              <button type="submit" 
+                      [disabled]="!mensajeRespuesta.trim() || enviandoRespuesta"
+                      class="w-10 h-10 bg-orange-600 text-white rounded-xl flex items-center justify-center hover:bg-orange-700 transition-all active:scale-90 disabled:opacity-30 shadow-lg shadow-orange-200">
+                <lucide-icon [img]="Send" [size]="16"></lucide-icon>
+              </button>
+            </form>
+            <div class="mt-3 flex items-center justify-center">
+              <button type="button" (click)="nuevaConsulta()" class="text-[9px] font-bold text-blue-600 hover:text-blue-800 transition-all uppercase tracking-wider flex items-center gap-1">
+                <span>+ Crear nueva consulta de soporte</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!activeTicket" class="flex-1 flex flex-col h-full p-6 overflow-y-auto">
+          <div *ngIf="derivacionEnviada" class="flex-1 flex flex-col items-center justify-center text-center p-4 animate-in fade-in zoom-in duration-300">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6 shadow-sm shadow-emerald-200">
+              <lucide-icon [img]="Rocket" [size]="32" class="animate-bounce"></lucide-icon>
+            </div>
+            <h4 class="text-base font-bold text-slate-800 mb-2">¡Derivación Enviada!</h4>
+            <p class="text-xs text-slate-600 max-w-xs leading-relaxed mb-6">
+              Tu caso ha sido derivado automáticamente al área de soporte institucional y al docente a cargo. Podrás ver y chatear con ellos directamente en esta pestaña.
+            </p>
+            <button type="button" (click)="loadStudentTickets()" class="btn-support-success">
+              Ver Chat de Soporte
+            </button>
+          </div>
+
+          <div *ngIf="!derivacionEnviada" class="flex-1 flex flex-col justify-between animate-in fade-in duration-300">
+            <div>
+              <h4 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">
+                Derivación de Alumno
+              </h4>
+              <p class="text-[11px] text-slate-500 mb-4 leading-normal">
+                Si estás experimentando problemas con tus estudios, inasistencias o inconvenientes en la plataforma, puedes iniciar un caso de soporte aquí.
+              </p>
+
+              <div *ngIf="userRiskLevel && userRiskLevel !== 'Estable'" class="p-3.5 bg-rose-50 border border-rose-100 rounded-2xl mb-4 flex gap-3 items-start">
+                <span class="text-rose-600 text-sm mt-0.5">⚠️</span>
+                <div>
+                  <p class="text-[11px] font-bold text-rose-700 leading-tight mb-0.5">Atención Proactiva</p>
+                  <p class="text-[10px] text-rose-600 leading-normal">
+                    Hemos detectado que tu perfil académico actual presenta un nivel de riesgo: <strong>{{ userRiskLevel }}</strong>. Te recomendamos enviar esta derivación.
+                  </p>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <div *ngIf="coursesInRisk && coursesInRisk.length > 0">
+                  <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">Curso con el que necesitas ayuda</label>
+                  <select [(ngModel)]="derivacionCurso" class="select-support-input">
+                    <option *ngFor="let c of coursesInRisk" [ngValue]="c">{{ c.courseName }} (Prof. {{ c.teacherName }})</option>
+                    <option value="general">Soporte General / Administrativo</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">Motivo del Soporte</label>
+                  <select [(ngModel)]="derivacionMotivo" class="select-support-input">
+                    <option value="Rendimiento Académico">Rendimiento Académico (Promedios bajos / Dudas)</option>
+                    <option value="Inasistencias / Faltas">Inasistencias / Faltas acumuladas</option>
+                    <option value="Orientación Vocacional o Psicológica">Orientación Vocacional o Psicológica</option>
+                    <option value="Problemas Técnicos o Administrativos">Problemas Técnicos o Administrativos</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">Describe la situación</label>
+                  <textarea [(ngModel)]="derivacionDetalle" 
+                            placeholder="Por favor, cuéntanos brevemente sobre la dificultad que tienes o qué ayuda necesitas para que te asignemos el especialista indicado..." 
+                            rows="5"
+                            class="textarea-support-input custom-scrollbar"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <button type="button" 
+                      [disabled]="!derivacionDetalle.trim() || derivacionCargando" 
+                      (click)="enviarDerivacion()" 
+                      class="btn-support-submit">
+                <span *ngIf="!derivacionCargando">Enviar Solicitud</span>
+                <span *ngIf="derivacionCargando" class="flex items-center gap-2 justify-center">
+                  <span class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <span>Enviando...</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- VISTA DOCENTE -->
+      <ng-container *ngIf="!esEstudiante">
+        <div *ngIf="!selectedTicketTeacher" class="flex-1 flex flex-col h-full overflow-hidden p-4">
+          <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider mb-3 px-2">Derivaciones Recibidas</h4>
+          
+          <div class="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar">
+            <div *ngFor="let t of teacherTickets" 
+                 (click)="seleccionarTicketTeacher(t)"
+                 class="p-4 bg-white border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all text-left shadow-sm">
+              <div class="flex items-center justify-between gap-2 mb-1.5">
+                <span class="text-xs font-bold text-slate-800">{{ t.studentName }}</span>
+                <span [ngClass]="t.status === 'PENDIENTE' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'"
+                      class="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border">
+                  {{ t.status }}
+                </span>
+              </div>
+              <p class="text-[10px] text-slate-500 font-bold mb-1">{{ t.courseName }} • {{ t.motivo }}</p>
+              <p class="text-[10px] text-slate-400 truncate leading-relaxed">{{ t.description }}</p>
+              <p class="text-[8px] text-slate-400 mt-2 text-right">{{ t.createdAt | date:'shortDate' }}</p>
+            </div>
+
+            <div *ngIf="teacherTickets.length === 0" class="flex flex-col items-center justify-center h-full text-slate-400 text-[11px] py-12">
+              <span>No tienes solicitudes de soporte pendientes.</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedTicketTeacher" class="flex-1 flex flex-col h-full overflow-hidden">
+          <div class="p-3 bg-white border-b border-slate-100 flex items-center gap-3 shrink-0 text-left">
+            <button type="button" (click)="deseleccionarTicketTeacher()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-all">
+              <span class="text-sm font-bold">←</span>
+            </button>
+            <div>
+              <h4 class="text-xs font-bold text-slate-800 leading-tight">Alumno: {{ selectedTicketTeacher.studentName }}</h4>
+              <p class="text-[9px] text-slate-500 mt-0.5">{{ selectedTicketTeacher.courseName }} • {{ selectedTicketTeacher.motivo }}</p>
+            </div>
+          </div>
+
+          <div id="teacher-chatbot-chat-box" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-slate-50/50">
+            <div class="flex justify-start w-full">
+              <div class="bg-blue-50 text-slate-700 rounded-2xl p-3.5 max-w-[85%] text-[11px] font-medium leading-relaxed border border-blue-100/60 shadow-sm text-left">
+                <p class="font-bold text-blue-800 text-[10px] uppercase tracking-wider mb-1">Descripción del Problema</p>
+                <p class="whitespace-pre-wrap">{{ selectedTicketTeacher.description }}</p>
+                <p class="text-[8px] text-slate-400 text-right mt-1.5">{{ selectedTicketTeacher.createdAt | date:'shortTime' }}</p>
+              </div>
+            </div>
+
+            <div *ngFor="let m of selectedTicketTeacher.messages" 
+                 [ngClass]="m.senderRole === 'DOCENTE' ? 'justify-end' : 'justify-start'" 
+                 class="flex w-full">
+              <div [ngClass]="m.senderRole === 'DOCENTE' 
+                      ? 'bg-orange-600 text-white rounded-tl-2xl rounded-bl-2xl rounded-br-2xl shadow-sm' 
+                      : 'bg-white text-slate-700 rounded-tr-2xl rounded-bl-2xl rounded-br-2xl shadow-sm border border-slate-200'"
+                   class="p-3.5 max-w-[85%] text-[11px] font-medium leading-relaxed text-left">
+                <p [ngClass]="m.senderRole === 'DOCENTE' ? 'text-orange-200' : 'text-blue-800'" 
+                   class="font-black text-[9px] uppercase tracking-wider mb-0.5">
+                   {{ m.senderName }} ({{ m.senderRole === 'DOCENTE' ? 'Tú' : 'Estudiante' }})
+                </p>
+                <p class="whitespace-pre-wrap">{{ m.message }}</p>
+                <p [ngClass]="m.senderRole === 'DOCENTE' ? 'text-orange-200' : 'text-slate-400'" 
+                   class="text-[8px] text-right mt-1.5">{{ m.createdAt | date:'shortTime' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 bg-white border-t border-slate-100 shrink-0">
+            <form (ngSubmit)="enviarRespuestaDocente()" class="flex items-center gap-2">
+              <input type="text" name="teacherReplyChatbot" [(ngModel)]="respuestaDocenteTexto"
+                     placeholder="Escribe un mensaje de ayuda..." 
+                     class="flex-1 bg-slate-100 border-none p-3 rounded-xl text-[11px] font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-orange-500/20 focus:bg-white transition-all shadow-inner" />
+              
+              <button type="submit" 
+                      [disabled]="!respuestaDocenteTexto.trim() || enviandoRespuestaDocente"
+                      class="w-10 h-10 bg-orange-600 text-white rounded-xl flex items-center justify-center hover:bg-orange-700 transition-all active:scale-90 disabled:opacity-30 shadow-lg">
+                <lucide-icon [img]="Send" [size]="16"></lucide-icon>
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+      </ng-container>
+
     </div>
   </div>
 </div>

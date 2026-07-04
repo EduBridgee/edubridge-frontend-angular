@@ -29,3 +29,83 @@
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.select-support-input {
+  width: 100%;
+  background-color: var(--color-white, #fff);
+  border: 1px solid var(--color-slate-200, oklch(92.4% 0.012 255.785));
+  border-radius: var(--radius-xl, 0.75rem);
+  padding: calc(var(--spacing, 0.25rem) * 3);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-slate-700, oklch(37.1% 0.038 255.679));
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.select-support-input:focus {
+  border-color: var(--color-blue-500, oklch(57.7% 0.198 253.945));
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.textarea-support-input {
+  width: 100%;
+  background-color: var(--color-white, #fff);
+  border: 1px solid var(--color-slate-200, oklch(92.4% 0.012 255.785));
+  border-radius: var(--radius-xl, 0.75rem);
+  padding: calc(var(--spacing, 0.25rem) * 3);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-slate-700, oklch(37.1% 0.038 255.679));
+  outline: none;
+  resize: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.textarea-support-input:focus {
+  border-color: var(--color-blue-500, oklch(57.7% 0.198 253.945));
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.btn-support-submit {
+  width: 100%;
+  background-color: #f97316;
+  color: white;
+  border: none;
+  border-radius: var(--radius-xl, 0.75rem);
+  padding-block: calc(var(--spacing, 0.25rem) * 3.5);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.2), 0 4px 6px -4px rgba(249, 115, 22, 0.2);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-support-submit:hover:not(:disabled) {
+  background-color: #ea580c;
+  transform: translateY(-1px);
+}
+
+.btn-support-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-support-success {
+  background-color: var(--color-emerald-600, oklch(62.7% 0.194 149.214));
+  color: white;
+  border: none;
+  border-radius: var(--radius-xl, 0.75rem);
+  padding-inline: calc(var(--spacing, 0.25rem) * 6);
+  padding-block: calc(var(--spacing, 0.25rem) * 2.5);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-support-success:hover {
+  background-color: var(--color-emerald-700, oklch(52.4% 0.165 149.929));
+}
