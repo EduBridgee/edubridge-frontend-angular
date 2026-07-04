@@ -1,18 +1,26 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { RoleService, UserRole } from '../../../core/services/role';
+import { LucideAngularModule, Bot, X, Send, Rocket } from 'lucide-angular';
+import { API_BASE_URL } from '../../../core/config/api.config';
 
 @Component({
   selector: 'app-chatbot',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './chatbot.html',
   styleUrl: './chatbot.css'
 })
 export class ChatbotComponent implements OnInit {
+  readonly Bot = Bot;
+  readonly X = X;
+  readonly Send = Send;
+  readonly Rocket = Rocket;
+
   @Input() misCursos: any[] = [];
-  
+
   @Output() tutoriaCreada = new EventEmitter<void>();
 
   isOpen = false;
@@ -21,14 +29,18 @@ export class ChatbotComponent implements OnInit {
   user: any = null;
   chatMessages: any[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient, 
+    private roleService: RoleService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit() {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
     const nombre = this.user.name || 'Estudiante';
-    
-    const bienvenida = this.user.role === 'DOCENTE'
-      ? `¡Hola, colega! Soy el asistente IA de EduBridge. ¿Te ayudo con la redacción de avisos?`
+
+    const bienvenida = this.roleService.isDocente(this.user.role)
+      ? '¡Hola, colega! Soy el asistente IA de EduBridge. ¿Te ayudo con la redacción de avisos?'
       : `¡Hola ${nombre}! Soy tu tutor IA. ¿Tienes dudas con tus cursos o quieres agendar una tutoría?`;
 
     this.chatMessages.push({ role: 'assistant', content: bienvenida });
@@ -45,24 +57,27 @@ export class ChatbotComponent implements OnInit {
     this.chatMessages.push({ role: 'user', content: texto });
     this.mensajeUser = '';
     this.loading = true;
+    this.cdr.detectChanges();
 
     const cursosStr = this.misCursos && this.misCursos.length > 0
       ? this.misCursos.map(c => c.name).join(", ")
-      : "Ecuaciones Diferenciales, Arquitectura de Computadoras, Física II";
+      : "Ecuaciones Diferenciales, Architecture of Computadoras, Física II";
 
     const payload = {
       message: texto,
       role: this.user.role || 'ESTUDIANTE',
       userName: this.user.name || 'Estudiante',
+      userId: this.user.id ? this.user.id.toString() : null, 
       cursos: cursosStr
     };
 
-    this.http.post('https://edubridge-backend-v2.onrender.com/api/chat/ask', payload).subscribe({
+    this.http.post(`${API_BASE_URL}/chat/ask`, payload).subscribe({
       next: (res: any) => {
         this.loading = false;
+        this.cdr.detectChanges();
         this.typeWriterEffect(res.answer);
 
-        if (res.answer.includes('registrado') || res.answer.includes('agendado')) {
+        if (res.answer.includes('registrado') || res.answer.includes('agendado') || res.answer.includes('sincronizada')) {
           this.tutoriaCreada.emit();
         }
       },
@@ -72,6 +87,7 @@ export class ChatbotComponent implements OnInit {
           role: 'assistant',
           content: 'Error de conexión. ¿Está el backend encendido, Estudiante/a?'
         });
+        this.cdr.detectChanges();
       }
     });
   }
@@ -80,9 +96,10 @@ export class ChatbotComponent implements OnInit {
     let index = 0;
     const assistantMessage = { role: 'assistant', content: '' };
     this.chatMessages.push(assistantMessage);
+    this.cdr.detectChanges();
 
     const formattedText = fullText
-      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') 
+      .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
       .replace(/\n/g, '<br>');
 
     const interval = setInterval(() => {
@@ -95,6 +112,7 @@ export class ChatbotComponent implements OnInit {
           assistantMessage.content += formattedText.charAt(index);
           index++;
         }
+        this.cdr.detectChanges();
         this.scrollToBottom();
       } else {
         clearInterval(interval);
@@ -104,7 +122,7 @@ export class ChatbotComponent implements OnInit {
 
   private scrollToBottom() {
     setTimeout(() => {
-      const container = document.getElementById('chat-box-container');
+      const container = document.getElementById('chat-box');
       if (container) {
         container.scrollTop = container.scrollHeight;
       }

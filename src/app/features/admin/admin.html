@@ -1,0 +1,1915 @@
+<div class="admin-main">
+
+    <app-sidebar [userName]="user.name" [userRole]="user.role"
+        [currentPage]="activeTab === 'dashboard' ? 'admin' : 'admin/' + activeTab" (setPage)="handlePageChange($event)"
+        (onLogout)="logout()">
+    </app-sidebar>
+
+    <div class="admin-sidebar-layout">
+
+        <main class="admin-body">
+
+            <div *ngIf="activeTab === 'dashboard'"
+                class="admin-tab-view animate-in fade-in duration-300">
+                <div>
+                    <h1 class="admin-tab-title">Dashboard Administrativo</h1>
+                    <p class="admin-tab-subtitle">Resumen general del sistema educativo</p>
+                </div>
+
+                <div class="quick-actions-banner">
+                    <p class="quick-actions-title">Acciones Rápidas</p>
+                    <div class="quick-actions-grid">
+                        <button (click)="activeTab = 'estudiantes'"
+                            class="quick-action-btn group">
+                            <lucide-icon [img]="UserPlus"
+                                class="quick-action-icon"></lucide-icon>
+                            <span class="quick-action-text">Nuevo Estudiante</span>
+                        </button>
+                        <button (click)="activeTab = 'cursos'"
+                            class="quick-action-btn group">
+                            <lucide-icon [img]="Plus"
+                                class="quick-action-icon"></lucide-icon>
+                            <span class="quick-action-text">Crear Curso</span>
+                        </button>
+                        <button (click)="activeTab = 'matriculas'"
+                            class="quick-action-btn group">
+                            <lucide-icon [img]="GraduationCap"
+                                class="quick-action-icon"></lucide-icon>
+                            <span class="quick-action-text">Matricular</span>
+                        </button>
+                        <button (click)="activeTab = 'reportes'"
+                            class="quick-action-btn group">
+                            <lucide-icon [img]="BarChart3"
+                                class="quick-action-icon"></lucide-icon>
+                            <span class="quick-action-text">Ver Reportes</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+
+                    <div
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-icon-wrapper-blue">
+                                <lucide-icon [img]="Users" class="w-4 h-4"></lucide-icon>
+                            </span>
+                            <span
+                                class="stat-trend-badge-green">+12%</span>
+                        </div>
+                        <div>
+                            <p class="stat-label">Total Estudiantes
+                            </p>
+                            <h3 class="stat-value">{{ stats.totalStudents || 0 }}</h3>
+                        </div>
+                    </div>
+
+                    <div
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <span
+                                class="stat-icon-wrapper-emerald">
+                                <lucide-icon [img]="BookOpen" class="w-4 h-4"></lucide-icon>
+                            </span>
+                            <span
+                                class="stat-trend-badge-green">+3</span>
+                        </div>
+                        <div>
+                            <p class="stat-label">Cursos Activos</p>
+                            <h3 class="stat-value">{{ stats.activeCourses || 0 }}</h3>
+                        </div>
+                    </div>
+
+                    <div
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-icon-wrapper-purple">
+                                <lucide-icon [img]="GraduationCap" class="w-4 h-4"></lucide-icon>
+                            </span>
+                            <span
+                                class="stat-trend-badge-green">+8%</span>
+                        </div>
+                        <div>
+                            <p class="stat-label">Matrículas Mes</p>
+                            <h3 class="stat-value">{{ stats.monthlyEnrollments || 0 }}
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <span class="stat-icon-wrapper-orange">
+                                <lucide-icon [img]="TrendingUp" class="w-4 h-4"></lucide-icon>
+                            </span>
+                            <span
+                                class="stat-trend-badge-green">+5%</span>
+                        </div>
+                        <div>
+                            <p class="stat-label">Tasa Aprobación
+                            </p>
+                            <h3 class="stat-value">{{ stats.approvalRate || 0 }}%</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panels-grid">
+                    <div class="activity-panel">
+                        <p class="panel-title">Actividad Reciente</p>
+                        <div class="panel-list">
+                            <div class="activity-item"
+                                *ngFor="let s of estudiantes.slice(0,2)">
+                                <div class="activity-item-info">
+                                    <span
+                                        class="activity-icon-wrapper"><lucide-icon
+                                            [img]="GraduationCap" class="w-4 h-4"></lucide-icon></span>
+                                    <div>
+                                        <p class="activity-text-title">{{s.name}}</p>
+                                        <p class="activity-text-desc">Matrícula Procesada con Éxito
+                                        </p>
+                                    </div>
+                                </div>
+                                <span class="activity-time">Hace 5 min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="activity-panel">
+                        <p class="panel-title">Tareas Pendientes</p>
+                        <div class="space-y-3">
+                            <div
+                                class="task-item-high">
+                                <div>
+                                    <p class="activity-text-title">Revisar solicitudes de matrícula</p>
+                                    <p class="activity-text-desc">Hoy, 5:00 PM</p>
+                                </div>
+                                <span
+                                    class="task-item-priority-high">Alta</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="activeTab === 'estudiantes'"
+                class="admin-tab-view animate-in fade-in duration-300">
+                <div class="flex justify-between items-center w-full">
+                    <div>
+                        <h1 class="admin-tab-title">Gestión de Cuentas</h1>
+                        <p class="admin-tab-subtitle">{{estudiantes.length}} estudiantes y
+                            {{profesores.length}} profesores registrados</p>
+                    </div>
+                    <div class="activity-item-info">
+                        <button (click)="showNewStudentModal = true"
+                            class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 active:scale-95 shrink-0">
+                            <lucide-icon [img]="UserPlus" class="w-4 h-4"></lucide-icon>
+                            <span>Nuevo Estudiante</span>
+                        </button>
+                        <button (click)="showNewTeacherModal = true"
+                            class="bg-blue-600 hover:bg-blue-500 text-white font-black text-xs px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 active:scale-95 shrink-0">
+                            <lucide-icon [img]="UserPlus" class="w-4 h-4"></lucide-icon>
+                            <span>Nuevo Profesor</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div
+                    class="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm items-center justify-between w-full">
+                    <div class="relative w-full sm:flex-1 flex items-center">
+                        <lucide-icon [img]="Search" class="w-4 h-4 text-slate-400 absolute left-3.5 z-10"></lucide-icon>
+                        <input type="text" [(ngModel)]="searchAccountTerm"
+                            placeholder="Buscar por nombre, email o especialidad..."
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs font-semibold focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end shrink-0">
+                        <div
+                            class="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+                            <lucide-icon [img]="SlidersHorizontal"
+                                class="w-3.5 h-3.5 text-slate-400 mr-2"></lucide-icon>
+                            <select [(ngModel)]="selectedAccountRole"
+                                class="bg-transparent text-xs font-bold text-slate-600 focus:outline-none cursor-pointer">
+                                <option value="Todos">Todos los roles</option>
+                                <option value="estudiante">Estudiantes</option>
+                                <option value="docente">Profesores</option>
+                            </select>
+                        </div>
+                        <button
+                            class="bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-2 active:scale-95"><lucide-icon
+                                [img]="Download" class="w-3.5 h-3.5"></lucide-icon><span>Exportar</span></button>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden w-full max-w-full">
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
+                            <thead>
+                                <tr
+                                    class="bg-slate-50/70 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4 pl-6">Usuario</th>
+                                    <th class="p-4">Rol / Estado</th>
+                                    <th class="p-4">Contacto</th>
+                                    <th class="p-4">Programa / Especialidad</th>
+                                    <th class="p-4">Cursos / Asignación</th>
+                                    <th class="p-4">Promedio</th>
+                                    <th class="p-4 pr-6 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-xs font-bold text-slate-700">
+                                <tr *ngFor="let account of combinedAccounts" class="hover:bg-slate-50/40 transition">
+                                    <td class="p-4 pl-6 flex items-center gap-3">
+                                        <div [ngClass]="account.role === 'estudiante' ? 'bg-orange-100 text-orange-700 border-orange-200/30' : 'bg-blue-100 text-blue-700 border-blue-200/30'"
+                                            class="w-9 h-9 font-black rounded-full flex items-center justify-center text-xs shrink-0 border">
+                                            {{ account.name.substring(0, 2).toUpperCase() }}</div>
+                                        <div class="truncate">
+                                            <p class="text-slate-900 font-black tracking-tight truncate">{{ account.name
+                                                }}</p>
+                                            <p class="activity-text-desc">ID: {{ account.id }}</p>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <div class="flex flex-col gap-1 items-start">
+                                            <span
+                                                [ngClass]="account.role === 'estudiante' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/50' : 'bg-blue-50 text-blue-700 border-blue-200/50'"
+                                                class="px-2 py-0.5 rounded-full text-[9px] font-black border uppercase tracking-wider">
+                                                {{ account.role === 'estudiante' ? 'Estudiante' : 'Docente' }}
+                                            </span>
+                                            <span
+                                                [ngClass]="account.status === 'Activo' ? 'bg-emerald-50/50 text-emerald-600' : 'bg-slate-50 text-slate-500'"
+                                                class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase">
+                                                {{ account.status }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <p class="font-semibold text-slate-600 truncate max-w-[180px]">{{ account.email
+                                            }}</p>
+                                        <p *ngIf="account.role === 'estudiante'"
+                                            class="text-[10px] text-slate-400 font-bold mt-0.5">{{ account.phone }}</p>
+                                    </td>
+                                    <td class="p-4 text-slate-500 font-medium">
+                                        <span *ngIf="account.role === 'estudiante'"
+                                            class="text-slate-600 font-semibold">{{ account.program }}</span>
+                                        <span *ngIf="account.role === 'docente'" class="text-slate-600 font-semibold">{{
+                                            account.specialization }}</span>
+                                    </td>
+                                    <td class="p-4">
+                                        <span *ngIf="account.role === 'estudiante'"
+                                            class="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-xl text-[10px] font-black border border-blue-100/50 whitespace-nowrap">
+                                            {{ account.courses }} cursos
+                                        </span>
+                                        <span *ngIf="account.role === 'docente'"
+                                            class="bg-purple-50 text-purple-600 px-2.5 py-1 rounded-xl text-[10px] font-black border border-purple-100/50 whitespace-nowrap">
+                                            {{ account.assignedCourse }}
+                                        </span>
+                                    </td>
+                                    <td class="p-4">
+                                        <div *ngIf="account.role === 'estudiante'"
+                                            class="flex items-center gap-2 w-max">
+                                            <div class="w-12 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                                <div [class]="account.average >= 4.0 ? 'bg-emerald-500' : 'bg-blue-500'"
+                                                    class="h-full" [style.width.%]="(account.average / 5) * 100"></div>
+                                            </div>
+                                            <span class="font-black text-slate-900">{{ account.average | number:'1.1-1'
+                                                }}</span>
+                                        </div>
+                                        <span *ngIf="account.role === 'docente'"
+                                            class="text-slate-400 font-medium">-</span>
+                                    </td>
+                                    <td class="p-4 pr-6 text-center whitespace-nowrap">
+                                        <div class="flex items-center justify-center gap-1 text-slate-400">
+                                            <button (click)="abrirEditarCuenta(account)"
+                                                class="hover:text-blue-600 p-1.5 rounded-lg hover:bg-slate-50 transition"><lucide-icon
+                                                    [img]="Edit" class="w-4 h-4"></lucide-icon></button>
+                                            <button (click)="toggleEstadoCuenta(account)"
+                                                [disabled]="account.role !== 'estudiante'"
+                                                [ngClass]="account.role !== 'estudiante' ? 'opacity-30 cursor-not-allowed' : 'hover:text-emerald-600'"
+                                                class="p-1.5 rounded-lg hover:bg-slate-50 transition"><lucide-icon
+                                                    [img]="UserCheck" class="w-4 h-4"></lucide-icon></button>
+                                            <button (click)="eliminarCuenta(account)"
+                                                class="hover:text-rose-600 p-1.5 rounded-lg hover:bg-slate-50 transition"><lucide-icon
+                                                    [img]="Trash2" class="w-4 h-4"></lucide-icon></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="combinedAccounts.length === 0">
+                                    <td colspan="7" class="p-8 text-center text-slate-400 font-medium">
+                                        No se encontraron cuentas con los filtros seleccionados
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="activeTab === 'cursos'" class="admin-tab-view animate-in fade-in duration-300">
+
+                <div class="flex justify-between items-center w-full">
+                    <div>
+                        <h1 class="admin-tab-title">Gestión de Cursos</h1>
+                        <p class="admin-tab-subtitle">{{cursos.length}} cursos activos en el
+                            sistema</p>
+                    </div>
+                    <button (click)="showNewCourseModal = true"
+                        class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 shrink-0 active:scale-95">
+                        <lucide-icon [img]="Plus" class="w-4 h-4"></lucide-icon>
+                        <span>Nuevo Curso</span>
+                    </button>
+                </div>
+
+                <div
+                    class="flex flex-col xl:flex-row gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm items-center justify-between w-full">
+                    <div class="relative w-full xl:w-96 flex items-center">
+                        <lucide-icon [img]="Search" class="w-4 h-4 text-slate-400 absolute left-3.5 z-10"></lucide-icon>
+                        <input type="text" placeholder="Buscar por nombre, código o profesor..."
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs font-semibold focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full xl:w-auto justify-start">
+                        <button *ngFor="let cat of ['Todas', 'Matemáticas', 'Ciencias', 'Tecnología', 'Humanidades']"
+                            (click)="setCategoria(cat)" [class.bg-orange-600]="categoriaSeleccionada === cat"
+                            [class.text-white]="categoriaSeleccionada === cat"
+                            [class.bg-slate-100]="categoriaSeleccionada !== cat"
+                            [class.text-slate-600]="categoriaSeleccionada !== cat"
+                            class="px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">
+                            {{ cat }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                    <div *ngFor="let curso of cursosFiltrados"
+                        class="group bg-white rounded-[2rem] border border-slate-200/60 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1">
+
+                        <div
+                            class="bg-gradient-to-br from-orange-600 to-orange-500 p-6 text-white relative h-32 flex flex-col justify-between">
+                            <div class="stat-card-header">
+                                <span
+                                    class="text-[10px] font-black bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full uppercase tracking-widest">
+                                    {{ curso.code }}
+                                </span>
+                                <button class="text-white/70 hover:text-white transition">
+                                    <lucide-icon [img]="MoreVertical" [size]="18"></lucide-icon>
+                                </button>
+                            </div>
+                            <h3 class="font-black text-lg leading-tight truncate">{{ curso.name }}</h3>
+                        </div>
+
+                        <div class="p-6 flex-1 flex flex-col gap-5">
+
+                            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-black text-[10px]">
+                                    {{ curso.initialDoc }}
+                                </div>
+                                <div class="overflow-hidden">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Profesor
+                                    </p>
+                                    <p class="text-xs font-bold text-slate-900 truncate">{{ curso.teacher }}</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-blue-50/50 p-3 rounded-xl">
+                                    <p class="text-[9px] font-black text-blue-400 uppercase">Alumnos</p>
+                                    <p class="text-lg font-black text-blue-700">{{ curso.students }}</p>
+                                </div>
+                                <div class="bg-emerald-50/50 p-3 rounded-xl">
+                                    <p class="text-[9px] font-black text-emerald-400 uppercase">Ocupación</p>
+                                    <p class="text-lg font-black text-emerald-700">{{ curso.occupancy }}%</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <div class="flex justify-between text-[9px] font-black uppercase mb-1">
+                                    <span class="text-slate-400">Progreso Aula</span>
+                                    <span class="text-slate-900">{{ curso.occupancy }}%</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                    <div class="h-full bg-orange-500 rounded-full transition-all duration-1000"
+                                        [style.width.%]="curso.occupancy"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50/50 border-t border-slate-100">
+                            <button (click)="abrirEditarCurso(curso)"
+                                class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-slate-200">
+                                Gestionar Aula
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="activeTab === 'matriculas'"
+                class="admin-tab-view animate-in fade-in duration-300">
+
+                
+                <div class="flex justify-between items-center w-full">
+                    <div>
+                        <h1 class="admin-tab-title">Gestión de Matrículas</h1>
+                        <p class="admin-tab-subtitle">{{ filteredEnrollments.length }} matrículas
+                            registradas</p>
+                    </div>
+                    <button (click)="showNewEnrollmentModal = true"
+                        class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 shrink-0 active:scale-95">
+                        <lucide-icon [img]="Plus" class="w-4 h-4"></lucide-icon>
+                        <span>Nueva Matrícula</span>
+                    </button>
+                </div>
+
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full">
+                    
+                    <div
+                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
+                        <div
+                            class="bg-emerald-50 text-emerald-600 w-12 h-12 rounded-xl flex items-center justify-center shrink-0">
+                            <lucide-icon [img]="Check" class="w-5 h-5"></lucide-icon>
+                        </div>
+                        <div>
+                            <p class="stat-label">Matrículas Activas
+                            </p>
+                            <h3 class="stat-value">{{ getMatriculasCount('Activa') }}</h3>
+                        </div>
+                    </div>
+
+                    
+                    <div
+                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
+                        <div
+                            class="bg-amber-50 text-amber-600 w-12 h-12 rounded-xl flex items-center justify-center shrink-0">
+                            <lucide-icon [img]="AlertTriangle" class="w-5 h-5"></lucide-icon>
+                        </div>
+                        <div>
+                            <p class="stat-label">Pendientes</p>
+                            <h3 class="stat-value">{{ getMatriculasCount('Pendiente') }}
+                            </h3>
+                        </div>
+                    </div>
+
+                    
+                    <div
+                        class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
+                        <div
+                            class="bg-rose-50 text-rose-600 w-12 h-12 rounded-xl flex items-center justify-center shrink-0">
+                            <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+                        </div>
+                        <div>
+                            <p class="stat-label">Canceladas</p>
+                            <h3 class="stat-value">{{ getMatriculasCount('Cancelada') }}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div
+                    class="flex flex-col sm:flex-row gap-3 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm items-center justify-between w-full">
+                    <div class="relative w-full sm:flex-1 flex items-center">
+                        <lucide-icon [img]="Search" class="w-4 h-4 text-slate-400 absolute left-3.5 z-10"></lucide-icon>
+                        <input type="text" [(ngModel)]="searchEnrollmentTerm"
+                            placeholder="Buscar por estudiante o curso..."
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs font-semibold focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end shrink-0">
+                        <div
+                            class="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+                            <lucide-icon [img]="SlidersHorizontal"
+                                class="w-3.5 h-3.5 text-slate-400 mr-2"></lucide-icon>
+                            <select [(ngModel)]="selectedEnrollmentStatus"
+                                class="bg-transparent text-xs font-bold text-slate-600 focus:outline-none cursor-pointer">
+                                <option value="Todos">Todos los estados</option>
+                                <option value="Activa">Activa</option>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="Cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div
+                    class="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden w-full max-w-full">
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
+                            <thead>
+                                <tr
+                                    class="bg-slate-50/70 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4 pl-6 w-20">ID</th>
+                                    <th class="p-4">Estudiante</th>
+                                    <th class="p-4">Curso</th>
+                                    <th class="p-4">Fecha Matrícula</th>
+                                    <th class="p-4">Calificación</th>
+                                    <th class="p-4">Estado</th>
+                                    <th class="p-4 pr-6 text-center w-32">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-xs font-bold text-slate-700">
+                                <tr *ngFor="let m of filteredEnrollments; let i = index"
+                                    class="hover:bg-slate-50/40 transition">
+                                    <td class="p-4 pl-6 text-slate-400">#{{ i + 1 }}</td>
+                                    <td class="p-4 flex items-center gap-3">
+                                        <div
+                                            class="w-9 h-9 bg-orange-600 text-white font-black rounded-full flex items-center justify-center text-xs shrink-0 shadow-sm">
+                                            {{ getInitials(m.student?.name) }}
+                                        </div>
+                                        <div class="truncate">
+                                            <p class="text-slate-900 font-black tracking-tight truncate">{{
+                                                m.student?.name }}</p>
+                                            <p class="activity-text-desc">ID: {{ m.student?.id }}</p>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <p class="text-slate-900 font-black tracking-tight">{{ m.course?.name }}</p>
+                                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">{{ m.course?.code }}</p>
+                                    </td>
+                                    <td class="p-4 text-slate-500 font-medium whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <lucide-icon [img]="Calendar"
+                                                class="w-3.5 h-3.5 text-slate-400"></lucide-icon>
+                                            <span>{{ formatDate(m.enrollmentDate) }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <div *ngIf="m.grade !== null && m.grade !== undefined"
+                                            class="flex items-center gap-2 w-max">
+                                            <div class="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                                <div [class]="m.grade >= 4.0 ? 'bg-emerald-500' : 'bg-blue-500'"
+                                                    class="h-full rounded-full" [style.width.%]="(m.grade / 5) * 100">
+                                                </div>
+                                            </div>
+                                            <span class="font-black text-slate-900">{{ m.grade | number:'1.1-1'
+                                                }}</span>
+                                        </div>
+                                        <div *ngIf="m.grade === null || m.grade === undefined"
+                                            class="text-slate-400 font-medium">
+                                            Sin calificar
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <span [ngClass]="{
+                                            'bg-emerald-50 text-emerald-700 border-emerald-200/50': getNormalizedStatus(m.status) === 'Activa',
+                                            'bg-amber-50 text-amber-700 border-amber-200/50': getNormalizedStatus(m.status) === 'Pendiente',
+                                            'bg-rose-50 text-rose-700 border-rose-200/50': getNormalizedStatus(m.status) === 'Cancelada'
+                                        }"
+                                            class="px-2.5 py-0.5 rounded-full text-[10px] font-black border uppercase tracking-wider">
+                                            {{ getNormalizedStatus(m.status) }}
+                                        </span>
+                                    </td>
+                                    <td class="p-4 pr-6 text-center whitespace-nowrap">
+                                        <div class="flex items-center justify-center gap-2">
+                                            
+                                            <button *ngIf="getNormalizedStatus(m.status) === 'Pendiente'"
+                                                (click)="abrirConfirmacion(m, 'APROBADO')"
+                                                class="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 px-3 py-1.5 rounded-xl text-[10px] font-black transition active:scale-95 shadow-sm uppercase tracking-wide">
+                                                Aprobar
+                                            </button>
+                                            
+                                            <button *ngIf="getNormalizedStatus(m.status) === 'Activa'"
+                                                (click)="abrirConfirmacion(m, 'CANCELADO')"
+                                                class="bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 px-3 py-1.5 rounded-xl text-[10px] font-black transition active:scale-95 shadow-sm uppercase tracking-wide">
+                                                Cancelar
+                                            </button>
+                                            <span *ngIf="getNormalizedStatus(m.status) === 'Cancelada'"
+                                                class="text-slate-300 text-[10px] font-medium">-</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="filteredEnrollments.length === 0">
+                                    <td colspan="7" class="p-8 text-center text-slate-400 font-medium">
+                                        No se encontraron matrículas con los filtros seleccionados
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="showNewEnrollmentModal"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+                <div class="modal-container-sm">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-black text-xl text-slate-900 tracking-tight">Nueva Matrícula</h2>
+                        <button (click)="showNewEnrollmentModal = false"
+                            class="modal-close-btn">
+                            <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </div>
+
+                    <div class="panel-list">
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Estudiante</label>
+                            <select [(ngModel)]="enrollmentRequest.studentId"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                                <option [ngValue]="null">Seleccionar estudiante...</option>
+                                <option *ngFor="let s of estudiantes" [value]="s.id">{{s.name}} (ID: {{s.id}})</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Curso</label>
+                            <select [(ngModel)]="enrollmentRequest.courseId"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                                <option [ngValue]="null">Asignar curso...</option>
+                                <option *ngFor="let c of cursos" [value]="c.id">{{c.name}} ({{c.code}})</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Semestre</label>
+                            <input type="text" [(ngModel)]="enrollmentRequest.semester" placeholder="Ej. 2026-I"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button (click)="showNewEnrollmentModal = false"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black text-xs transition active:scale-95">
+                            Cancelar
+                        </button>
+                        <button (click)="procesarMatricula()"
+                            [disabled]="!enrollmentRequest.studentId || !enrollmentRequest.courseId"
+                            class="flex-1 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:pointer-events-none text-white py-3 rounded-xl font-black text-xs transition active:scale-95 shadow-md shadow-orange-600/10">
+                            Procesar Alta
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="showConfirmModal"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+                <div class="bg-white p-8 rounded-3xl w-full max-w-sm space-y-5 shadow-2xl border border-slate-100">
+                    <div class="flex flex-col items-center text-center space-y-3">
+                        <div [class]="confirmActionType === 'APROBADO' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'"
+                            class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mb-1">
+                            <lucide-icon [img]="confirmActionType === 'APROBADO' ? CheckCircle2 : AlertTriangle"
+                                class="w-6 h-6"></lucide-icon>
+                        </div>
+                        <h2 class="font-black text-lg text-slate-900 tracking-tight">Confirmar Acción</h2>
+                        <p class="text-xs text-slate-500 font-bold leading-relaxed px-2">{{ confirmModalMessage }}</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button (click)="showConfirmModal = false"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black text-xs transition active:scale-95">
+                            Cancelar
+                        </button>
+                        <button (click)="confirmarMatricula()"
+                            [class]="confirmActionType === 'APROBADO' ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/10' : 'bg-rose-600 hover:bg-rose-500 shadow-rose-600/10'"
+                            class="flex-1 text-white py-3 rounded-xl font-black text-xs transition active:scale-95 shadow-md">
+                            Confirmar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="showNewStudentModal"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+                <div
+                    class="modal-container">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-black text-xl text-slate-900 tracking-tight">Nuevo Estudiante</h2>
+                        <button (click)="showNewStudentModal = false"
+                            class="modal-close-btn">
+                            <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="space-y-1.5 col-span-1 sm:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre
+                                Completo</label>
+                            <input type="text" [(ngModel)]="studentRequest.name" placeholder="Ej. Juan Pérez"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Correo
+                                Electrónico</label>
+                            <input type="email" [(ngModel)]="studentRequest.email"
+                                placeholder="Ej. juan.perez@upc.edu.pe"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Código de
+                                Alumno</label>
+                            <input type="text" [(ngModel)]="studentRequest.code" placeholder="Ej. U202612345"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Programa/Carrera</label>
+                            <input type="text" [(ngModel)]="studentRequest.program"
+                                placeholder="Ej. Ingeniería de Software"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Semestre de
+                                Ingreso</label>
+                            <input type="text" [(ngModel)]="studentRequest.semester" placeholder="Ej. 2026-I"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Teléfono</label>
+                            <input type="text" [(ngModel)]="studentRequest.phone" placeholder="Ej. 987654321"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Dirección</label>
+                            <input type="text" [(ngModel)]="studentRequest.address" placeholder="Ej. Av. Primavera 123"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button (click)="showNewStudentModal = false"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black text-xs transition active:scale-95">
+                            Cancelar
+                        </button>
+                        <button (click)="procesarNuevoEstudiante()"
+                            [disabled]="!studentRequest.name || !studentRequest.email || !studentRequest.code"
+                            class="flex-1 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:pointer-events-none text-white py-3 rounded-xl font-black text-xs transition active:scale-95 shadow-md shadow-orange-600/10">
+                            Registrar Estudiante
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="showNewTeacherModal"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+                <div
+                    class="modal-container">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-black text-xl text-slate-900 tracking-tight">Nuevo Profesor</h2>
+                        <button (click)="showNewTeacherModal = false"
+                            class="modal-close-btn">
+                            <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="space-y-1.5 col-span-1 sm:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre
+                                Completo</label>
+                            <input type="text" [(ngModel)]="teacherRequest.name" placeholder="Ej. Dr. Armando Paredes"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5 col-span-1 sm:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Correo
+                                Electrónico</label>
+                            <input type="email" [(ngModel)]="teacherRequest.email"
+                                placeholder="Ej. armando.paredes@upc.edu.pe"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Especialidad</label>
+                            <input type="text" [(ngModel)]="teacherRequest.specialization"
+                                placeholder="Ej. Matemáticas / Física"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Asignar Curso
+                                Inicial</label>
+                            <select [(ngModel)]="teacherRequest.courseId"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                                <option [ngValue]="null">Ninguno / Por asignar</option>
+                                <option *ngFor="let c of cursos" [value]="c.id">{{c.name}} ({{c.code}})</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button (click)="showNewTeacherModal = false"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black text-xs transition active:scale-95">
+                            Cancelar
+                        </button>
+                        <button (click)="procesarNuevoProfesor()"
+                            [disabled]="!teacherRequest.name || !teacherRequest.email || !teacherRequest.specialization"
+                            class="flex-1 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:pointer-events-none text-white py-3 rounded-xl font-black text-xs transition active:scale-95 shadow-md shadow-orange-600/10">
+                            Registrar Profesor
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="showEditStudentModal"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+                <div
+                    class="modal-container">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-black text-xl text-slate-900 tracking-tight">Editar Estudiante</h2>
+                        <button (click)="showEditStudentModal = false"
+                            class="modal-close-btn">
+                            <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="space-y-1.5 col-span-1 sm:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre
+                                Completo</label>
+                            <input type="text" [(ngModel)]="studentRequest.name" placeholder="Ej. Juan Pérez"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Correo
+                                Electrónico</label>
+                            <input type="email" [(ngModel)]="studentRequest.email"
+                                placeholder="Ej. juan.perez@upc.edu.pe"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Código de
+                                Alumno</label>
+                            <input type="text" [(ngModel)]="studentRequest.code" placeholder="Ej. U202612345"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Programa/Carrera</label>
+                            <input type="text" [(ngModel)]="studentRequest.program"
+                                placeholder="Ej. Ingeniería de Software"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Semestre de
+                                Ingreso</label>
+                            <input type="text" [(ngModel)]="studentRequest.semester" placeholder="Ej. 2026-I"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Teléfono</label>
+                            <input type="text" [(ngModel)]="studentRequest.phone" placeholder="Ej. 987654321"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Dirección</label>
+                            <input type="text" [(ngModel)]="studentRequest.address" placeholder="Ej. Av. Primavera 123"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5 col-span-1 sm:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Contraseña
+                                (Dejar en blanco para no cambiar)</label>
+                            <input type="password" [(ngModel)]="studentRequest.password"
+                                placeholder="Nueva contraseña..."
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button (click)="showEditStudentModal = false"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black text-xs transition active:scale-95">
+                            Cancelar
+                        </button>
+                        <button (click)="procesarEditarEstudiante()"
+                            [disabled]="!studentRequest.name || !studentRequest.email || !studentRequest.code"
+                            class="flex-1 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:pointer-events-none text-white py-3 rounded-xl font-black text-xs transition active:scale-95 shadow-md shadow-orange-600/10">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="showEditTeacherModal"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+                <div
+                    class="modal-container">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-black text-xl text-slate-900 tracking-tight">Editar Profesor</h2>
+                        <button (click)="showEditTeacherModal = false"
+                            class="modal-close-btn">
+                            <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="space-y-1.5 col-span-1 sm:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre
+                                Completo</label>
+                            <input type="text" [(ngModel)]="teacherRequest.name" placeholder="Ej. Dr. Armando Paredes"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5 col-span-1 sm:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Correo
+                                Electrónico</label>
+                            <input type="email" [(ngModel)]="teacherRequest.email"
+                                placeholder="Ej. armando.paredes@upc.edu.pe"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Especialidad</label>
+                            <input type="text" [(ngModel)]="teacherRequest.specialization"
+                                placeholder="Ej. Matemáticas / Física"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Asignar
+                                Curso</label>
+                            <select [(ngModel)]="teacherRequest.courseId"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                                <option [ngValue]="null">Ninguno / Por asignar</option>
+                                <option *ngFor="let c of cursos" [value]="c.id">{{c.name}} ({{c.code}})</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1.5 col-span-1 sm:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Contraseña
+                                (Dejar en blanco para no cambiar)</label>
+                            <input type="password" [(ngModel)]="teacherRequest.password"
+                                placeholder="Nueva contraseña..."
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button (click)="showEditTeacherModal = false"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black text-xs transition active:scale-95">
+                            Cancelar
+                        </button>
+                        <button (click)="procesarEditarProfesor()"
+                            [disabled]="!teacherRequest.name || !teacherRequest.email || !teacherRequest.specialization"
+                            class="flex-1 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:pointer-events-none text-white py-3 rounded-xl font-black text-xs transition active:scale-95 shadow-md shadow-orange-600/10">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="showNewCourseModal"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+                <div
+                    class="bg-white p-8 rounded-3xl w-full max-w-lg space-y-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-black text-xl text-slate-900 tracking-tight">Nuevo Curso</h2>
+                        <button (click)="showNewCourseModal = false"
+                            class="modal-close-btn">
+                            <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="space-y-1.5 col-span-1 sm:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre del
+                                Curso</label>
+                            <input type="text" [(ngModel)]="courseRequest.name" placeholder="Ej. Cálculo Multivariable"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Código del
+                                Curso</label>
+                            <input type="text" [(ngModel)]="courseRequest.code" placeholder="Ej. MA261"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Créditos</label>
+                            <input type="number" [(ngModel)]="courseRequest.credits" placeholder="Ej. 4" min="1"
+                                max="10"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Categoría</label>
+                            <select [(ngModel)]="courseRequest.category"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                                <option value="Matemáticas">Matemáticas</option>
+                                <option value="Ciencias">Ciencias</option>
+                                <option value="Tecnología">Tecnología</option>
+                                <option value="Humanidades">Humanidades</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Profesor a
+                                Cargo</label>
+                            <select [(ngModel)]="courseRequest.teacherId"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                                <option [ngValue]="null">Ninguno / Por asignar</option>
+                                <option *ngFor="let p of profesores" [value]="p.id">{{ p.name }} ({{ p.specialization
+                                    }})</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button (click)="showNewCourseModal = false"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black text-xs transition active:scale-95">
+                            Cancelar
+                        </button>
+                        <button (click)="procesarNuevoCurso()"
+                            [disabled]="!courseRequest.name || !courseRequest.code || !courseRequest.category"
+                            class="flex-1 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:pointer-events-none text-white py-3 rounded-xl font-black text-xs transition active:scale-95 shadow-md shadow-orange-600/10">
+                            Crear Curso
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="showEditCourseModal"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+                <div
+                    class="bg-white p-8 rounded-3xl w-full max-w-lg space-y-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-black text-xl text-slate-900 tracking-tight">Gestionar Aula (Editar Curso)</h2>
+                        <button (click)="showEditCourseModal = false"
+                            class="modal-close-btn">
+                            <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="space-y-1.5 col-span-1 sm:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre del
+                                Curso</label>
+                            <input type="text" [(ngModel)]="editCourseRequest.name"
+                                placeholder="Ej. Cálculo Multivariable"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Código del
+                                Curso</label>
+                            <input type="text" [(ngModel)]="editCourseRequest.code" placeholder="Ej. MA261"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Créditos</label>
+                            <input type="number" [(ngModel)]="editCourseRequest.credits" placeholder="Ej. 4" min="1"
+                                max="10"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Categoría</label>
+                            <select [(ngModel)]="editCourseRequest.category"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                                <option value="Matemáticas">Matemáticas</option>
+                                <option value="Ciencias">Ciencias</option>
+                                <option value="Tecnología">Tecnología</option>
+                                <option value="Humanidades">Humanidades</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Profesor a
+                                Cargo</label>
+                            <select [(ngModel)]="editCourseRequest.teacherId"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                                <option [ngValue]="null">Ninguno / Por asignar</option>
+                                <option *ngFor="let p of profesores" [value]="p.id">{{ p.name }} ({{ p.specialization
+                                    }})</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button (click)="showEditCourseModal = false"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black text-xs transition active:scale-95">
+                            Cancelar
+                        </button>
+                        <button (click)="procesarEditarCurso()"
+                            [disabled]="!editCourseRequest.name || !editCourseRequest.code || !editCourseRequest.category"
+                            class="flex-1 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:pointer-events-none text-white py-3 rounded-xl font-black text-xs transition active:scale-95 shadow-md shadow-orange-600/10">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="activeTab === 'reportes'"
+                class="admin-tab-view animate-in fade-in duration-300">
+
+                
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 w-full">
+                    <div>
+                        <h1 class="admin-tab-title">Reportes y Analíticas</h1>
+                        <p class="admin-tab-subtitle">Informes detallados del desempeño institucional</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button (click)="imprimirReporte()"
+                            class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5 active:scale-95 shadow-sm">
+                            <lucide-icon [img]="Printer" class="w-3.5 h-3.5 text-slate-500"></lucide-icon>
+                            <span>Imprimir</span>
+                        </button>
+                        <button (click)="abrirEnviarReporteModal()"
+                            class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5 active:scale-95 shadow-sm">
+                            <lucide-icon [img]="Send" class="w-3.5 h-3.5 text-slate-500"></lucide-icon>
+                            <span>Enviar</span>
+                        </button>
+                        <button (click)="exportarPDF()"
+                            class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 active:scale-95 shadow-md shadow-orange-600/10">
+                            <lucide-icon [img]="FileDown" class="w-3.5 h-3.5"></lucide-icon>
+                            <span>Exportar PDF</span>
+                        </button>
+                    </div>
+                </div>
+
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+                    <button *ngFor="let rep of ['Rendimiento Académico', 'Asistencia', 'Matrículas']"
+                        (click)="reporteActivo = rep; calcularReportes()" [class.border-orange-500]="reporteActivo === rep"
+                        [class.ring-2]="reporteActivo === rep" [class.ring-orange-500/10]="reporteActivo === rep"
+                        class="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm flex items-center gap-3 text-left transition-all active:scale-95">
+                        <span
+                            [ngClass]="reporteActivo === rep ? 'bg-orange-50 text-orange-600' : 'bg-slate-50 text-slate-500'"
+                            class="p-2.5 rounded-xl flex items-center justify-center shrink-0">
+                            <lucide-icon
+                                [img]="rep === 'Rendimiento Académico' ? User : (rep === 'Asistencia' ? Activity : BookOpen)"
+                                class="w-4 h-4"></lucide-icon>
+                        </span>
+                        <span class="text-xs font-black text-slate-800 tracking-tight">{{rep}}</span>
+                    </button>
+                </div>
+
+                
+                <div
+                    class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm items-end w-full">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Período</label>
+                        <div
+                            class="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                            <lucide-icon [img]="Calendar" class="w-3.5 h-3.5 text-slate-400 mr-2"></lucide-icon>
+                            <select [(ngModel)]="selectedReportPeriod" (change)="calcularReportes()"
+                                class="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer w-full">
+                                <option value="Todos">Todos los períodos</option>
+                                <option *ngFor="let p of periodos" [value]="p">{{p}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Curso</label>
+                        <div
+                            class="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                            <lucide-icon [img]="SlidersHorizontal"
+                                class="w-3.5 h-3.5 text-slate-400 mr-2"></lucide-icon>
+                            <select [(ngModel)]="selectedReportCourseId" (change)="calcularReportes()"
+                                class="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer w-full">
+                                <option [ngValue]="null">Todos los Cursos</option>
+                                <option *ngFor="let c of cursos" [value]="c.id">{{c.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button (click)="cargarDataGeneral()"
+                        class="bg-blue-600 hover:bg-blue-500 text-white font-black text-xs h-[38px] rounded-xl transition shadow-sm flex items-center justify-center gap-2 active:scale-95">
+                        <lucide-icon [img]="RotateCcw" class="w-3.5 h-3.5"></lucide-icon>
+                        <span>Actualizar</span>
+                    </button>
+                </div>
+
+                
+                <div class="stats-grid">
+                    <div
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <p class="stat-label">
+                                {{ reporteActivo === 'Rendimiento Académico' ? 'Promedio General' : (reporteActivo === 'Asistencia' ? 'Asistencia Promedio' : 'Total Matrículas') }}
+                            </p>
+                            <lucide-icon [img]="TrendingUp" class="w-4 h-4 text-emerald-500"></lucide-icon>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-slate-900">
+                                {{ reporteActivo === 'Rendimiento Académico' ? (reportStats.avgGrade | number:'1.2-2') : (reporteActivo === 'Asistencia' ? (reportStats.avgAttendance | number:'1.1-1') + '%' : reportStats.totalEnrollments) }}
+                            </h3>
+                            <p class="text-[10px] text-emerald-500 font-bold mt-0.5">
+                                {{ reporteActivo === 'Rendimiento Académico' ? '+0.12 vs anterior' : (reporteActivo === 'Asistencia' ? '+0.5% vs anterior' : 'Solicitudes registradas') }}
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <p class="stat-label">
+                                {{ reporteActivo === 'Rendimiento Académico' ? 'Tasa de Aprobación' : (reporteActivo === 'Asistencia' ? 'Asistencia Perfecta' : 'Matrículas Activas') }}
+                            </p>
+                            <lucide-icon [img]="TrendingUp" class="w-4 h-4 text-emerald-500"></lucide-icon>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-slate-900">
+                                {{ reporteActivo === 'Rendimiento Académico' ? (reportStats.approvalRate | number:'1.1-1') + '%' : (reporteActivo === 'Asistencia' ? reportStats.perfectAttendanceCount : reportStats.activeEnrollmentsCount) }}
+                            </h3>
+                            <p class="text-[10px] text-emerald-500 font-bold mt-0.5">
+                                {{ reporteActivo === 'Rendimiento Académico' ? '+2.1% vs anterior' : (reporteActivo === 'Asistencia' ? (reportStats.perfectAttendancePct | number:'1.1-1') + '% del total' : (reportStats.activeEnrollmentsPct | number:'1.1-1') + '% del total') }}
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <p class="stat-label">
+                                {{ reporteActivo === 'Rendimiento Académico' ? 'Estudiantes Destacados' : (reporteActivo === 'Asistencia' ? 'Clases Totales' : 'Solicitudes Pendientes') }}
+                            </p>
+                            <lucide-icon [img]="reporteActivo === 'Rendimiento Académico' ? User : (reporteActivo === 'Asistencia' ? Calendar : Clock)" class="w-4 h-4 text-orange-500"></lucide-icon>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-slate-900">
+                                {{ reporteActivo === 'Rendimiento Académico' ? reportStats.topStudentsCount : (reporteActivo === 'Asistencia' ? reportStats.totalClasses : reportStats.pendingEnrollmentsCount) }}
+                            </h3>
+                            <p class="text-[10px] text-slate-400 font-bold mt-0.5">
+                                {{ reporteActivo === 'Rendimiento Académico' ? (reportStats.topStudentsPct | number:'1.1-1') + '% del total' : (reporteActivo === 'Asistencia' ? 'Clases programadas' : 'Requieren aprobación') }}
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        class="stat-card">
+                        <div class="stat-card-header">
+                            <p class="stat-label">
+                                {{ reporteActivo === 'Rendimiento Académico' ? 'En Riesgo' : (reporteActivo === 'Asistencia' ? 'Riesgo de Inasistencia' : 'Matrículas Canceladas') }}
+                            </p>
+                            <lucide-icon [img]="AlertTriangle" class="w-4 h-4 text-rose-500"></lucide-icon>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black" [ngClass]="reportStats.riskStudentsCount > 0 || reportStats.riskAttendanceCount > 0 || reportStats.cancelledEnrollmentsCount > 0 ? 'text-rose-600' : 'text-slate-900'">
+                                {{ reporteActivo === 'Rendimiento Académico' ? reportStats.riskStudentsCount : (reporteActivo === 'Asistencia' ? reportStats.riskAttendanceCount : reportStats.cancelledEnrollmentsCount) }}
+                            </h3>
+                            <p class="text-[10px] text-rose-500 font-bold mt-0.5">
+                                {{ reporteActivo === 'Rendimiento Académico' ? 'Requiere intervención' : (reporteActivo === 'Asistencia' ? 'Asistencia < 70%' : 'Canceladas / Bajas') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="panels-grid">
+
+                    
+                    <div
+                        class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-80">
+                        <span class="text-xs font-black text-slate-800 uppercase tracking-wider mb-4 block">
+                            {{ reporteActivo === 'Rendimiento Académico' ? 'Rendimiento por Materia' : (reporteActivo === 'Asistencia' ? 'Asistencia por Materia (%)' : 'Solicitudes por Materia') }}
+                        </span>
+                        <div
+                            class="flex-1 flex items-end justify-between gap-2 px-4 border-b border-l border-slate-200 pt-4 h-48 relative">
+                            
+                            <div
+                                class="absolute inset-x-0 top-1/4 border-t border-slate-100 border-dashed text-[9px] text-slate-300 pl-1">
+                                {{ reporteActivo === 'Rendimiento Académico' ? '4.0' : (reporteActivo === 'Asistencia' ? '80%' : '30') }}
+                            </div>
+                            <div
+                                class="absolute inset-x-0 top-2/4 border-t border-slate-100 border-dashed text-[9px] text-slate-300 pl-1">
+                                {{ reporteActivo === 'Rendimiento Académico' ? '2.5' : (reporteActivo === 'Asistencia' ? '50%' : '15') }}
+                            </div>
+
+                            
+                            <div *ngFor="let bar of reporteBarras" class="flex flex-col items-center gap-2 w-12 z-10">
+                                <div class="bg-orange-500 w-full rounded-t-lg transition-all duration-500" [style.height.%]="bar.height"></div>
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-tight">{{ bar.label }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div
+                        class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between h-80">
+                        <span class="text-xs font-black text-slate-800 uppercase tracking-wider mb-4 block">
+                            {{ reporteActivo === 'Rendimiento Académico' ? 'Distribución de Calificaciones' : (reporteActivo === 'Asistencia' ? 'Rango de Asistencia' : 'Estado de Matrículas') }}
+                        </span>
+                        <div class="flex-1 flex items-center justify-center gap-8">
+                            
+                            <div class="w-40 h-40 rounded-full shadow-inner relative shrink-0 border border-slate-100"
+                                [style.background]="getPieChartGradient(pieChartSlices)">
+                                <div
+                                    class="absolute inset-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                    <span
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{{ pieChartCenterLabel }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 text-[10px] font-black text-slate-600">
+                                <div *ngFor="let slice of pieChartSlices" class="flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded block" [style.backgroundColor]="slice.color"></span>
+                                    <span>{{ slice.label }} ({{ slice.pct | number:'1.0-0' }}%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                
+                <div class="bg-white p-6 rounded-2xl border border-slate-200/60 shadow-sm w-full">
+                    <span class="text-xs font-black text-slate-800 uppercase tracking-wider mb-4 block">Análisis de Competencias</span>
+                    <div class="flex flex-col md:flex-row items-center justify-around gap-6 py-4">
+                        <div class="w-64 h-64 shrink-0 relative flex items-center justify-center">
+                            <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible">
+                                
+                                <polygon points="50,10 85,35 85,75 50,95 15,75 15,35" fill="none" stroke="#e2e8f0"
+                                    stroke-width="0.5" />
+                                <polygon points="50,25 72,43 72,67 50,81 28,67 28,43" fill="none" stroke="#e2e8f0"
+                                    stroke-width="0.5" />
+                                <polygon points="50,40 60,50 60,61 50,70 40,61 40,50" fill="none" stroke="#e2e8f0"
+                                    stroke-width="0.5" />
+                                
+                                <line x1="50" y1="50" x2="50" y2="10" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="50" y1="50" x2="85" y2="35" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="50" y1="50" x2="85" y2="75" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="50" y1="50" x2="50" y2="95" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="50" y1="50" x2="15" y2="75" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="50" y1="50" x2="15" y2="35" stroke="#cbd5e1" stroke-width="0.5" />
+                                
+                                <polygon [attr.points]="radarPoints" fill="rgba(249, 115, 22, 0.2)"
+                                    stroke="#f97316" stroke-width="1" />
+                            </svg>
+                            
+                            <span
+                                class="absolute top-0 text-[9px] font-black text-slate-500 uppercase tracking-tighter">Pensamiento Crítico</span>
+                            <span
+                                class="absolute top-1/4 right-0 text-[9px] font-black text-slate-500 uppercase tracking-tighter">Comunicación</span>
+                            <span
+                                class="absolute bottom-1/4 right-0 text-[9px] font-black text-slate-500 uppercase tracking-tighter">Trabajo en Equipo</span>
+                            <span
+                                class="absolute bottom-0 text-[9px] font-black text-slate-500 uppercase tracking-tighter">Resolución Problemas</span>
+                            <span
+                                class="absolute bottom-1/4 left-0 text-[9px] font-black text-slate-500 uppercase tracking-tighter">Creatividad</span>
+                            <span
+                                class="absolute top-1/4 left-0 text-[9px] font-black text-slate-500 uppercase tracking-tighter">Liderazgo</span>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div
+                    class="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden w-full max-w-full">
+                    <div class="p-4 border-b border-slate-100">
+                        <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Detalle por Materia</span>
+                    </div>
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left border-collapse min-w-[700px]">
+                            
+                            <thead *ngIf="reporteActivo === 'Rendimiento Académico'">
+                                <tr class="bg-slate-50/70 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4 pl-6">Materia</th>
+                                    <th class="p-4">Estudiantes</th>
+                                    <th class="p-4">Promedio</th>
+                                    <th class="p-4">Aprobados</th>
+                                    <th class="p-4">Destacados</th>
+                                    <th class="p-4 pr-6">En Riesgo</th>
+                                </tr>
+                            </thead>
+                            
+                            <thead *ngIf="reporteActivo === 'Asistencia'">
+                                <tr class="bg-slate-50/70 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4 pl-6">Materia</th>
+                                    <th class="p-4">Estudiantes</th>
+                                    <th class="p-4">Asistencia Prom.</th>
+                                    <th class="p-4">Asist. Perfecta</th>
+                                    <th class="p-4">Asist. Regular</th>
+                                    <th class="p-4 pr-6">Asist. Crítica</th>
+                                </tr>
+                            </thead>
+                            
+                            <thead *ngIf="reporteActivo === 'Matrículas'">
+                                <tr class="bg-slate-50/70 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4 pl-6">Materia</th>
+                                    <th class="p-4">Capacidad / Cupo</th>
+                                    <th class="p-4">Total Solicitudes</th>
+                                    <th class="p-4">Activas</th>
+                                    <th class="p-4">Pendientes</th>
+                                    <th class="p-4 pr-6">Canceladas</th>
+                                </tr>
+                            </thead>
+
+                            
+                            <tbody *ngIf="reporteActivo === 'Rendimiento Académico'" class="divide-y divide-slate-100 text-xs font-bold text-slate-700">
+                                <tr *ngFor="let m of reporteMaterias" class="hover:bg-slate-50/40 transition">
+                                    <td class="p-4 pl-6 text-slate-900 font-black tracking-tight">{{ m.name }}</td>
+                                    <td class="p-4 text-slate-400 font-medium">{{ m.students }}</td>
+                                    <td class="p-4 text-slate-900 font-black">{{ m.average | number:'1.1-1' }}</td>
+                                    <td class="p-4 text-emerald-600 font-black">{{ m.approved }}</td>
+                                    <td class="p-4 text-blue-600 font-black">{{ m.top }}</td>
+                                    <td class="p-4 pr-6 text-rose-600 font-black">{{ m.risk }}</td>
+                                </tr>
+                            </tbody>
+                            
+                            <tbody *ngIf="reporteActivo === 'Asistencia'" class="divide-y divide-slate-100 text-xs font-bold text-slate-700">
+                                <tr *ngFor="let m of reporteMaterias" class="hover:bg-slate-50/40 transition">
+                                    <td class="p-4 pl-6 text-slate-900 font-black tracking-tight">{{ m.name }}</td>
+                                    <td class="p-4 text-slate-400 font-medium">{{ m.students }}</td>
+                                    <td class="p-4 text-slate-900 font-black">{{ m.average | number:'1.1-1' }}%</td>
+                                    <td class="p-4 text-emerald-600 font-black">{{ m.perfect }}</td>
+                                    <td class="p-4 text-blue-600 font-black">{{ m.regular }}</td>
+                                    <td class="p-4 pr-6 text-rose-600 font-black">{{ m.risk }}</td>
+                                </tr>
+                            </tbody>
+                            
+                            <tbody *ngIf="reporteActivo === 'Matrículas'" class="divide-y divide-slate-100 text-xs font-bold text-slate-700">
+                                <tr *ngFor="let m of reporteMaterias" class="hover:bg-slate-50/40 transition">
+                                    <td class="p-4 pl-6 text-slate-900 font-black tracking-tight">{{ m.name }}</td>
+                                    <td class="p-4 text-slate-400 font-medium">{{ m.capacity }}</td>
+                                    <td class="p-4 text-slate-900 font-black">{{ m.students }}</td>
+                                    <td class="p-4 text-emerald-600 font-black">{{ m.active }}</td>
+                                    <td class="p-4 text-blue-600 font-black">{{ m.pending }}</td>
+                                    <td class="p-4 pr-6 text-rose-600 font-black">{{ m.cancelled }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                
+                <div *ngIf="showSendReportModal"
+                    class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200 no-print">
+                    <div
+                        class="bg-white p-8 rounded-3xl w-full max-w-md space-y-6 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
+                        <div class="flex justify-between items-center">
+                            <h2 class="font-black text-xl text-slate-900 tracking-tight">Enviar Reporte a Docente</h2>
+                            <button (click)="showSendReportModal = false"
+                                class="modal-close-btn">
+                                <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+                            </button>
+                        </div>
+
+                        <div class="panel-list">
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Seleccionar Profesor</label>
+                                <select [(ngModel)]="selectedTeacherForReport"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500 transition-all">
+                                    <option [ngValue]="null">-- Selecciona un docente --</option>
+                                    <option *ngFor="let p of profesores" [ngValue]="p">{{ p.name }} ({{ p.specialization }})</option>
+                                </select>
+                            </div>
+                            
+                            <div *ngIf="selectedTeacherForReport" class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2 text-xs">
+                                <p class="font-black text-slate-700">Resumen a enviar:</p>
+                                <p class="text-slate-500 leading-relaxed font-semibold">
+                                    Se enviará una notificación con el reporte consolidado de su curso asignado (promedios, asistencia y estudiantes matriculados).
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3 pt-2">
+                            <button (click)="showSendReportModal = false"
+                                class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-black text-xs transition active:scale-95">
+                                Cancelar
+                            </button>
+                            <button (click)="enviarReporteADocente()"
+                                [disabled]="!selectedTeacherForReport"
+                                class="flex-1 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:pointer-events-none text-white py-3 rounded-xl font-black text-xs transition active:scale-95 shadow-md shadow-orange-600/10">
+                                Enviar Reporte
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            
+            <div *ngIf="activeTab === 'configuracion'"
+                class="admin-tab-view animate-in fade-in duration-300">
+
+                
+                <div class="flex justify-between items-center w-full">
+                    <div>
+                        <h1 class="admin-tab-title">Configuración del Sistema</h1>
+                        <p class="admin-tab-subtitle">Gestiona las preferencias y configuración de
+                            la plataforma</p>
+                    </div>
+                    <button (click)="guardarConfiguracion()"
+                        class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-2 shrink-0 active:scale-95">
+                        <lucide-icon [img]="Save" class="w-4 h-4"></lucide-icon>
+                        <span>Guardar Cambios</span>
+                    </button>
+                </div>
+
+                
+                <div class="flex flex-col lg:flex-row gap-6 items-start w-full">
+
+                    
+                    <div
+                        class="w-full lg:w-64 bg-white rounded-2xl border border-slate-200/60 shadow-sm p-3 space-y-1 shrink-0">
+                        <button (click)="configTab = 'general'" [class.bg-orange-50]="configTab === 'general'"
+                            [class.text-orange-600]="configTab === 'general'"
+                            [class.text-slate-600]="configTab !== 'general'"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black transition text-left active:scale-98">
+                            <lucide-icon [img]="Settings" class="w-4 h-4"></lucide-icon><span>General</span>
+                        </button>
+                        <button (click)="configTab = 'notificaciones'"
+                            [class.bg-orange-50]="configTab === 'notificaciones'"
+                            [class.text-orange-600]="configTab === 'notificaciones'"
+                            [class.text-slate-600]="configTab !== 'notificaciones'"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black transition text-left active:scale-98">
+                            <lucide-icon [img]="Bell" class="w-4 h-4"></lucide-icon><span>Notificaciones</span>
+                        </button>
+                        <button (click)="configTab = 'seguridad'" [class.bg-orange-50]="configTab === 'seguridad'"
+                            [class.text-orange-600]="configTab === 'seguridad'"
+                            [class.text-slate-600]="configTab !== 'seguridad'"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black transition text-left active:scale-98">
+                            <lucide-icon [img]="Lock" class="w-4 h-4"></lucide-icon><span>Seguridad</span>
+                        </button>
+                        <button (click)="configTab = 'usuarios'" [class.bg-orange-50]="configTab === 'usuarios'"
+                            [class.text-orange-600]="configTab === 'usuarios'"
+                            [class.text-slate-600]="configTab !== 'usuarios'"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black transition text-left active:scale-98">
+                            <lucide-icon [img]="Users" class="w-4 h-4"></lucide-icon><span>Usuarios</span>
+                        </button>
+
+                        <button (click)="configTab = 'integraciones'"
+                            [class.bg-orange-50]="configTab === 'integraciones'"
+                            [class.text-orange-600]="configTab === 'integraciones'"
+                            [class.text-slate-600]="configTab !== 'integraciones'"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black transition text-left active:scale-98">
+                            <lucide-icon [img]="Globe" class="w-4 h-4"></lucide-icon><span>Integraciones</span>
+                        </button>
+                    </div>
+
+                    
+                    <div class="flex-1 bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 w-full min-w-0">
+
+                        
+                        <div *ngIf="configTab === 'general'" class="space-y-6 animate-in fade-in duration-200">
+                            <div>
+                                <h2 class="text-base font-black text-slate-900">Configuración General</h2>
+                                <p class="text-xs text-slate-400 font-bold mt-0.5">Información básica de la institución
+                                </p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-1.5"><label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nombre de
+                                        la Institución</label><input type="text" [(ngModel)]="institucionName" name="institucionName"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                                </div>
+                                <div class="space-y-1.5"><label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Email
+                                        Principal</label><input type="email" [(ngModel)]="institucionEmail" name="institucionEmail"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                                </div>
+                                <div class="space-y-1.5"><label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Teléfono</label><input
+                                        type="text" [(ngModel)]="institucionPhone" name="institucionPhone"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                                </div>
+                                <div class="space-y-1.5"><label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Zona
+                                        Horaria</label><select [(ngModel)]="institucionTimeZone" name="institucionTimeZone"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none">
+                                        <option value="Lima (UTC-5)">Lima (UTC-5)</option>
+                                    </select></div>
+                                <div class="space-y-1.5"><label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Idioma</label><select [(ngModel)]="institucionLanguage" name="institucionLanguage"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none">
+                                        <option value="Español">Español</option>
+                                    </select></div>
+                                <div class="space-y-1.5"><label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Año
+                                        Académico Actual</label><input type="text" [(ngModel)]="institucionYear" name="institucionYear"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                                </div>
+                            </div>
+                            <div
+                                class="bg-blue-50/50 border border-blue-100 rounded-xl p-4 flex gap-3 text-xs font-bold text-blue-700">
+                                <lucide-icon [img]="Bell" class="w-4 h-4 shrink-0 mt-0.5"></lucide-icon>
+                                <div>
+                                    <p class="font-black text-blue-900">Información importante</p>
+                                    <p class="text-blue-600 font-medium text-[11px] mt-0.5">Los cambios en la
+                                        configuración general afectarán a todos los usuarios del sistema.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div *ngIf="configTab === 'notificaciones'" class="space-y-6 animate-in fade-in duration-200">
+                            <div>
+                                <h2 class="text-base font-black text-slate-900">Notificaciones</h2>
+                                <p class="text-xs text-slate-400 font-bold mt-0.5">Configura cómo y cuándo recibir
+                                    notificaciones</p>
+                            </div>
+                            <div class="space-y-3">
+                                <div
+                                    class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-xl">
+                                    <div class="flex gap-3"><span
+                                            class="stat-icon-wrapper-blue"><lucide-icon
+                                                [img]="Bell" class="w-4 h-4"></lucide-icon></span>
+                                        <div>
+                                            <p class="activity-text-title">Notificaciones por Email</p>
+                                            <p class="text-[10px] text-slate-400 font-bold mt-0.5">Recibe alertas
+                                                importantes por correo</p>
+                                        </div>
+                                    </div>
+                                    <button (click)="emailNotifications = !emailNotifications"
+                                        [class.bg-orange-600]="emailNotifications"
+                                        [class.bg-slate-200]="!emailNotifications"
+                                        class="w-10 h-5 rounded-full relative transition-colors duration-200 focus:outline-none"><span
+                                            [class.translate-x-5]="emailNotifications"
+                                            [class.translate-x-1]="!emailNotifications"
+                                            class="w-4 h-4 bg-white rounded-full absolute top-0.5 left-0 transition-transform duration-200 shadow-sm block"></span></button>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-xl">
+                                    <div class="flex gap-3"><span
+                                            class="stat-icon-wrapper-emerald"><lucide-icon
+                                                [img]="MessageSquare" class="w-4 h-4"></lucide-icon></span>
+                                        <div>
+                                            <p class="activity-text-title">Notificaciones SMS</p>
+                                            <p class="text-[10px] text-slate-400 font-bold mt-0.5">Alertas urgentes vía
+                                                mensaje de texto</p>
+                                        </div>
+                                    </div>
+                                    <button (click)="smsNotifications = !smsNotifications"
+                                        [class.bg-orange-600]="smsNotifications"
+                                        [class.bg-slate-200]="!smsNotifications"
+                                        class="w-10 h-5 rounded-full relative transition-colors duration-200 focus:outline-none"><span
+                                            [class.translate-x-5]="smsNotifications"
+                                            [class.translate-x-1]="!smsNotifications"
+                                            class="w-4 h-4 bg-white rounded-full absolute top-0.5 left-0 transition-transform duration-200 shadow-sm block"></span></button>
+                                </div>
+                            </div>
+                            <div class="space-y-3 pt-2">
+                                <h3 class="text-xs font-black text-slate-900 uppercase tracking-wide">Tipos de
+                                    Notificación</h3>
+                                <div class="space-y-2.5 text-xs font-bold text-slate-700">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" [(ngModel)]="notifNewEnrollments" name="notifNewEnrollments"
+                                            class="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span>Nuevas
+                                            matrículas</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" [(ngModel)]="notifNewGrades" name="notifNewGrades"
+                                            class="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span>Calificaciones
+                                            publicadas</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" [(ngModel)]="notifAttendanceAlerts" name="notifAttendanceAlerts"
+                                            class="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span>Alertas
+                                            de asistencia</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div *ngIf="configTab === 'seguridad'" class="space-y-6 animate-in fade-in duration-200">
+                            <div>
+                                <h2 class="text-base font-black text-slate-900">Seguridad</h2>
+                                <p class="text-xs text-slate-400 font-bold mt-0.5">Protege tu cuenta y datos
+                                    institucionales</p>
+                            </div>
+                            <div
+                                class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-xl">
+                                <div class="flex gap-3"><span
+                                        class="stat-icon-wrapper-purple"><lucide-icon
+                                            [img]="Shield" class="w-4 h-4"></lucide-icon></span>
+                                    <div>
+                                        <p class="activity-text-title">Autenticación de Dos Factores</p>
+                                        <p class="text-[10px] text-slate-400 font-bold mt-0.5">Capa extra de seguridad
+                                            para tu cuenta</p>
+                                    </div>
+                                </div>
+                                <button (click)="toggleTwoFactorSwitch()" [class.bg-orange-600]="twoFactorAuth"
+                                    [class.bg-slate-200]="!twoFactorAuth"
+                                    class="w-10 h-5 rounded-full relative transition-colors duration-200 focus:outline-none"><span
+                                        [class.translate-x-5]="twoFactorAuth" [class.translate-x-1]="!twoFactorAuth"
+                                        class="w-4 h-4 bg-white rounded-full absolute top-0.5 left-0 transition-transform duration-200 shadow-sm block"></span></button>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                <div class="space-y-1.5"><label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Tiempo de
+                                        Inactividad (minutos)</label><select [(ngModel)]="inactiveTimeout" name="inactiveTimeout"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none">
+                                        <option value="30 minutos">30 minutos</option>
+                                    </select></div>
+                                <div class="space-y-1.5"><label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-wide">Expiración
+                                        de Contraseña (días)</label><select [(ngModel)]="passwordExpiration" name="passwordExpiration"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none">
+                                        <option value="90 días">90 días</option>
+                                    </select></div>
+                            </div>
+                            <div class="space-y-3 border-t border-slate-100 pt-4">
+                                <h3 class="text-xs font-black text-slate-900 uppercase tracking-wide">Cambiar Contraseña
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-1.5"><input type="password" placeholder="Nueva contraseña" [(ngModel)]="newPasswordConfig" name="newPasswordConfig"
+                                             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                                    </div>
+                                    <div class="space-y-1.5"><input type="password" placeholder="Confirmar contraseña" [(ngModel)]="confirmPasswordConfig" name="confirmPasswordConfig"
+                                             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:outline-none focus:border-orange-500">
+                                    </div>
+                                </div>
+                                <button (click)="actualizarPasswordConfig()"
+                                    class="bg-orange-600 hover:bg-orange-500 text-white font-black text-xs px-4 py-2 rounded-xl transition active:scale-95 shadow-sm mt-2">Actualizar
+                                    Contraseña</button>
+                            </div>
+                        </div>
+
+                        
+                        <div *ngIf="configTab === 'usuarios'" class="space-y-6 animate-in fade-in duration-200">
+                            <div>
+                                <h2 class="text-base font-black text-slate-900">Gestión de Usuarios</h2>
+                                <p class="text-xs text-slate-400 font-bold mt-0.5">Permisos y roles de usuario</p>
+                            </div>
+                            <div class="panel-list">
+                                
+                                <div class="p-4 border border-slate-200 rounded-2xl space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <p class="activity-text-title">Rol: Administrador</p><span
+                                            class="bg-purple-50 text-purple-600 font-black text-[9px] px-2 py-0.5 rounded-lg border border-purple-100/50">{{ getRoleCount('admin') }}
+                                            usuario{{ getRoleCount('admin') === 1 ? '' : 's' }}</span>
+                                    </div>
+                                    <p class="activity-text-desc">Acceso completo al sistema</p>
+                                    <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-600 pt-1"><label
+                                            class="flex items-center gap-1.5"><input type="checkbox" checked disabled
+                                                class="text-orange-600 rounded"><span>Gestionar
+                                                estudiantes</span></label><label
+                                            class="flex items-center gap-1.5"><input type="checkbox" checked disabled
+                                                class="text-orange-600 rounded"><span>Gestionar
+                                                cursos</span></label><label class="flex items-center gap-1.5"><input
+                                                type="checkbox" checked disabled
+                                                class="text-orange-600 rounded"><span>Ver reportes</span></label><label
+                                            class="flex items-center gap-1.5"><input type="checkbox" checked disabled
+                                                class="text-orange-600 rounded"><span>Configuración</span></label></div>
+                                </div>
+                                
+                                <div class="p-4 border border-slate-200 rounded-2xl space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <p class="activity-text-title">Rol: Profesor</p><span
+                                            class="bg-blue-50 text-blue-600 font-black text-[9px] px-2 py-0.5 rounded-lg border border-blue-100/50">{{ getRoleCount('docente') }}
+                                            usuario{{ getRoleCount('docente') === 1 ? '' : 's' }}</span>
+                                    </div>
+                                    <p class="activity-text-desc">Gestión de clases y estudiantes</p>
+                                    <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-600 pt-1"><label
+                                            class="flex items-center gap-1.5"><input type="checkbox" checked
+                                                class="text-orange-600 rounded"><span>Ver
+                                                estudiantes</span></label><label
+                                            class="flex items-center gap-1.5"><input type="checkbox" checked
+                                                class="text-orange-600 rounded"><span>Calificar</span></label><label
+                                            class="flex items-center gap-1.5"><input type="checkbox" checked
+                                                class="text-orange-600 rounded"><span>Tomar
+                                                asistencia</span></label><label class="flex items-center gap-1.5"><input
+                                                type="checkbox" class="text-orange-600 rounded"><span>Gestionar
+                                                cursos</span></label></div>
+                                </div>
+                                
+                                <div class="p-4 border border-slate-200 rounded-2xl space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <p class="activity-text-title">Rol: Estudiante</p><span
+                                            class="bg-emerald-50 text-emerald-600 font-black text-[9px] px-2 py-0.5 rounded-lg border border-emerald-100/50">{{ getRoleCount('estudiante') }}
+                                            usuario{{ getRoleCount('estudiante') === 1 ? '' : 's' }}</span>
+                                    </div>
+                                    <p class="activity-text-desc">Acceso básico a cursos</p>
+                                    <div class="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-600 pt-1"><label
+                                            class="flex items-center gap-1.5"><input type="checkbox" checked
+                                                class="text-orange-600 rounded"><span>Ver cursos</span></label><label
+                                            class="flex items-center gap-1.5"><input type="checkbox" checked
+                                                class="text-orange-600 rounded"><span>Ver
+                                                calificaciones</span></label><label
+                                            class="flex items-center gap-1.5"><input type="checkbox" checked
+                                                class="text-orange-600 rounded"><span>Descargar
+                                                recursos</span></label><label class="flex items-center gap-1.5"><input
+                                                type="checkbox" checked class="text-orange-600 rounded"><span>Solicitar
+                                                tutorías</span></label></div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        
+                        <div *ngIf="configTab === 'integraciones'" class="space-y-6 animate-in fade-in duration-200">
+                            <div>
+                                <h2 class="text-base font-black text-slate-900">Integraciones</h2>
+                                <p class="text-xs text-slate-400 font-bold mt-0.5">Conecta servicios externos con
+                                    EduBridge</p>
+                            </div>
+                            <div class="space-y-3">
+                                
+                                <div
+                                    class="flex items-center justify-between p-4 border border-emerald-100 rounded-xl bg-emerald-50/20">
+                                    <div class="flex gap-3"><span
+                                            class="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl flex items-center justify-center shrink-0"><lucide-icon
+                                                [img]="Database" class="w-4 h-4"></lucide-icon></span>
+                                        <div>
+                                            <p class="activity-text-title">Neon</p>
+                                            <p class="text-[10px] text-slate-400 font-bold mt-0.5">Base de datos principal (PostgreSQL)</p>
+                                        </div>
+                                    </div>
+                                    <span
+                                        class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-3 py-1 rounded-xl border border-emerald-200/50 uppercase tracking-wide">Conectado</span>
+                                </div>
+                                
+                                <div
+                                    class="flex items-center justify-between p-4 border border-amber-100 rounded-xl bg-amber-50/20">
+                                    <div class="flex gap-3"><span
+                                            class="bg-amber-50 text-amber-600 p-2.5 rounded-xl flex items-center justify-center shrink-0"><lucide-icon
+                                                [img]="Globe" class="w-4 h-4"></lucide-icon></span>
+                                        <div>
+                                            <p class="activity-text-title">Namecheap</p>
+                                            <p class="text-[10px] text-slate-400 font-bold mt-0.5">Gestión de dominio y DNS</p>
+                                        </div>
+                                    </div>
+                                    <span
+                                        class="bg-amber-100 text-amber-700 text-[10px] font-black px-3 py-1 rounded-xl border border-amber-200/50 uppercase tracking-wide">Conectado</span>
+                                </div>
+                                
+                                <div
+                                    class="flex items-center justify-between p-4 border border-slate-200 rounded-xl bg-slate-50/50">
+                                    <div class="flex gap-3"><span
+                                            class="bg-slate-100 text-slate-700 p-2.5 rounded-xl flex items-center justify-center shrink-0"><lucide-icon
+                                                [img]="Mail" class="w-4 h-4"></lucide-icon></span>
+                                        <div>
+                                            <p class="activity-text-title">Resend</p>
+                                            <p class="text-[10px] text-slate-400 font-bold mt-0.5">Envío de correos y recuperación de contraseñas</p>
+                                        </div>
+                                    </div>
+                                    <span
+                                        class="bg-slate-200 text-slate-800 text-[10px] font-black px-3 py-1 rounded-xl border border-slate-300/50 uppercase tracking-wide">Conectado</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="show2faSetupModal"
+                class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+                <div class="bg-white p-8 rounded-[2rem] w-full max-w-md space-y-6 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-black text-xl text-slate-900 tracking-tight">Activar Autenticación 2FA</h2>
+                        <button (click)="cancelarActivacion2fa()"
+                            class="modal-close-btn">
+                            <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </div>
+
+                    <div class="space-y-4 text-xs text-slate-600 font-medium">
+                        <p>Añade una capa adicional de seguridad a tu cuenta mediante un autenticador móvil (Google Authenticator, Authy, etc.).</p>
+                        
+                        
+                        <div class="space-y-2">
+                            <p class="font-black text-[10px] text-slate-400 uppercase tracking-wider">Paso 1: Escanear Código QR</p>
+                            <div class="flex justify-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                <img [src]="scanned2faQRCodeUrl" alt="Código QR 2FA" class="w-40 h-40 rounded-lg shadow-sm border border-white" />
+                            </div>
+                        </div>
+
+                        
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between">
+                            <div>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Clave Secreta Manual</p>
+                                <p class="font-mono text-xs text-slate-800 font-bold select-all">{{ totpSecretKey }}</p>
+                            </div>
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider bg-white px-2 py-1 rounded-lg border">Copiar</span>
+                        </div>
+
+                        
+                        <div class="space-y-1.5">
+                            <p class="font-black text-[10px] text-slate-400 uppercase tracking-wider">Paso 2: Ingresar Código de 6 Dígitos</p>
+                            <input type="text" maxlength="6" [(ngModel)]="totpVerificationCode" placeholder="Ej. 123456"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-center tracking-[0.5em] text-slate-800 focus:outline-none focus:border-orange-500 transition-all">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button (click)="cancelarActivacion2fa()"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3.5 rounded-xl font-black text-xs transition active:scale-95 uppercase tracking-wide">
+                            Cancelar
+                        </button>
+                        <button (click)="confirmarActivacion2fa()"
+                            [disabled]="!totpVerificationCode || totpVerificationCode.length !== 6"
+                            class="flex-1 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:pointer-events-none text-white py-3.5 rounded-xl font-black text-xs transition active:scale-95 shadow-md shadow-orange-600/10 uppercase tracking-wide">
+                            Activar 2FA
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</div>

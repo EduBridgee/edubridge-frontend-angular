@@ -1,14 +1,29 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { RoleService, UserRole } from '../../../core/services/role';
+import { LucideAngularModule, LayoutDashboard, BookOpen, GraduationCap, Calendar, FolderOpen, User, Settings, LogOut, Menu, X, Users, FileText } from 'lucide-angular';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './sidebar.html'
 })
 export class SidebarComponent {
+  readonly LayoutDashboard = LayoutDashboard;
+  readonly BookOpen = BookOpen;
+  readonly GraduationCap = GraduationCap;
+  readonly Calendar = Calendar;
+  readonly FolderOpen = FolderOpen;
+  readonly User = User;
+  readonly Settings = Settings;
+  readonly LogOut = LogOut;
+  readonly Menu = Menu;
+  readonly X = X;
+  readonly Users = Users;
+  readonly FileText = FileText;
+
   @Input() userName = '';
   @Input() userRole = '';
   @Input() currentPage = 'dashboard';
@@ -16,21 +31,31 @@ export class SidebarComponent {
   @Output() onLogout = new EventEmitter<void>();
 
   menuItems = [
-    { name: 'Dashboard', id: 'dashboard', icon: '📊', roles: ['docente', 'estudiante'] },
-    { name: 'Mis Cursos', id: 'cursos', icon: '📘', roles: ['estudiante'] },
-    { name: 'Estudiantes', id: 'estudiantes', icon: '🎓', roles: ['docente'] },
-    { name: 'Tutorías', id: 'tutorias', icon: '📅', roles: ['docente', 'estudiante'] },
-    { name: 'Recursos', id: 'recursos', icon: '📖', roles: ['docente', 'estudiante'] },
-    { name: 'Mi Perfil', id: 'perfil', icon: '⚙️', roles: ['estudiante'] },
-    { name: 'Gestión Docente', id: 'gestion', icon: '⚙️', roles: ['docente'] },
+    { name: 'Dashboard', id: 'admin', icon: LayoutDashboard, roles: [UserRole.ADMIN] },
+    { name: 'Dashboard', id: 'dashboard', icon: LayoutDashboard, roles: [UserRole.DOCENTE, UserRole.ESTUDIANTE] },
+
+    { name: 'Mis Cursos', id: 'cursos', icon: BookOpen, roles: [UserRole.ESTUDIANTE] },
+    { name: 'Cursos Asignados', id: 'cursos', icon: BookOpen, roles: [UserRole.DOCENTE] },
+    { name: 'Estudiantes', id: 'estudiantes', icon: GraduationCap, roles: [UserRole.DOCENTE] },
+    { name: 'Tutorías', id: 'tutorias', icon: Calendar, roles: [UserRole.DOCENTE, UserRole.ESTUDIANTE] },
+    { name: 'Recursos', id: 'recursos', icon: FolderOpen, roles: [UserRole.DOCENTE, UserRole.ESTUDIANTE] },
+    { name: 'Mi Perfil', id: 'perfil', icon: User, roles: [UserRole.ESTUDIANTE] },
+    { name: 'Gestión Docente', id: 'gestion', icon: Settings, roles: [UserRole.DOCENTE] },
+
+    { name: 'Gestión Cuentas', id: 'admin/estudiantes', icon: Users, roles: [UserRole.ADMIN] },
+    { name: 'Control Cursos', id: 'admin/cursos', icon: BookOpen, roles: [UserRole.ADMIN] },
+    { name: 'Matrículas', id: 'admin/matriculas', icon: GraduationCap, roles: [UserRole.ADMIN] },
+    { name: 'Reportes', id: 'admin/reportes', icon: FileText, roles: [UserRole.ADMIN] },
+    { name: 'Configuración', id: 'admin/configuracion', icon: Settings, roles: [UserRole.ADMIN] }
   ];
 
-  constructor(private router: Router) { }
-  
+  constructor(private router: Router, private roleService: RoleService) { }
+
   isMenuOpen = false;
 
   get filteredMenu() {
-    return this.menuItems.filter(item => item.roles.includes(this.userRole));
+    const normalizedRole = this.roleService.normalizeRole(this.userRole);
+    return this.menuItems.filter(item => item.roles.includes(normalizedRole as UserRole));
   }
 
   getInitials(name: string): string {
@@ -42,9 +67,14 @@ export class SidebarComponent {
   }
 
   changePage(id: string) {
-    this.currentPage = id; 
-    this.setPage.emit(id); 
-    this.router.navigate([`/${id}`]); 
+    this.currentPage = id;
+    this.setPage.emit(id);
+
+    if (id.startsWith('admin')) {
+      this.router.navigate(['/admin']);
+    } else {
+      this.router.navigate([`/${id}`]);
+    }
   }
 
   logout() {
@@ -54,5 +84,4 @@ export class SidebarComponent {
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
   }
-
 }

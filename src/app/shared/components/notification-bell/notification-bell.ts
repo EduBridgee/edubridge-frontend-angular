@@ -1,37 +1,67 @@
 import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { RoleService } from '../../../core/services/role';
+import { LucideAngularModule, Bell, AlertTriangle, FileText, FolderOpen, Sparkles, Volume2, Check } from 'lucide-angular';
+import { API_BASE_URL } from '../../../core/config/api.config';
 
 @Component({
   selector: 'app-notification-bell',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './notification-bell.html',
   styleUrl: './notification-bell.css'
 })
 export class NotificationBellComponent implements OnInit, OnDestroy, OnChanges {
+  readonly Bell = Bell;
+  readonly AlertTriangle = AlertTriangle;
+  readonly FileText = FileText;
+  readonly FolderOpen = FolderOpen;
+  readonly Sparkles = Sparkles;
+  readonly Volume2 = Volume2;
+  readonly Check = Check;
+
   @Input() user: any;
-  
+
   notifications: any[] = [];
   isOpen = false;
-  private intervalId: any;
-  private readonly API_URL = 'https://edubridge-backend-v2.onrender.com/api/notifications';
+  private intervalId: ReturnType<typeof setInterval> | null = null;
+  private readonly API_URL = `${API_BASE_URL}/notifications`;
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+  
+  private isFetching = false;
+
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private roleService: RoleService
+  ) { }
 
   ngOnInit() {
     this.checkAndFetch();
-    this.intervalId = setInterval(() => this.fetchNotifications(), 30000);
+    if (!this.intervalId) {
+      
+      this.intervalId = setInterval(() => this.fetchNotifications(), 30000);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    
     if (changes['user'] && changes['user'].currentValue) {
-      this.checkAndFetch();
+      const prevId = changes['user'].previousValue?.id;
+      const currId = changes['user'].currentValue?.id;
+
+      if (currId !== prevId) {
+        this.checkAndFetch();
+      }
     }
   }
 
   ngOnDestroy() {
-    if (this.intervalId) clearInterval(this.intervalId);
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
   }
 
   private checkAndFetch() {
@@ -39,22 +69,48 @@ export class NotificationBellComponent implements OnInit, OnDestroy, OnChanges {
       this.user = JSON.parse(localStorage.getItem('user') || '{}');
     }
 
-    if (this.user && this.user.id) {
+    if ((this.user && this.user.id) || localStorage.getItem('user_id')) {
       this.fetchNotifications();
     }
   }
 
   fetchNotifications() {
-    if (!this.user || !this.user.id) return;
+    
+    if (this.isFetching) return;
 
-    this.http.get<any[]>(`${this.API_URL}/student/${this.user.id}`)
-      .subscribe({
-        next: (data) => {
-          this.notifications = data.filter(n => !n.read).reverse();
+    const studentId = this.user?.id || localStorage.getItem('user_id');
+
+    if (!studentId) {
+      this.notifications = [];
+      return;
+    }
+
+    this.isFetching = true;
+
+    const token = localStorage.getItem('token') || localStorage.getItem('jwt') || localStorage.getItem('access_token');
+    const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
+
+    this.http.get<any[]>(`${this.API_URL}/student/${studentId}`, options).subscribe({
+      next: (data) => {
+        this.notifications = data || [];
+
+
+
+        
+        setTimeout(() => {
+          this.isFetching = false;
           this.cdr.detectChanges();
-        },
-        error: (err) => console.error("Error EduBridge Notifs:", err)
-      });
+        });
+      },
+      error: (err) => {
+        console.error("Error al recuperar las alertas del alumno desde el servidor:", err);
+        this.notifications = [];
+        setTimeout(() => {
+          this.isFetching = false;
+          this.cdr.detectChanges();
+        });
+      }
+    });
   }
 
   toggleDropdown() {
@@ -63,7 +119,10 @@ export class NotificationBellComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   confirmarLectura(id: number) {
-    this.http.patch(`${this.API_URL}/${id}/read`, {})
+    const token = localStorage.getItem('token') || localStorage.getItem('jwt') || localStorage.getItem('access_token');
+    const options = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
+
+    this.http.patch(`${this.API_URL}/${id}/read`, {}, options)
       .subscribe({
         next: () => {
           this.notifications = this.notifications.filter(n => n.id !== id);
