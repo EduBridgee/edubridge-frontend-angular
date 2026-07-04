@@ -24,7 +24,7 @@ export class StudentProfileComponent implements OnInit {
   showEditModal: boolean = false;
   editingStudent: any = {};
   newGrade = { courseId: null, value: null };
-  
+
   academicHistory = [
     {
       period: "2024-I",
@@ -105,7 +105,7 @@ export class StudentProfileComponent implements OnInit {
 
 
   filtrarAlumnos() {
-    this.filteredStudents = this.students.filter(s => 
+    this.filteredStudents = this.students.filter(s =>
       s.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
       (s.code && s.code.toLowerCase().includes(this.searchTerm.toLowerCase()))
     );
@@ -164,7 +164,7 @@ export class StudentProfileComponent implements OnInit {
       next: () => {
         alert("Nota sincronizada correctamente.");
         this.newGrade = { courseId: null, value: null };
-        this.cargarEstudiantes(); 
+        this.cargarEstudiantes();
       },
       error: (err) => console.error("Error al registrar nota", err)
     });

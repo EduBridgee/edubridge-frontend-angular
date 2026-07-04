@@ -1111,7 +1111,7 @@
 }
 .secret-key-val {
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-      "Courier New", monospace);
+  "Courier New", monospace);
   font-size: var(--text-xs, 0.75rem);
   line-height: var(--tw-leading, var(--text-xs--line-height, calc(1 / 0.75)));
   --tw-font-weight: var(--font-weight-bold, 700);
@@ -1580,8 +1580,63 @@
       --tw-backdrop-opacity: initial;
       --tw-backdrop-saturate: initial;
       --tw-backdrop-sepia: initial;
-      --tw-border-spacing-x: 0;
-      --tw-border-spacing-y: 0;
     }
   }
 }
+
+/* US22: Exportation of grades report buttons styles */
+.profile-export-buttons-group {
+  display: flex;
+  gap: calc(var(--spacing, 0.25rem) * 2.5);
+  align-items: center;
+}
+
+.btn-export-csv, .btn-export-pdf {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing, 0.25rem) * 1.5);
+  border-radius: var(--radius-xl, 0.75rem);
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+  padding-inline: calc(var(--spacing, 0.25rem) * 4);
+  padding-block: calc(var(--spacing, 0.25rem) * 2);
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-bold, 700);
+  font-weight: var(--font-weight-bold, 700);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider, 0.05em);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-export-csv {
+  border-color: var(--color-slate-100, oklch(96.8% 0.007 247.896));
+  background-color: var(--color-white, #fff);
+  color: var(--color-slate-600, oklch(44.6% 0.043 257.281));
+  --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+
+.btn-export-csv:hover {
+  background-color: var(--color-slate-50, oklch(98.4% 0.003 247.858));
+  border-color: var(--color-slate-200, oklch(92.4% 0.012 255.785));
+  color: var(--color-slate-800, oklch(27.9% 0.041 260.031));
+}
+
+.btn-export-pdf {
+  border-color: rgba(79, 70, 229, 0.2);
+  background-color: rgba(79, 70, 229, 0.05);
+  color: #4f46e5;
+  --tw-shadow: 0 1px 3px 0 rgba(79, 70, 229, 0.1);
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+
+.btn-export-pdf:hover {
+  background-color: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+  --tw-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2), 0 4px 6px -4px rgba(79, 70, 229, 0.2);
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  transform: translateY(-1px);
+}
+
